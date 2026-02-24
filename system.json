@@ -1,0 +1,36 @@
+{
+  "id": "gundog",
+  "title": "GUNDOG TRPG",
+  "description": "Unofficial GUNDOG TRPG system for Foundry VTT",
+  "version": "0.1.0",
+  "authors": [
+    {
+      "name": "Your Name"
+    }
+  ],
+  "compatibility": {
+    "minimum": 13,
+    "verified": 13
+  },
+  "esmodules": [
+    "gundog.js"
+  ],
+  "styles": [
+    "gundog.css"
+  ],
+  "languages": [
+    {
+      "lang": "ko",
+      "name": "한국어",
+      "path": "lang/ko.json"
+    }
+  ],
+      "grid": {
+        "distance": 2,
+        "units": "m",
+        "type": 1,
+        "diagonals": 0
+    },
+  "packs": [],
+  "socket": false
+}

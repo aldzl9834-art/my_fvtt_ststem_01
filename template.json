@@ -1,0 +1,39 @@
+{
+"Actor": {
+  "types": ["gundog" , "character"],
+  "gundog": {
+  "attributes": {
+    "str": {
+    "value": 5,
+    "bonus": 0,
+    "penalty": 0
+  },
+  "dex": {
+    "value": 5,
+    "bonus": 0,
+    "penalty": 0
+  },
+  "handgun": {
+    "lv": 0,
+    "bonus": 0,
+    "penalty": 0
+  },
+    "con": { "value": 50, "bonus": 0, "penalty": 0 }
+  },
+  "class": {
+    "main": ["assault_main" , "scout_main"],
+    "sub": ["assault_sub" , "scout_main"]
+}}
+},
+"Item": {
+  "types": ["item"],
+  "htmlFields": ["description"],
+  "item": {
+    "description": "",
+    "quantity": 1,
+    "weight": 0,
+    "attributes": {},
+    "groups": {}
+  }
+}
+}

@@ -1,0 +1,118 @@
+<form class="gundog-sheet" autocomplete="off">
+
+  <h1>GUNDOG 캐릭터 시트</h1>
+  <input class="input--title" name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+
+  <div class="class-row">
+  <label>Main Class</label>
+  <select name="system.class.main">
+    {{#select system.class.main}}
+      <option value="assault_main">Assault</option>
+      <option value="scout_main">Scout</option>
+    {{/select}}
+  </select>
+</div>
+
+<div class="class-row">
+  <label>Sub Class</label>
+  <select name="system.class.sub">
+    {{#select system.class.sub}}
+      <option value="assault_sub">Assault</option>
+      <option value="scout_sub">Scout</option>
+    {{/select}}
+  </select>
+</div>
+
+<div class="stat-row">
+  <label>STR</label>
+
+  <input type="number"
+         value="{{total.str}}"
+         disabled />
+
+  <button type="button"
+          class="roll-d100"
+          data-attribute="str"
+          data-label="근력 판정">
+    🎲
+  </button>
+</div>
+  {{!-- STR --}}
+  <div class="stat-row">
+    <label>STR</label>
+
+    <input type="number"
+       value="{{total.str}}"
+       disabled />
+
+    <span>+</span>
+    <input type="number"
+           name="system.attributes.str.bonus"
+           value="{{system.attributes.str.bonus}}" />
+
+    <span>-</span>
+    <input type="number"
+           name="system.attributes.str.penalty"
+           value="{{system.attributes.str.penalty}}" />
+
+    <button type="button"
+            class="roll-d100"
+            data-attribute="str"
+            data-label="근력 판정">
+      🎲
+    </button>
+  </div>
+
+  {{!-- DEX --}}
+  <div class="stat-row">
+    <label>DEX</label>
+
+    <input type="number"
+           name="system.attributes.dex.value"
+           value="{{system.attributes.dex.value}}" />
+
+    <span>+</span>
+    <input type="number"
+           name="system.attributes.dex.bonus"
+           value="{{system.attributes.dex.bonus}}" />
+
+    <span>-</span>
+    <input type="number"
+           name="system.attributes.dex.penalty"
+           value="{{system.attributes.dex.penalty}}" />
+
+    <button type="button"
+            class="roll-d100"
+            data-attribute="dex"
+            data-label="민첩 판정">
+      🎲
+    </button>
+  </div>
+
+  {{!-- CON --}}
+  <div class="stat-row">
+    <label>CON</label>
+
+    <input type="number"
+           name="system.attributes.con.value"
+           value="{{system.attributes.con.value}}" />
+
+    <span>+</span>
+    <input type="number"
+           name="system.attributes.con.bonus"
+           value="{{system.attributes.con.bonus}}" />
+
+    <span>-</span>
+    <input type="number"
+           name="system.attributes.con.penalty"
+           value="{{system.attributes.con.penalty}}" />
+
+    <button type="button"
+            class="roll-d100"
+            data-attribute="con"
+            data-label="체력 판정">
+      🎲
+    </button>
+  </div>
+</div>
+</form>
