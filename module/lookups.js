@@ -79,4 +79,25 @@ GUNDOG.classes = {
     groupBonuses: {},
     specialties: []
   }
+},
+// module/lookups.js 기존 GUNDOG.classes 아래에 추가
+
+/**
+ * 스킬별 주 능력치(primary)와 부 능력치(secondary) 매핑
+ * 값은 template.json에 정의한 capabilities의 key 값과 동일해야 합니다.
+ * (physical, dexterity, quickness, intelligence, sense, charisma, constitution, appearance)
+ */
+GUNDOG.skillAttributes = {
+  // 사격계
+  handgun: { primary: "dexterity", secondary: "sense" },
+  smg: { primary: "dexterity", secondary: "quickness" },
+  rifle: { primary: "sense", secondary: "dexterity" },
+  heavyWeaponry: { primary: "physical", secondary: "sense" },
+  sniping: { primary: "sense", secondary: "intelligence" },
+  
+  // 기술계 (전문분야 예시)
+  mechanics: { primary: "intelligence", secondary: "dexterity" },
+  medical: { primary: "intelligence", secondary: "sense" },
+  
+  // ... 나머지 30개 스킬에 대해서도 동일하게 작성 (생략)
 };

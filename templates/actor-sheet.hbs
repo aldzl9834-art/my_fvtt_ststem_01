@@ -1,3 +1,40 @@
+<div class="skills-container">
+  {{#each system.skills as |group groupKey|}}
+    <div class="skill-group">
+      <h3>{{groupKey}} (사격계, 격투계 등 번역값 연결)</h3>
+      
+      <div class="skill-list">
+        {{#each group as |skill skillKey|}}
+          <div class="skill-row flexrow">
+            <div class="skill-name">{{skillKey}}</div>
+            
+            <div class="skill-lv">
+              <label>Lv</label>
+              <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.lv" value="{{skill.lv}}" data-dtype="Number"/>
+            </div>
+
+            <div class="skill-mod">
+              <label>Mod</label>
+              <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.mod" value="{{skill.mod}}" data-dtype="Number"/>
+            </div>
+
+            <div class="skill-target-value">
+              <span>목표값: <strong>{{skill.targetValue}}</strong></span>
+            </div>
+            
+            <button class="roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}">
+              <i class="fas fa-dice-d10"></i> 굴림
+            </button>
+          </div>
+        {{/each}}
+      </div>
+      
+    </div>
+  {{/each}}
+</div>
+
+<!-- 주석시작
+
 <form class="gundog-sheet" autocomplete="off">
 
   <h1>GUNDOG 캐릭터 시트</h1>
@@ -116,3 +153,5 @@
   </div>
 </div>
 </form>
+
+주석 끝 -->
