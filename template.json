@@ -1,39 +1,107 @@
 {
-"Actor": {
-  "types": ["gundog" , "character"],
-  "gundog": {
-  "attributes": {
-    "str": {
-    "value": 5,
-    "bonus": 0,
-    "penalty": 0
+  "Actor": {
+    "types": ["character", "vehicle"],
+    "templates": {
+      "capabilities": {
+        "capabilities": {
+          "physical": { "value": 0, "mod": 0, "exp": 0 },
+          "dexterity": { "value": 0, "mod": 0, "exp": 0 },
+          "quickness": { "value": 0, "mod": 0, "exp": 0 },
+          "intelligence": { "value": 0, "mod": 0, "exp": 0 },
+          "sense": { "value": 0, "mod": 0, "exp": 0 },
+          "charisma": { "value": 0, "mod": 0, "exp": 0 },
+          "constitution": { "value": 0, "mod": 0, "exp": 0 },
+          "appearance": { "value": 0, "mod": 0, "exp": 0 }
+        }
+      },
+      "skills": {
+        "skills": {
+          "shooting": {
+            "handgun": { "lv": 0, "value": 0, "mod": 0 },
+            "smg": { "lv": 0, "value": 0, "mod": 0 },
+            "rifle": { "lv": 0, "value": 0, "mod": 0 },
+            "heavyWeaponry": { "lv": 0, "value": 0, "mod": 0 },
+            "sniping": { "lv": 0, "value": 0, "mod": 0 }
+          },
+          "fighting": {
+            "fighting": { "lv": 0, "value": 0, "mod": 0 },
+            "meleeCombat": { "lv": 0, "value": 0, "mod": 0 },
+            "throwing": { "lv": 0, "value": 0, "mod": 0 },
+            "toughness": { "lv": 0, "value": 0, "mod": 0 }
+          },
+          "negotiation": {
+            "negotiation": { "lv": 0, "value": 0, "mod": 0 },
+            "psychology": { "lv": 0, "value": 0, "mod": 0 },
+            "procurement": { "lv": 0, "value": 0, "mod": 0 }
+          },
+          "exercise": {
+            "athletics": { "lv": 0, "value": 0, "mod": 0 },
+            "urbanAction": { "lv": 0, "value": 0, "mod": 0 },
+            "fieldcraft": { "lv": 0, "value": 0, "mod": 0 }
+          },
+          "generalEducation": {
+            "tactics": { "lv": 0, "value": 0, "mod": 0 },
+            "dataProcessing": { "lv": 0, "value": 0, "mod": 0, "isSpecialty": true },
+            "survival": { "lv": 0, "value": 0, "mod": 0 },
+            "knowledge": { "lv": 0, "value": 0, "mod": 0 },
+            "language": { "lv": 0, "value": 0, "mod": 0 },
+            "art": { "lv": 0, "value": 0, "mod": 0 }
+          },
+          "perception": {
+            "situationalAwareness": { "lv": 0, "value": 0, "mod": 0 },
+            "detection": { "lv": 0, "value": 0, "mod": 0 },
+            "willpower": { "lv": 0, "value": 0, "mod": 0 }
+          },
+          "expertise": {
+            "sleightOfHand": { "lv": 0, "value": 0, "mod": 0 },
+            "mechanics": { "lv": 0, "value": 0, "mod": 0, "isSpecialty": true },
+            "explosives": { "lv": 0, "value": 0, "mod": 0, "isSpecialty": true },
+            "medical": { "lv": 0, "value": 0, "mod": 0, "isSpecialty": true },
+            "communications": { "lv": 0, "value": 0, "mod": 0, "isSpecialty": true },
+            "piloting": { "lv": 0, "value": 0, "mod": 0 }
+          }
+        }
+      },
+      "profile": {
+        "profile": {
+          "hp": { "value": 0, "max": 0 },
+          "exp": { "current": 0, "total": 0 },
+          "rewardPoints": 0,
+          "movement": {
+            "careful": 0,
+            "normal": 0,
+            "sprint": 0
+          },
+          "age": 0,
+          "height": 0,
+          "weight": 0,
+          "characterName": "",
+          "nationality": "",
+          "occupation": "",
+          "affiliation": "",
+          "gender": "",
+          "bloodType": "",
+          "languages": "",
+          "career": "",
+          "bonusSkill": "",
+          "mainClass": "",
+          "subClass": ""
+        }
+      }
+    },
+    "character": {
+      "templates": [
+        "capabilities",
+        "skills",
+        "profile"
+      ]
+    },
+    "vehicle": {
+      "templates": []
+    }
   },
-  "dex": {
-    "value": 5,
-    "bonus": 0,
-    "penalty": 0
-  },
-  "handgun": {
-    "lv": 0,
-    "bonus": 0,
-    "penalty": 0
-  },
-    "con": { "value": 50, "bonus": 0, "penalty": 0 }
-  },
-  "class": {
-    "main": ["assault_main" , "scout_main"],
-    "sub": ["assault_sub" , "scout_main"]
-}}
-},
-"Item": {
-  "types": ["item"],
-  "htmlFields": ["description"],
-  "item": {
-    "description": "",
-    "quantity": 1,
-    "weight": 0,
-    "attributes": {},
-    "groups": {}
+  "Item": {
+    "types": [],
+    "templates": {}
   }
-}
 }
