@@ -1,157 +1,111 @@
-<div class="skills-container">
-  {{#each system.skills as |group groupKey|}}
-    <div class="skill-group">
-      <h3>{{groupKey}} (사격계, 격투계 등 번역값 연결)</h3>
-      
-      <div class="skill-list">
-        {{#each group as |skill skillKey|}}
-          <div class="skill-row flexrow">
-            <div class="skill-name">{{skillKey}}</div>
-            
-            <div class="skill-lv">
-              <label>Lv</label>
-              <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.lv" value="{{skill.lv}}" data-dtype="Number"/>
-            </div>
-
-            <div class="skill-mod">
-              <label>Mod</label>
-              <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.mod" value="{{skill.mod}}" data-dtype="Number"/>
-            </div>
-
-            <div class="skill-target-value">
-              <span>목표값: <strong>{{skill.targetValue}}</strong></span>
-            </div>
-            
-            <button class="roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}">
-              <i class="fas fa-dice-d10"></i> 굴림
-            </button>
-          </div>
-        {{/each}}
-      </div>
-      
-    </div>
-  {{/each}}
-</div>
-
-<!-- 주석시작
-
 <form class="gundog-sheet" autocomplete="off">
+  
+  <header class="sheet-header">
+    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+    <div class="header-fields">
+      <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="캐릭터 이름"/></h1>
+      
+      <div class="class-select" style="margin-top: 10px;">
+        <label>Main Class:</label>
+        <select name="system.profile.mainClass">
+          <option value="">-- 선택 --</option>
+          {{#each gundogClasses as |classData key|}}
+            <option value="{{key}}" {{#if (eq ../system.profile.mainClass key)}}selected{{/if}}>{{classData.label}}</option>
+          {{/each}}
+        </select>
+        
+        <label style="margin-left:15px;">Sub Class:</label>
+        <select name="system.profile.subClass">
+          <option value="">-- 선택 --</option>
+          {{#each gundogClasses as |classData key|}}
+            <option value="{{key}}" {{#if (eq ../system.profile.subClass key)}}selected{{/if}}>{{classData.label}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+  </header>
 
-  <h1>GUNDOG 캐릭터 시트</h1>
-  <input class="input--title" name="name" type="text" value="{{actor.name}}" placeholder="Name"/>
+  <div class="capabilities-container" style="margin-top:20px;">
+    <h2 style="background:#222; color:white; padding:5px; margin-bottom:10px;">능력치 (Capabilities)</h2>
+    
+    <div class="capabilities-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+      {{#each system.capabilities as |cap key|}}
+        <div class="capability-row flexrow" style="border: 1px solid #ccc; padding: 5px; border-radius: 4px; display: flex; align-items: center; gap: 5px;">
+          
+          <div style="flex:2; font-weight:bold; font-size: 13px;">
+            {{lookup ../capabilityLabels key}}
+          </div>
+          
+          <div style="flex:1; text-align:center;">
+            <div style="font-size:10px; color:#666;">Total</div>
+            <div style="font-size:16px; font-weight:bold; color:#d9534f;">{{cap.total}}</div>
+          </div>
 
-  <div class="class-row">
-  <label>Main Class</label>
-  <select name="system.class.main">
-    {{#select system.class.main}}
-      <option value="assault_main">Assault</option>
-      <option value="scout_main">Scout</option>
-    {{/select}}
-  </select>
-</div>
+          <div style="flex:1;">
+            <label style="font-size:10px; color:#666;">Value</label>
+            <input type="text" name="system.capabilities.{{key}}.value" value="{{cap.value}}" data-dtype="Number" style="width:100%; text-align:center;"/>
+          </div>
 
-<div class="class-row">
-  <label>Sub Class</label>
-  <select name="system.class.sub">
-    {{#select system.class.sub}}
-      <option value="assault_sub">Assault</option>
-      <option value="scout_sub">Scout</option>
-    {{/select}}
-  </select>
-</div>
+          <div style="flex:1;">
+            <label style="font-size:10px; color:#666;">Mod</label>
+            <input type="text" name="system.capabilities.{{key}}.mod" value="{{cap.mod}}" data-dtype="Number" style="width:100%; text-align:center;"/>
+          </div>
 
-<div class="stat-row">
-  <label>STR</label>
-
-  <input type="number"
-         value="{{total.str}}"
-         disabled />
-
-  <button type="button"
-          class="roll-d100"
-          data-attribute="str"
-          data-label="근력 판정">
-    🎲
-  </button>
-</div>
-  {{!-- STR --}}
-  <div class="stat-row">
-    <label>STR</label>
-
-    <input type="number"
-       value="{{total.str}}"
-       disabled />
-
-    <span>+</span>
-    <input type="number"
-           name="system.attributes.str.bonus"
-           value="{{system.attributes.str.bonus}}" />
-
-    <span>-</span>
-    <input type="number"
-           name="system.attributes.str.penalty"
-           value="{{system.attributes.str.penalty}}" />
-
-    <button type="button"
-            class="roll-d100"
-            data-attribute="str"
-            data-label="근력 판정">
-      🎲
-    </button>
+          <div style="flex:1;">
+            <label style="font-size:10px; color:#666;">Exp</label>
+            <input type="text" name="system.capabilities.{{key}}.exp" value="{{cap.exp}}" data-dtype="Number" style="width:100%; text-align:center;"/>
+          </div>
+        </div>
+      {{/each}}
+    </div>
   </div>
 
-  {{!-- DEX --}}
-  <div class="stat-row">
-    <label>DEX</label>
 
-    <input type="number"
-           name="system.attributes.dex.value"
-           value="{{system.attributes.dex.value}}" />
+  <div class="skills-container" style="margin-top:20px;">
+    {{#each system.skills as |group groupKey|}}
+      <div class="skill-group" style="border:1px solid #ccc; margin-bottom: 10px; padding: 5px;">
+        <h3 style="background:#222; color:white; padding:3px; text-transform:uppercase;">{{groupKey}}</h3>
+        
+        <div class="skill-list">
+          {{#each group as |skill skillKey|}}
+            <div class="skill-row flexrow" style="display:flex; gap: 10px; align-items: center; margin-bottom: 5px; font-size: 13px;">
+              
+              <div class="skill-name" style="flex:2;"><strong>{{skillKey}}</strong></div>
+              
+              <div class="skill-lv" style="flex:0.5; text-align:center;">
+                <label style="font-size:10px; color:#666; display:block;">Lv</label>
+                <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.lv" value="{{skill.lv}}" data-dtype="Number" style="width: 100%; text-align:center;"/>
+              </div>
 
-    <span>+</span>
-    <input type="number"
-           name="system.attributes.dex.bonus"
-           value="{{system.attributes.dex.bonus}}" />
+              <div class="skill-bonus" style="flex:0.5; text-align:center;">
+                <label style="font-size:10px; color:#28a745; display:block;">Bonus</label>
+                <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.bonus" value="{{skill.bonus}}" data-dtype="Number" style="width: 100%; text-align:center; border: 1px solid #28a745;"/>
+              </div>
 
-    <span>-</span>
-    <input type="number"
-           name="system.attributes.dex.penalty"
-           value="{{system.attributes.dex.penalty}}" />
+              <div class="skill-penalty" style="flex:0.5; text-align:center;">
+                <label style="font-size:10px; color:#dc3545; display:block;">Penalty</label>
+                <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.penalty" value="{{skill.penalty}}" data-dtype="Number" style="width: 100%; text-align:center; border: 1px solid #dc3545;"/>
+              </div>
 
-    <button type="button"
-            class="roll-d100"
-            data-attribute="dex"
-            data-label="민첩 판정">
-      🎲
-    </button>
+              <div class="skill-item-mod" style="flex:0.5; text-align:center;">
+                <label style="font-size:10px; color:#17a2b8; display:block;">Item</label>
+                <div style="font-weight:bold; color:#17a2b8; padding-top:4px;">{{skill.itemMod}}</div>
+              </div>
+
+              <div class="skill-target-value" style="flex:1.5; text-align:right; padding-right:10px;">
+                <span style="font-size:11px;">목표:</span> <strong style="color:blue; font-size:16px;">{{skill.targetValue}}</strong>
+              </div>
+              
+              <button class="roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}" style="flex:1; cursor:pointer;">
+                <i class="fas fa-dice-d10"></i> 굴림
+              </button>
+            </div>
+          {{/each}}
+        </div>
+          {{/each}}
+        </div>
+      </div>
+    {{/each}}
   </div>
 
-  {{!-- CON --}}
-  <div class="stat-row">
-    <label>CON</label>
-
-    <input type="number"
-           name="system.attributes.con.value"
-           value="{{system.attributes.con.value}}" />
-
-    <span>+</span>
-    <input type="number"
-           name="system.attributes.con.bonus"
-           value="{{system.attributes.con.bonus}}" />
-
-    <span>-</span>
-    <input type="number"
-           name="system.attributes.con.penalty"
-           value="{{system.attributes.con.penalty}}" />
-
-    <button type="button"
-            class="roll-d100"
-            data-attribute="con"
-            data-label="체력 판정">
-      🎲
-    </button>
-  </div>
-</div>
 </form>
-
-주석 끝 -->
