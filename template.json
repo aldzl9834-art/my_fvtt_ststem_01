@@ -72,6 +72,10 @@
             "normal": 0,
             "sprint": 0
           },
+          "wealth": {
+            "bank": 0,
+            "cash": 0
+          },
           "age": 0,
           "height": 0,
           "weight": 0,
