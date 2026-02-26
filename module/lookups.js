@@ -3,7 +3,7 @@
 export const GUNDOG = {};
 
 GUNDOG.classes = {
-  assault: { label: "어설트", groupBonuses: { shooting: 10, fighting: 5 }, specialties: ["explosives"] },
+  assault: { label: "어설트", groupBonuses: { shooting: 30, fighting: 20 }, specialties: ["explosives"] },
   sniper: { label: "스나이퍼", groupBonuses: { shooting: 15, perception: 5 }, specialties: [] },
   grappler: { label: "그래플러", groupBonuses: { fighting: 15, exercise: 5 }, specialties: [] },
   commander: { label: "커맨더", groupBonuses: { negotiation: 10, generalEducation: 10 }, specialties: [] },
