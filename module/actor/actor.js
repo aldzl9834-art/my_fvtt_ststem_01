@@ -71,8 +71,27 @@ export class GundogActor extends Actor {
         // 최종 Mod (보너스 - 페널티 + 아이템 보정치)
         skill.mod = skillBonus - skillPenalty + itemMod;
 
-        // 최종 목표값 계산 (skill.mod 가 통째로 더해집니다)
-        skill.targetValue = (primaryCap * 3) + secondaryCap + (skillLv * 10) + classGroupBonus + skill.mod + specialtyPenalty;
+        let baseCapValue = 0;
+
+        if (groupKey === "shooting") {
+          // 사격계인 경우: 근력 + 재주 + 지력 + 감각
+          let physical = system.capabilities.physical?.total || 0;
+          let dexterity = system.capabilities.dexterity?.total || 0;
+          let intelligence = system.capabilities.intelligence?.total || 0;
+          let sense = system.capabilities.sense?.total || 0;
+          
+          baseCapValue = physical + dexterity + intelligence + sense;
+        } else {
+          // 그 외의 스킬인 경우: (주능력치 * 3) + 부능력치
+          let attrs = GUNDOG.skillAttributes[skillKey] || { primary: "physical", secondary: "physical" };
+          let primaryCap = system.capabilities[attrs.primary]?.total || 0;
+          let secondaryCap = system.capabilities[attrs.secondary]?.total || 0;
+          
+          baseCapValue = (primaryCap * 3) + secondaryCap;
+        }
+
+        // 최종 목표값 계산 (조건문으로 구한 baseCapValue를 적용)
+        skill.targetValue = baseCapValue + (skillLv * 10) + classGroupBonus + skill.mod + specialtyPenalty;
       }
     }
   }
