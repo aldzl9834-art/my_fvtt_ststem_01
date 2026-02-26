@@ -22,18 +22,25 @@ export class GundogActor extends Actor {
       cap.total = (Number(cap.value) || 0) + (Number(cap.mod) || 0);
     }
 
-    // 2. 클래스 데이터 로드
+    // 2. 클래스 데이터 로드 (기본 빈 객체 구조도 변경)
     const mainClassKey = system.profile.mainClass || "";
     const subClassKey = system.profile.subClass || "";
-    const mainClassData = GUNDOG.classes[mainClassKey] || { groupBonuses: {}, specialties: [] };
-    const subClassData = GUNDOG.classes[subClassKey] || { groupBonuses: {}, specialties: [] };
+    
+    // 데이터가 없을 때를 대비한 기본값(Fallback)도 mainBonuses와 subBonuses를 가지도록 변경
+    const defaultClassData = { mainBonuses: {}, subBonuses: {}, specialties: [] };
+    const mainClassData = GUNDOG.classes[mainClassKey] || defaultClassData;
+    const subClassData = GUNDOG.classes[subClassKey] || defaultClassData;
+    
+    // 전문분야 면제 리스트 합치기
     const exemptSpecialties = [...(mainClassData.specialties || []), ...(subClassData.specialties || [])];
 
     // 3. 스킬 목표값 연산
     for (let [groupKey, group] of Object.entries(system.skills)) {
+      
+      // ★ 변경된 부분: 메인 클래스는 mainBonuses, 서브 클래스는 subBonuses에서 보정치를 가져옵니다.
       let classGroupBonus = 
-        (Number(mainClassData.groupBonuses[groupKey]) || 0) + 
-        (Number(subClassData.groupBonuses[groupKey]) || 0);
+        (Number(mainClassData.mainBonuses[groupKey]) || 0) + 
+        (Number(subClassData.subBonuses[groupKey]) || 0);
 
       for (let [skillKey, skill] of Object.entries(group)) {
         let specialtyPenalty = 0;
