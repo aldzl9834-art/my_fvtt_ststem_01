@@ -16,11 +16,21 @@ export class GundogActor extends Actor {
     system.capabilities = system.capabilities || {};
     system.skills = system.skills || {};
     system.profile = system.profile || {};
+    system.profile.hp = system.profile.hp || { value: 0, max: 0 };
+    system.profile.movement = system.profile.movement || { careful: 0, normal: 0, sprint: 0 };
+    system.profile.careers = system.profile.careers || {}; // 경력 안전장치 추가
+    
+    // ★ 추가: 새로 바뀐 구조에 대한 안전장치
+    if (typeof system.profile.rewardPoints !== "object") system.profile.rewardPoints = { current: 0, total: 0 };
+    if (typeof system.profile.languages !== "object") system.profile.languages = { lang1: "", lang2: "", lang3: "", lang4: "", lang5: "", lang6: "" };
 
     // 1. 능력치 계산
     for (let [key, cap] of Object.entries(system.capabilities)) {
       cap.total = (Number(cap.value) || 0) + (Number(cap.mod) || 0);
     }
+
+    // ★ 추가: 경력에서 얻은 스킬 보너스를 저장할 임시 객체
+    let careerSkillBonuses = {};
 
     // 2. 클래스 데이터 로드 (기본 빈 객체 구조도 변경)
     const mainClassKey = system.profile.mainClass || "";
@@ -94,5 +104,25 @@ export class GundogActor extends Actor {
         skill.targetValue = baseCapValue + (skillLv * 10) + classGroupBonus + skill.mod + specialtyPenalty;
       }
     }
+
+    // ==========================================
+    // ★ 4. 내구력(HP) 및 이동력(Movement) 연산 추가 ★
+    // ==========================================
+    
+    // [내구력 계산] (근력 + 체격) * 3 + (터프니스 갯수 * 5)
+    let physicalTotal = system.capabilities.physical?.total || 0;
+    let constitutionTotal = system.capabilities.constitution?.total || 0;
+    let toughnessArtsCount = 0; // TODO: 추후 클래스 아츠 구현 시 연동할 변수 공간
+    
+    system.profile.hp.max = ((physicalTotal + constitutionTotal) * 3) + (toughnessArtsCount * 5);
+
+    // [이동력 계산] Mobility = 민첩 + athletics(운동) Lv
+    let quicknessTotal = system.capabilities.quickness?.total || 0;
+    let athleticsLv = Number(system.skills.exercise?.athletics?.lv) || 0;
+    let mobility = quicknessTotal + athleticsLv;
+
+    system.profile.movement.careful = Math.ceil(mobility / 2); // 소수점 올림
+    system.profile.movement.normal = mobility;
+    system.profile.movement.sprint = (mobility * 2) + 20;
   }
 }

@@ -1,109 +1,213 @@
 <form class="gundog-sheet" autocomplete="off">
   
-  <header class="sheet-header">
-    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
-    <div class="header-fields">
-      <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="캐릭터 이름"/></h1>
+  <header class="sheet-header" style="display:flex; gap: 15px; margin-bottom: 10px;">
+    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="140" width="140" style="border: 2px solid #000; object-fit: cover;"/>
+    
+    <div class="header-fields" style="flex: 1; display:flex; flex-direction:column; gap:8px;">
       
-      <div class="class-select" style="margin-top: 10px;">
-        <label>Main Class:</label>
-        <select name="system.profile.mainClass">
-          <option value="">-- 선택 --</option>
-          {{#each gundogClasses as |classData key|}}
-            <option value="{{key}}" {{#if (eq ../system.profile.mainClass key)}}selected{{/if}}>{{classData.label}}</option>
-          {{/each}}
-        </select>
-        
-        <label style="margin-left:15px;">Sub Class:</label>
-        <select name="system.profile.subClass">
-          <option value="">-- 선택 --</option>
-          {{#each gundogClasses as |classData key|}}
-            <option value="{{key}}" {{#if (eq ../system.profile.subClass key)}}selected{{/if}}>{{classData.label}}</option>
-          {{/each}}
-        </select>
+      <div style="display:flex; gap:10px; align-items:flex-end;">
+        <h1 class="charname" style="flex:1; margin:0; border-bottom:2px solid #222;">
+          <input name="name" type="text" value="{{actor.name}}" placeholder="캐릭터 이름" style="font-weight:bold;"/>
+        </h1>
+        <div style="flex:1; display:flex; gap:10px;">
+          <div style="flex:1;"><label style="font-size:11px; color:#666; font-weight:bold;">Main Class</label><select name="system.profile.mainClass" style="width:100%;"><option value="">-- 선택 --</option>{{#each gundogClasses as |classData key|}}<option value="{{key}}" {{#if (eq ../system.profile.mainClass key)}}selected{{/if}}>{{classData.label}}</option>{{/each}}</select></div>
+          <div style="flex:1;"><label style="font-size:11px; color:#666; font-weight:bold;">Sub Class</label><select name="system.profile.subClass" style="width:100%;"><option value="">-- 선택 --</option>{{#each gundogClasses as |classData key|}}<option value="{{key}}" {{#if (eq ../system.profile.subClass key)}}selected{{/if}}>{{classData.label}}</option>{{/each}}</select></div>
+        </div>
       </div>
+
+      <div style="display:flex; gap:10px; background:#f4f4f4; padding:8px 10px; border-radius:4px; border:1px solid #ddd;">
+        <div style="flex:1;">
+          <label style="font-weight:bold; color:#d9534f; font-size:13px;"><i class="fas fa-heart"></i> 내구력 (HP)</label>
+          <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
+            <input type="text" name="system.profile.hp.value" value="{{system.profile.hp.value}}" data-dtype="Number" style="width:40px; height:24px; text-align:center; font-size:14px; font-weight:bold;"/>
+            <span style="font-size:14px; color:#555;">/</span>
+            <span style="font-size:16px; font-weight:bold; color:#d9534f; padding:0 5px;">{{system.profile.hp.max}}</span>
+          </div>
+        </div>
+        
+        <div style="flex:1.5;">
+          <label style="font-weight:bold; color:#0056b3; font-size:13px;"><i class="fas fa-running"></i> 이동력</label>
+          <div style="display:flex; justify-content:space-around; margin-top:2px; text-align:center;">
+            <div><span style="font-size:10px; color:#666;">신중</span><br><span style="font-size:14px; font-weight:bold;">{{system.profile.movement.careful}}</span></div>
+            <div><span style="font-size:10px; color:#666;">일반</span><br><span style="font-size:14px; font-weight:bold; color:#0056b3;">{{system.profile.movement.normal}}</span></div>
+            <div><span style="font-size:10px; color:#666;">전력질주</span><br><span style="font-size:14px; font-weight:bold;">{{system.profile.movement.sprint}}</span></div>
+          </div>
+        </div>
+
+        <div style="flex:0.8;">
+          <label style="font-weight:bold; color:#17a2b8; font-size:13px;"><i class="fas fa-star"></i> 리워드 포인트</label>
+          <div style="display:flex; align-items:center; justify-content:center; gap:5px; margin-top:2px;">
+            <input type="text" name="system.profile.rewardPoints.current" value="{{system.profile.rewardPoints.current}}" data-dtype="Number" style="width:35px; height:24px; text-align:center; font-weight:bold;"/>
+            <span style="font-size:12px; color:#555;">/</span>
+            <input type="text" name="system.profile.rewardPoints.total" value="{{system.profile.rewardPoints.total}}" data-dtype="Number" style="width:35px; height:24px; text-align:center;"/>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; background:#e9ecef; padding:6px 10px; border-radius:4px; border:1px solid #ccc; font-size:11px;">
+        <div style="flex:1;">
+          <label style="font-weight:bold; color:#333;">EXP (현재/누적)</label>
+          <div style="display:flex; gap:2px; align-items:center; margin-top:2px;">
+            <input type="text" name="system.profile.exp.current" value="{{system.profile.exp.current}}" data-dtype="Number" style="width:35px; height:20px; text-align:center;"/> /
+            <input type="text" name="system.profile.exp.total" value="{{system.profile.exp.total}}" data-dtype="Number" style="width:35px; height:20px; text-align:center;"/>
+          </div>
+        </div>
+
+        <div style="flex:0.8;">
+          <label style="font-weight:bold; color:#333;">현금 (Cash)</label>
+          <input type="text" name="system.profile.wealth.cash" value="{{system.profile.wealth.cash}}" data-dtype="Number" style="width:100%; height:20px; text-align:center; margin-top:2px;"/>
+        </div>
+
+        <div style="flex:1;">
+          <label style="font-weight:bold; color:#333;">소속</label>
+          <div style="display:flex; gap:4px; align-items:center; margin-top:2px;">
+            <select name="system.profile.affiliation" class="affiliation-select" disabled style="flex:1; height:20px; font-size:11px; background:#f0f0f0; cursor:not-allowed;">
+              <option value="">-- 선택 --</option>
+              {{#each gundogAffiliations as |label key|}}
+                <option value="{{key}}" {{#if (eq ../system.profile.affiliation key)}}selected{{/if}}>{{label}}</option>
+              {{/each}}
+            </select>
+            <a class="toggle-affiliation" style="font-size:11px; color:#dc3545; cursor:pointer;" title="수정하려면 클릭하세요"><i class="fas fa-lock"></i></a>
+          </div>
+        </div>
+
+        <div style="flex:1.5;">
+          <label style="font-weight:bold; color:#333;">사용 언어 (최대 6개)</label>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px; margin-top:2px;">
+            <input type="text" name="system.profile.languages.lang1" value="{{system.profile.languages.lang1}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang2" value="{{system.profile.languages.lang2}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang3" value="{{system.profile.languages.lang3}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang4" value="{{system.profile.languages.lang4}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang5" value="{{system.profile.languages.lang5}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang6" value="{{system.profile.languages.lang6}}" style="height:18px; text-align:center; font-size:10px;"/>
+          </div>
+        </div>
+      </div>
+
     </div>
   </header>
 
-  <div class="capabilities-container" style="margin-top:20px;">
-    <h2 style="background:#222; color:white; padding:5px; margin-bottom:10px;">능력치 (Capabilities)</h2>
-    
-    <div class="capabilities-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+  <div class="capabilities-container" style="margin-bottom: 15px;">
+    <h2 style="background:#222; color:white; padding:4px 8px; margin:0 0 8px 0; font-size: 13px;">능력치 (Capabilities)</h2>
+    <div class="capabilities-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
       {{#each system.capabilities as |cap key|}}
-        <div class="capability-row flexrow" style="border: 1px solid #ccc; padding: 5px; border-radius: 4px; display: flex; align-items: center; gap: 5px;">
-          
-          <div style="flex:2; font-weight:bold; font-size: 13px;">
-            {{lookup ../capabilityLabels key}}
+        <div class="capability-row" style="border: 1px solid #ccc; padding: 4px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; background: #f9f9f9;">
+          <div style="font-weight:bold; font-size: 11px; margin-bottom: 4px;">{{lookup ../capabilityLabels key}}</div>
+          <div style="display: flex; gap: 3px; width: 100%; text-align: center;">
+            <div style="flex:1;"><label style="font-size:9px; color:#666;">Val</label><input type="text" name="system.capabilities.{{key}}.value" value="{{cap.value}}" data-dtype="Number" style="height:20px; text-align:center; font-size:11px;"/></div>
+            <div style="flex:1;"><label style="font-size:9px; color:#666;">Mod</label><input type="text" name="system.capabilities.{{key}}.mod" value="{{cap.mod}}" data-dtype="Number" style="height:20px; text-align:center; font-size:11px;"/></div>
+            <div style="flex:1;"><label style="font-size:9px; color:#666;">Exp</label><input type="text" name="system.capabilities.{{key}}.exp" value="{{cap.exp}}" data-dtype="Number" style="height:20px; text-align:center; font-size:11px;"/></div>
           </div>
-          
-          <div style="flex:1; text-align:center;">
-            <div style="font-size:10px; color:#666;">Total</div>
-            <div style="font-size:16px; font-weight:bold; color:#d9534f;">{{cap.total}}</div>
-          </div>
-
-          <div style="flex:1;">
-            <label style="font-size:10px; color:#666;">Value</label>
-            <input type="text" name="system.capabilities.{{key}}.value" value="{{cap.value}}" data-dtype="Number" style="width:100%; text-align:center;"/>
-          </div>
-
-          <div style="flex:1;">
-            <label style="font-size:10px; color:#666;">Mod</label>
-            <input type="text" name="system.capabilities.{{key}}.mod" value="{{cap.mod}}" data-dtype="Number" style="width:100%; text-align:center;"/>
-          </div>
-
-          <div style="flex:1;">
-            <label style="font-size:10px; color:#666;">Exp</label>
-            <input type="text" name="system.capabilities.{{key}}.exp" value="{{cap.exp}}" data-dtype="Number" style="width:100%; text-align:center;"/>
-          </div>
+          <div style="font-size:13px; font-weight:bold; color:#d9534f; margin-top:4px;">Total: {{cap.total}}</div>
         </div>
       {{/each}}
     </div>
   </div>
 
+  <nav class="sheet-tabs tabs" data-group="primary" style="display:flex; gap: 5px; border-bottom: 2px solid #222; margin-bottom: 10px;">
+    <a class="item" data-tab="profile" style="padding: 5px 15px; font-weight: bold; background: #eee; cursor:pointer;">프로필</a>
+    <a class="item" data-tab="skills" style="padding: 5px 15px; font-weight: bold; background: #eee; cursor:pointer;">스킬</a>
+    <a class="item" data-tab="equipment" style="padding: 5px 15px; font-weight: bold; background: #eee; cursor:pointer;">장비</a>
+    <a class="item" data-tab="items" style="padding: 5px 15px; font-weight: bold; background: #eee; cursor:pointer;">아이템</a>
+    <a class="item" data-tab="class-arts" style="padding: 5px 15px; font-weight: bold; background: #eee; cursor:pointer;">클래스 아츠</a>
+  </nav>
 
-  <div class="skills-container" style="margin-top:20px;">
-    {{#each system.skills as |group groupKey|}}
-      <div class="skill-group" style="border:1px solid #ccc; margin-bottom: 10px; padding: 5px;">
-        <h3 style="background:#222; color:white; padding:3px; text-transform:uppercase;">{{groupKey}}</h3>
+  <section class="sheet-body">
+    
+    <div class="tab profile" data-group="primary" data-tab="profile">
+      <div class="profile-details-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; border:1px solid #ccc; padding:12px; background:#fff; border-radius:4px;">
         
-        <div class="skill-list">
-          {{#each group as |skill skillKey|}}
-            <div class="skill-row flexrow" style="display:flex; gap: 10px; align-items: center; margin-bottom: 5px; font-size: 13px;">
-              
-              <div class="skill-name" style="flex:2;"><strong>{{skillKey}}</strong></div>
-              
-              <div class="skill-lv" style="flex:0.5; text-align:center;">
-                <label style="font-size:10px; color:#666; display:block;">Lv</label>
-                <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.lv" value="{{skill.lv}}" data-dtype="Number" style="width: 100%; text-align:center;"/>
-              </div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">국적</label><input type="text" name="system.profile.nationality" value="{{system.profile.nationality}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">직업</label><input type="text" name="system.profile.occupation" value="{{system.profile.occupation}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">소속 단체</label><input type="text" name="system.profile.affiliation" value="{{system.profile.affiliation}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">성별</label><input type="text" name="system.profile.gender" value="{{system.profile.gender}}" style="height:24px; font-size:12px;"/></div>
 
-              <div class="skill-bonus" style="flex:0.5; text-align:center;">
-                <label style="font-size:10px; color:#28a745; display:block;">Bonus</label>
-                <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.bonus" value="{{skill.bonus}}" data-dtype="Number" style="width: 100%; text-align:center; border: 1px solid #28a745;"/>
-              </div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">혈액형</label><input type="text" name="system.profile.bloodType" value="{{system.profile.bloodType}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">나이</label><input type="text" name="system.profile.age" value="{{system.profile.age}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">신장 (cm)</label><input type="text" name="system.profile.height" value="{{system.profile.height}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">체중 (kg)</label><input type="text" name="system.profile.weight" value="{{system.profile.weight}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
 
-              <div class="skill-penalty" style="flex:0.5; text-align:center;">
-                <label style="font-size:10px; color:#dc3545; display:block;">Penalty</label>
-                <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.penalty" value="{{skill.penalty}}" data-dtype="Number" style="width: 100%; text-align:center; border: 1px solid #dc3545;"/>
-              </div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">머리색</label><input type="text" name="system.profile.hairColor" value="{{system.profile.hairColor}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">눈색</label><input type="text" name="system.profile.eyeColor" value="{{system.profile.eyeColor}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">피부색</label><input type="text" name="system.profile.skinColor" value="{{system.profile.skinColor}}" style="height:24px; font-size:12px;"/></div>
+        
+        <div><label style="font-size:11px; color:#0056b3; font-weight:bold;">예금 (Bank)</label><input type="text" name="system.profile.wealth.bank" value="{{system.profile.wealth.bank}}" data-dtype="Number" style="height:24px; font-size:12px; border-color:#0056b3;"/></div>
 
-              <div class="skill-item-mod" style="flex:0.5; text-align:center;">
-                <label style="font-size:10px; color:#17a2b8; display:block;">Item</label>
-                <div style="font-weight:bold; color:#17a2b8; padding-top:4px;">{{skill.itemMod}}</div>
-              </div>
-
-              <div class="skill-target-value" style="flex:1.5; text-align:right; padding-right:10px;">
-                <span style="font-size:11px;">목표:</span> <strong style="color:blue; font-size:16px;">{{skill.targetValue}}</strong>
-              </div>
-              
-              <button class="roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}" style="flex:1; cursor:pointer;">
-                <i class="fas fa-dice-d10"></i> 굴림
-              </button>
-            </div>
-          {{/each}}
+        <div style="grid-column: span 4; margin-top:10px;">
+          <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">백 스토리 (Backstory)</label>
+          <div style="min-height: 120px; border: 1px solid #ddd; padding: 5px; background: #fafafa;">
+            {{editor enrichedBackstory target="system.profile.backstory" button=true owner=owner editable=editable engine="prosemirror"}}
+          </div>
         </div>
-      </div>
-    {{/each}}
-  </div>
 
+        <div style="grid-column: span 4; margin-top:5px;">
+          <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">기타 특이 사항 (Notes)</label>
+          <div style="min-height: 80px; border: 1px solid #ddd; padding: 5px; background: #fafafa;">
+            {{editor enrichedNotes target="system.profile.notes" button=true owner=owner editable=editable engine="prosemirror"}}
+          </div>
+        </div>
+
+        <div style="grid-column: span 4; margin-top: 10px;">
+          <label style="font-size:11px; color:#666; font-weight:bold;">경력 (최대 5개 / 클릭하여 선택)</label>
+          <div style="display:flex; gap:10px; margin-top:4px;">
+            {{#each system.profile.careers as |career slotId|}}
+              <div class="career-slot" data-slot="{{slotId}}" style="flex:1; height:40px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; background:#f9f9f9; position:relative;">
+                {{#if career.name}}
+                  <div style="font-weight:bold; font-size:12px; color:#222;">{{lookup (lookup @root.careerDisplay slotId) 'label'}}</div>
+                  <div style="font-size:10px; color:#0056b3;">{{lookup (lookup @root.careerDisplay slotId) 'skill1'}}, {{lookup (lookup @root.careerDisplay slotId) 'skill2'}}</div>
+                  <a class="reset-career" data-slot="{{slotId}}" style="position:absolute; top:2px; right:4px; font-size:11px; color:#dc3545; z-index:10;" title="경력 초기화"><i class="fas fa-trash"></i></a>
+                {{else}}
+                  <div style="font-size:11px; color:#999;"><i class="fas fa-plus"></i> 추가</div>
+                {{/if}}
+              </div>
+            {{/each}}
+          </div>
+        </div>
+
+        <div style="grid-column: span 4; margin-top: 5px;">
+          <label style="font-size:11px; color:#666; font-weight:bold;">보너스 스킬 (3개 선택 / 클릭하여 추가)</label>
+          <div class="bonus-skill-slot" style="margin-top:4px; height:40px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; background:#f9f9f9; position:relative;">
+            {{#if system.profile.bonusSkills.skill1}}
+              <div style="font-weight:bold; font-size:12px; color:#0056b3;">
+                {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill1}}, 
+                {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill2}}, 
+                {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill3}}
+              </div>
+              <a class="reset-bonus-skills" style="position:absolute; top:2px; right:4px; font-size:11px; color:#dc3545; z-index:10;" title="보너스 스킬 초기화"><i class="fas fa-trash"></i></a>
+            {{else}}
+              <div style="font-size:11px; color:#999;"><i class="fas fa-plus"></i> 보너스 스킬 선택</div>
+            {{/if}}
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="tab skills" data-group="primary" data-tab="skills">
+      <div class="skills-container">
+        {{#each system.skills as |group groupKey|}}
+          <div class="skill-group" style="border:1px solid #ccc; margin-bottom: 10px; padding: 5px; background: #fff;">
+            <h3 style="background:#222; color:white; padding:3px 8px; margin: 0 0 8px 0; text-transform:uppercase; font-size:13px;">{{groupKey}}</h3>
+            <div class="skill-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+              {{#each group as |skill skillKey|}}
+                <div class="skill-row" style="display:flex; gap: 4px; align-items: center; font-size: 11px; border: 1px solid #e0e0e0; padding: 2px 4px; border-radius: 3px;">
+                  <div class="skill-name" style="flex:0 0 70px; font-weight:bold; overflow:hidden; text-overflow:ellipsis;" title="{{skillKey}}">{{skillKey}}</div>
+                  <div class="skill-lv" style="flex:1; text-align:center;"><label style="font-size:9px; color:#666; display:block;">Lv</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.lv" value="{{skill.lv}}" data-dtype="Number" style="height:20px; text-align:center;"/></div>
+                  <div class="skill-bonus" style="flex:1; text-align:center;"><label style="font-size:9px; color:#28a745; display:block;">(+)</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.bonus" value="{{skill.bonus}}" data-dtype="Number" style="height:20px; text-align:center; border: 1px solid #28a745;"/></div>
+                  <div class="skill-penalty" style="flex:1; text-align:center;"><label style="font-size:9px; color:#dc3545; display:block;">(-)</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.penalty" value="{{skill.penalty}}" data-dtype="Number" style="height:20px; text-align:center; border: 1px solid #dc3545;"/></div>
+                  <div class="skill-item-mod" style="flex:1; text-align:center;"><label style="font-size:9px; color:#17a2b8; display:block;">Item</label><div style="font-weight:bold; color:#17a2b8; line-height:20px;">{{skill.itemMod}}</div></div>
+                  <div class="skill-target-value" style="flex:0 0 35px; text-align:center;"><label style="font-size:9px; display:block;">목표</label><strong style="color:blue; font-size:13px;">{{skill.targetValue}}</strong></div>
+                  <button class="roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}" style="flex:0 0 30px; height:24px; padding:0; cursor:pointer; font-size:10px;" title="판정"><i class="fas fa-dice-d10"></i></button>
+                </div>
+              {{/each}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+
+    <div class="tab equipment" data-group="primary" data-tab="equipment"><h3 style="padding: 10px; text-align:center; color:#666;">장비(무기/방어구 등)가 표시될 공간입니다.</h3></div>
+    <div class="tab items" data-group="primary" data-tab="items"><h3 style="padding: 10px; text-align:center; color:#666;">일반 아이템 및 소지품이 표시될 공간입니다.</h3></div>
+    <div class="tab class-arts" data-group="primary" data-tab="class-arts"><h3 style="padding: 10px; text-align:center; color:#666;">직업 고유의 클래스 아츠가 표시될 공간입니다.</h3></div>
+  </section>
 </form>

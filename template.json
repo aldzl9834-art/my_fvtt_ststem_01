@@ -66,7 +66,7 @@
         "profile": {
           "hp": { "value": 0, "max": 0 },
           "exp": { "current": 0, "total": 0 },
-          "rewardPoints": 0,
+          "rewardPoints": { "current": 0, "total": 0 },
           "movement": {
             "careful": 0,
             "normal": 0,
@@ -85,9 +85,26 @@
           "affiliation": "",
           "gender": "",
           "bloodType": "",
-          "languages": "",
-          "career": "",
-          "bonusSkill": "",
+          "hairColor": "",
+          "eyeColor": "",
+          "skinColor": "",
+          "backstory": "",
+          "notes": "",
+          "languages": {
+            "lang1": "", "lang2": "", "lang3": "", "lang4": "", "lang5": "", "lang6": ""
+          },
+          "careers": {
+            "slot1": { "name": "", "skill1": "", "skill2": "" },
+            "slot2": { "name": "", "skill1": "", "skill2": "" },
+            "slot3": { "name": "", "skill1": "", "skill2": "" },
+            "slot4": { "name": "", "skill1": "", "skill2": "" },
+            "slot5": { "name": "", "skill1": "", "skill2": "" }
+          },
+          "bonusSkills": {
+            "skill1": "",
+            "skill2": "",
+            "skill3": ""
+          },
           "mainClass": "",
           "subClass": ""
         }
