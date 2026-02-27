@@ -123,8 +123,13 @@
     }
   },
   "Item": {
-    "types": ["weapon", "armor", "attachment"],
+    "types": ["weapon", "armor", "attachment", "gear"],
     "weapon": {
+      "locked": false,
+      "availability": "",
+      "price": 0,
+      "ammoAvailability": "",
+      "ammoPrice": 0,
       "description": "",
       "weaponType": "핸드건",
       "skill": "handgun",
@@ -149,19 +154,47 @@
         "sight": [],
         "common": [],
         "underbarrel": [],
-        "muzzle": []
+        "muzzle": [],
+        "magazine": []
       }
     },
     "armor": {
+      "locked": false,
+      "availability": "",
+      "price": 0,
       "description": "",
       "armorType": "body", 
       "defense": 0,
-      "penalty": 0,
-      "equipped": false
+      "armorValue": 0,
+      "requiredStr": 0,
+      "portability": { "x": 0, "y": 0 },
+      "equipped": false,
+      "modifiers": {
+        "skillGroups": {
+          "shooting": 0,
+          "fighting": 0,
+          "expertise": 0
+        },
+        "skills": {
+          "urbanAction": 0,
+          "fieldcraft": 0,
+          "detection": 0,
+          "situationalAwareness": 0
+        },
+        "movement": {
+          "base": 0,
+          "cautious": 0,
+          "normal": 0,
+          "sprint": 0
+        }
+      }
     },
     "attachment": {
+      "locked": false,
+      "availability": "",
+      "price": 0,
       "description": "",
-      "attachType": "sight", 
+      "attachType": "sight",
       "modifiers": {
         "rangeBuffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
         "rangePenalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
@@ -172,7 +205,8 @@
         "damageNonPen": "",
         "damagePen": "",
         "armorPiercing": 0,
-        "ammoMax": 0
+        "ammoMax": 0,
+        "ammoMultiplier": 1
       }
     }
   }

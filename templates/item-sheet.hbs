@@ -2,12 +2,38 @@
   
   <header class="sheet-header" style="display:flex; gap:15px; margin-bottom:15px; padding-bottom:10px; border-bottom:2px solid #222;">
     <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="80" width="80" style="border:2px solid #000; background:#fff;"/>
-    <div class="header-fields" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
-      <h1 class="charname" style="margin:0;">
+    <div class="header-fields" style="flex:1; display:flex; flex-direction:column; justify-content:center; position:relative;">
+      <a class="toggle-item-lock" style="position:absolute; top:0; right:0; font-size:18px; color:{{#if system.locked}}#dc3545{{else}}#28a745{{/if}}; cursor:pointer;" title="시트 잠금/해제">
+        <i class="fas {{#if system.locked}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
+      </a>
+      <h1 class="charname" style="margin:0; padding-right:25px;">
         <input name="name" type="text" value="{{item.name}}" placeholder="아이템 이름" style="font-weight:bold; font-size:24px; border:none; border-bottom:1px solid #ccc; background:transparent;"/>
       </h1>
-      <div style="margin-top:5px; font-weight:bold; color:#666; font-size:12px; text-transform:uppercase;">
-        아이템 타입: {{item.type}}
+      <div style="margin-top:5px; font-weight:bold; color:#666; font-size:12px; display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
+        <span style="text-transform:uppercase;">아이템 타입: {{item.type}}</span>
+        
+        <div style="display:flex; align-items:center; gap:5px;">
+          <label>입수치</label>
+          <input type="text" name="system.availability" value="{{system.availability}}" style="width:40px; height:22px; text-align:center; font-size:11px;"/>
+        </div>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <label>가격</label>
+          <input type="number" name="system.price" value="{{system.price}}" style="width:60px; height:22px; text-align:center; font-size:11px;"/>
+        </div>
+
+        {{#if isWeapon}}
+        <div style="display:flex; align-items:center; gap:5px; border-left:1px solid #ccc; padding-left:15px;">
+          <label>탄알 입수치</label>
+          <input type="text" name="system.ammoAvailability" value="{{system.ammoAvailability}}" style="width:40px; height:22px; text-align:center; font-size:11px;"/>
+        </div>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <label>탄알 가격(기본)</label>
+          <input type="number" name="system.ammoPrice" value="{{system.ammoPrice}}" style="width:60px; height:22px; text-align:center; font-size:11px;"/>
+          {{#if computed.showFinalAmmoPrice}}
+            <span style="font-size:11px; color:#d9534f; font-weight:bold; margin-left:5px;">(최종: {{computed.finalAmmoPrice}})</span>
+          {{/if}}
+        </div>
+        {{/if}}
       </div>
     </div>
   </header>
@@ -33,22 +59,26 @@
 
       <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:10px;">
         <label style="font-weight:bold; font-size:12px; color:#333;">사격 모드</label>
-        <select name="system.firingMode">
-          <option value="단발" {{#if (eq system.firingMode "단발")}}selected{{/if}}>단발</option>
-          <option value="더블 액션" {{#if (eq system.firingMode "더블 액션")}}selected{{/if}}>더블 액션</option>
-          <option value="연사" {{#if (eq system.firingMode "연사")}}selected{{/if}}>연사</option>
-        </select>
-        <label style="font-weight:bold; font-size:12px; color:#333;">신뢰성 {{{computed.relStr}}}</label>
-        <input type="text" name="system.reliability" value="{{system.reliability}}"/>
+        <input type="text" name="system.firingMode" value="{{system.firingMode}}" placeholder="예: 단발, 3점사" style="width:100%; height:24px;"/>
+        <label style="font-weight:bold; font-size:12px; color:#333;">신뢰성</label>
+        <div style="display:flex; align-items:center; border:1px solid #bbb; background:#fff; border-radius:3px; height:24px;">
+          <input type="text" name="system.reliability" value="{{system.reliability}}" style="border:none; background:transparent; width:100%; text-align:center; height:100%; outline:none;"/>
+          <span style="font-weight:bold; font-size:11px; padding-right:4px; white-space:nowrap;">{{{computed.relStr}}}</span>
+        </div>
+
         <label style="font-weight:bold; font-size:12px; color:#333;">사정거리</label>
         <div style="display:flex; align-items:center; gap:4px;">
-            <input type="text" name="system.range" value="{{system.range}}" style="width:60px; text-align:center;"/> <span style="font-size:12px;">m</span>
+            <input type="text" name="system.range" value="{{system.range}}" style="width:60px; text-align:center; height:24px;"/>
+            <span style="font-size:12px;">m</span>
         </div>
-        <label style="font-weight:bold; font-size:12px; color:#333;">소음 레벨 {{{computed.noiseStr}}}</label>
-        <input type="text" name="system.noiseLevel" value="{{system.noiseLevel}}" style="width:60px;"/>
-      </div>
 
-      <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        <label style="font-weight:bold; font-size:12px; color:#333;">소음 레벨</label>
+        <div style="display:flex; align-items:center; border:1px solid #bbb; background:#fff; border-radius:3px; height:24px;">
+          <input type="text" name="system.noiseLevel" value="{{system.noiseLevel}}" style="border:none; background:transparent; width:100%; text-align:center; height:100%; outline:none;"/>
+          <span style="font-weight:bold; font-size:11px; padding-right:4px; white-space:nowrap;">{{{computed.noiseStr}}}</span>
+        </div>
+
+      </div> <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
         <label style="font-weight:bold; font-size:12px; color:#333;">필요 근력</label>
         <div style="display:flex; align-items:center; gap:4px;">
           <span style="font-size:10px; color:#666;">한손</span><input type="text" name="system.requiredStr.oneHand" value="{{system.requiredStr.oneHand}}" style="width:40px; text-align:center;"/>
@@ -88,20 +118,31 @@
       </div>
 
       <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:10px; padding:10px; background:#fefefe; border:1px dashed #ccc; border-radius:4px;">
-        <label style="font-weight:bold; font-size:12px; color:#d9534f;">관통력 (AP) {{{computed.apStr}}}</label>
-        <input type="text" name="system.armorPiercing" value="{{system.armorPiercing}}" style="text-align:center; font-weight:bold; color:#d9534f;"/>
-
-        <label style="font-weight:bold; font-size:12px; color:#333;">탄약 {{{computed.ammoStr}}}</label>
-        <div style="display:flex; gap:5px; align-items:center;">
-          <input type="text" name="system.ammo.value" value="{{system.ammo.value}}" style="width:50px; text-align:center;"/> /
-          <input type="text" name="system.ammo.max" value="{{system.ammo.max}}" style="width:50px; text-align:center;"/>
+        
+        <label style="font-weight:bold; font-size:12px; color:#d9534f;">관통력 (AP)</label>
+        <div style="display:flex; align-items:center; border:1px solid #bbb; background:#fff; border-radius:3px; height:24px;">
+          <input type="text" name="system.armorPiercing" value="{{system.armorPiercing}}" style="border:none; background:transparent; width:100%; text-align:center; font-weight:bold; color:#d9534f; height:100%; outline:none;"/>
+          <span style="font-weight:bold; font-size:11px; padding-right:4px; white-space:nowrap;">{{{computed.apStr}}}</span>
         </div>
 
-        <label style="font-weight:bold; font-size:12px; color:#333;">비관통 데미지 {{#if computed.damageNonPenBonus}}<span style="color:blue;">(+{{computed.damageNonPenBonus}})</span>{{/if}}</label>
-        <input type="text" name="system.damageNonPenetrating" value="{{system.damageNonPenetrating}}" style="text-align:center;"/>
+        <label style="font-weight:bold; font-size:12px; color:#333;">탄약</label>
+        <div style="display:flex; gap:5px; align-items:center;">
+          <input type="text" name="system.ammo.value" value="{{system.ammo.value}}" style="width:40px; text-align:center; height:24px; font-weight:bold;"/> /
+          <span style="font-weight:bold; font-size:14px; color:#222; padding:0 5px;">{{computed.ammoMaxBonus}}</span>
+        </div>
 
-        <label style="font-weight:bold; font-size:12px; color:#333;">관통 데미지 {{#if computed.damagePenBonus}}<span style="color:blue;">(+{{computed.damagePenBonus}})</span>{{/if}}</label>
-        <input type="text" name="system.damagePenetrating" value="{{system.damagePenetrating}}" style="text-align:center;"/>
+        <label style="font-weight:bold; font-size:12px; color:#333;">비관통 데미지</label>
+        <div style="display:flex; align-items:center; border:1px solid #bbb; background:#fff; border-radius:3px; height:24px;">
+          <input type="text" name="system.damageNonPenetrating" value="{{system.damageNonPenetrating}}" style="border:none; background:transparent; width:100%; text-align:center; height:100%; outline:none;"/>
+          {{#if computed.damageNonPenBonus}}<span style="font-weight:bold; font-size:11px; padding-right:4px; color:blue; white-space:nowrap;">+ {{computed.damageNonPenBonus}}</span>{{/if}}
+        </div>
+
+        <label style="font-weight:bold; font-size:12px; color:#333;">관통 데미지</label>
+        <div style="display:flex; align-items:center; border:1px solid #bbb; background:#fff; border-radius:3px; height:24px;">
+          <input type="text" name="system.damagePenetrating" value="{{system.damagePenetrating}}" style="border:none; background:transparent; width:100%; text-align:center; height:100%; outline:none;"/>
+          {{#if computed.damagePenBonus}}<span style="font-weight:bold; font-size:11px; padding-right:4px; color:blue; white-space:nowrap;">+ {{computed.damagePenBonus}}</span>{{/if}}
+        </div>
+
       </div>
 
       <h4 style="margin:15px 0 5px 0; font-size:12px; color:#0056b3; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-puzzle-piece"></i> 부착물 (다중 장착 가능 / 아이템 드롭)</h4>
@@ -150,23 +191,87 @@
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
         </div>
+
+        <div class="attachment-slot" data-slot="magazine" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
+          <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">탄창</div>
+          {{#each safeAttachments.magazine as |att index|}}
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
+              <span class="attachment-edit" data-id="{{att.id}}" style="font-weight:bold; color:#28a745; cursor:pointer;" title="클릭하여 상세 보기">{{att.name}}</span>
+              <a class="remove-attachment" data-slot="magazine" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
+            </div>
+          {{/each}}
+          <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
+        </div>
+
       </div>
     {{/if}}
 
     {{#if isArmor}}
       <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">방어구 프로필</h3>
-      <div style="display:grid; grid-template-columns: 100px 1fr; gap:8px; align-items:center;">
-        <label style="font-weight:bold; font-size:12px;">방어 부위</label>
-        <select name="system.armorType" style="height:26px;">
+      
+      <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        
+        <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
+          <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+        </div>
+
+        <label style="font-weight:bold; font-size:12px; color:#333;">방어 부위</label>
+        <select name="system.armorType" style="height:24px;">
           <option value="body" {{#if (eq system.armorType "body")}}selected{{/if}}>몸통 (Body)</option>
           <option value="head" {{#if (eq system.armorType "head")}}selected{{/if}}>머리 (Head)</option>
         </select>
         
-        <label style="font-weight:bold; font-size:12px;">방어력 (Defense)</label>
-        <input type="text" name="system.defense" value="{{system.defense}}" data-dtype="Number" style="width:100px; text-align:center;"/>
+        <label style="font-weight:bold; font-size:12px; color:#333;">필요 근력</label>
+        <input type="number" name="system.requiredStr" value="{{system.requiredStr}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
         
-        <label style="font-weight:bold; font-size:12px;">행동 페널티</label>
-        <input type="text" name="system.penalty" value="{{system.penalty}}" data-dtype="Number" style="width:100px; text-align:center;"/>
+        <label style="font-weight:bold; font-size:12px; color:#333;">방어치</label>
+        <input type="number" name="system.defense" value="{{system.defense}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+        
+        <label style="font-weight:bold; font-size:12px; color:#333;">장갑치</label>
+        <input type="number" name="system.armorValue" value="{{system.armorValue}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+        
+        <div></div><div></div>
+      </div>
+
+      <h4 style="margin:15px 0 5px 0; font-size:12px; color:#d9534f; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-exclamation-triangle"></i> 행동 페널티 및 보너스 (+/-)</h4>
+      
+      <div style="border:1px solid #ddd; padding:8px; border-radius:4px; background:#fdfdfd; margin-bottom:10px;">
+        <div style="font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:8px; padding-bottom:3px; color:#555;">스킬 페널티 & 보너스</div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; font-size:12px;">
+          <div>
+            <div style="font-size:11px; font-weight:bold; color:#0056b3; margin-bottom:5px; border-bottom:1px dashed #bee5eb; padding-bottom:2px;">[ 스킬 그룹 ]</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>사격계</span> <input type="number" name="system.modifiers.skillGroups.shooting" value="{{system.modifiers.skillGroups.shooting}}" style="width:45px; text-align:center;"/></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>격투계</span> <input type="number" name="system.modifiers.skillGroups.fighting" value="{{system.modifiers.skillGroups.fighting}}" style="width:45px; text-align:center;"/></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>기술계</span> <input type="number" name="system.modifiers.skillGroups.expertise" value="{{system.modifiers.skillGroups.expertise}}" style="width:45px; text-align:center;"/></div>
+          </div>
+          
+          <div>
+            <div style="font-size:11px; font-weight:bold; color:#17a2b8; margin-bottom:5px; border-bottom:1px dashed #bee5eb; padding-bottom:2px;">[ 개별 스킬 ]</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>시가지 행동</span> <input type="number" name="system.modifiers.skills.urbanAction" value="{{system.modifiers.skills.urbanAction}}" style="width:45px; text-align:center;"/></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>국지 행동</span> <input type="number" name="system.modifiers.skills.fieldcraft" value="{{system.modifiers.skills.fieldcraft}}" style="width:45px; text-align:center;"/></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>감지</span> <input type="number" name="system.modifiers.skills.detection" value="{{system.modifiers.skills.detection}}" style="width:45px; text-align:center;"/></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>상황파악</span> <input type="number" name="system.modifiers.skills.situationalAwareness" value="{{system.modifiers.skills.situationalAwareness}}" style="width:45px; text-align:center;"/></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid #ddd; padding:8px; border-radius:4px; background:#fdfdfd; margin-bottom:10px;">
+        <div style="font-weight:bold; border-bottom:1px solid #ccc; margin-bottom:8px; padding-bottom:3px; color:#555;">이동력 보정</div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; font-size:12px;">
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px; font-weight:bold; color:#0056b3;"><span>기본 이동력</span> <input type="number" name="system.modifiers.movement.base" value="{{system.modifiers.movement.base}}" style="width:45px; text-align:center; border:1px solid #0056b3; border-radius:2px;"/></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>신중한 이동</span> <input type="number" name="system.modifiers.movement.cautious" value="{{system.modifiers.movement.cautious}}" style="width:45px; text-align:center;"/></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>일반 이동</span> <input type="number" name="system.modifiers.movement.normal" value="{{system.modifiers.movement.normal}}" style="width:45px; text-align:center;"/></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>전력질주</span> <input type="number" name="system.modifiers.movement.sprint" value="{{system.modifiers.movement.sprint}}" style="width:45px; text-align:center;"/></div>
+          </div>
+        </div>
       </div>
     {{/if}}
 
@@ -180,27 +285,32 @@
           <option value="common" {{#if (eq system.attachType "common")}}selected{{/if}}>총기 악세서리 (공통)</option>
           <option value="underbarrel" {{#if (eq system.attachType "underbarrel")}}selected{{/if}}>총기 악세서리 (하부)</option>
           <option value="muzzle" {{#if (eq system.attachType "muzzle")}}selected{{/if}}>총구 부착물 (오른쪽)</option>
+          <option value="magazine" {{#if (eq system.attachType "magazine")}}selected{{/if}}>탄창</option>
         </select>
       </div>
 
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; font-size:12px;">
-        <div>
-          <h4 style="color:blue; border-bottom:1px solid #ccc; margin-bottom:5px;">명중 버프 (+)</h4>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>지근거리</span> <input type="number" name="system.modifiers.rangeBuffs.pointBlank" value="{{system.modifiers.rangeBuffs.pointBlank}}" style="width:40px; text-align:center;"/></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>근거리</span> <input type="number" name="system.modifiers.rangeBuffs.short" value="{{system.modifiers.rangeBuffs.short}}" style="width:40px; text-align:center;"/></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>중거리</span> <input type="number" name="system.modifiers.rangeBuffs.medium" value="{{system.modifiers.rangeBuffs.medium}}" style="width:40px; text-align:center;"/></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>장거리</span> <input type="number" name="system.modifiers.rangeBuffs.long" value="{{system.modifiers.rangeBuffs.long}}" style="width:40px; text-align:center;"/></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px; color:#17a2b8; font-weight:bold;"><span>저격</span> <input type="number" name="system.modifiers.rangeBuffs.sniping" value="{{system.modifiers.rangeBuffs.sniping}}" style="width:40px; text-align:center;"/></div>
-        </div>
+      <h4 style="margin:15px 0 5px 0; font-size:12px; color:#0056b3; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-crosshairs"></i> 사거리별 명중 수정치</h4>
+      <div style="display:grid; grid-template-columns: 65px repeat(5, 1fr); gap:2px; text-align:center; font-size:11px; margin-bottom:15px; align-items:center;">
+        
+        <div></div> <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">지근거리</div>
+        <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">근거리</div>
+        <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">중거리</div>
+        <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">장거리</div>
+        <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0; color:#17a2b8;">저격</div>
 
-        <div>
-          <h4 style="color:red; border-bottom:1px solid #ccc; margin-bottom:5px;">명중 페널티 (-)</h4>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>지근거리</span> <input type="number" name="system.modifiers.rangePenalties.pointBlank" value="{{system.modifiers.rangePenalties.pointBlank}}" style="width:40px; text-align:center;"/></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>근거리</span> <input type="number" name="system.modifiers.rangePenalties.short" value="{{system.modifiers.rangePenalties.short}}" style="width:40px; text-align:center;"/></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>중거리</span> <input type="number" name="system.modifiers.rangePenalties.medium" value="{{system.modifiers.rangePenalties.medium}}" style="width:40px; text-align:center;"/></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>장거리</span> <input type="number" name="system.modifiers.rangePenalties.long" value="{{system.modifiers.rangePenalties.long}}" style="width:40px; text-align:center;"/></div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px; color:#17a2b8; font-weight:bold;"><span>저격</span> <input type="number" name="system.modifiers.rangePenalties.sniping" value="{{system.modifiers.rangePenalties.sniping}}" style="width:40px; text-align:center;"/></div>
-        </div>
+        <div style="font-weight:bold; color:blue;">버프 (+)</div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.pointBlank" value="{{system.modifiers.rangeBuffs.pointBlank}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.short" value="{{system.modifiers.rangeBuffs.short}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.medium" value="{{system.modifiers.rangeBuffs.medium}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.long" value="{{system.modifiers.rangeBuffs.long}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.sniping" value="{{system.modifiers.rangeBuffs.sniping}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
+
+        <div style="font-weight:bold; color:red;">페널티 (-)</div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="number" name="system.modifiers.rangePenalties.pointBlank" value="{{system.modifiers.rangePenalties.pointBlank}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="number" name="system.modifiers.rangePenalties.short" value="{{system.modifiers.rangePenalties.short}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="number" name="system.modifiers.rangePenalties.medium" value="{{system.modifiers.rangePenalties.medium}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="number" name="system.modifiers.rangePenalties.long" value="{{system.modifiers.rangePenalties.long}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="number" name="system.modifiers.rangePenalties.sniping" value="{{system.modifiers.rangePenalties.sniping}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
       </div>
 
       <hr style="margin:15px 0;">
@@ -217,7 +327,10 @@
         
         <label>관통력(AP) 보너스</label><input type="number" name="system.modifiers.armorPiercing" value="{{system.modifiers.armorPiercing}}" style="width:50px; text-align:center;"/>
         <label>최대 탄약 증가</label><input type="number" name="system.modifiers.ammoMax" value="{{system.modifiers.ammoMax}}" style="width:50px; text-align:center;"/>
-      </div>
+        
+        <label style="color:#d9534f; font-weight:bold;">탄약 가격 배수(x)</label>
+        <input type="number" name="system.modifiers.ammoMultiplier" value="{{system.modifiers.ammoMultiplier}}" placeholder="기본 1" style="width:50px; text-align:center; border:2px solid #d9534f;"/>
+        <div></div> </div>
     {{/if}}
 
     <div style="margin-top:15px;">

@@ -117,6 +117,21 @@ class GundogActorSheet extends ActorSheet {
     // 액터가 소지한 모든 아이템을 반복하며 종류별로 분류합니다.
     for (let item of this.actor.items) {
       if (item.type === "weapon") {
+        
+        // ★ 추가: 부착물의 최대 탄약 보너스를 미리 계산하여 액터 시트로 넘겨줍니다.
+        let computedAmmoMax = 0;
+        const atts = item.system.attachments || {};
+        for (let slot in atts) {
+          if (Array.isArray(atts[slot])) {
+            for (let att of atts[slot]) {
+              if (att.modifiers && att.modifiers.ammoMax) {
+                computedAmmoMax += Number(att.modifiers.ammoMax) || 0;
+              }
+            }
+          }
+        }
+        item.computedAmmoMax = computedAmmoMax; // HTML에서 출력할 수 있도록 데이터 주입
+
         context.weapons.push(item);
       } else if (item.type === "armor") {
         if (item.system.armorType === "head") {
@@ -487,9 +502,9 @@ class GundogItemSheet extends ItemSheet {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["gundog", "sheet", "item"],
       template: "systems/gundog/templates/item-sheet.hbs",
-      width: 520,
-      height: 650,
-      resizable: true,
+      width: 465,
+      height: 620,
+      resizable: false,
       dragDrop: [{ dragSelector: null, dropSelector: ".attachment-slot" }]
     });
   }
@@ -508,10 +523,12 @@ class GundogItemSheet extends ItemSheet {
         sight: Array.isArray(context.system.attachments?.sight) ? context.system.attachments.sight : [],
         common: Array.isArray(context.system.attachments?.common) ? context.system.attachments.common : [],
         underbarrel: Array.isArray(context.system.attachments?.underbarrel) ? context.system.attachments.underbarrel : [],
-        muzzle: Array.isArray(context.system.attachments?.muzzle) ? context.system.attachments.muzzle : []
+        muzzle: Array.isArray(context.system.attachments?.muzzle) ? context.system.attachments.muzzle : [],
+        magazine: Array.isArray(context.system.attachments?.magazine) ? context.system.attachments.magazine : []
       };
 
       let computed = {
+        ammoMultiplier: 1, // 탄약 가격 배수 초기값
         rangeBuffs: duplicate(context.system.rangeModifiers?.buffs || {}),
         rangePenalties: duplicate(context.system.rangeModifiers?.penalties || {}),
         reliabilityBonus: 0,
@@ -542,10 +559,33 @@ class GundogItemSheet extends ItemSheet {
           computed.snipingBonus += Number(att.modifiers.snipingBonus) || 0;
           computed.snipingPenalty += Number(att.modifiers.snipingPenalty) || 0;
           
-          if (att.modifiers.damageNonPen) computed.dmgNonPenArr.push(att.modifiers.damageNonPen);
-          if (att.modifiers.damagePen) computed.dmgPenArr.push(att.modifiers.damagePen);
+         if (att.modifiers.damageNonPen) dmgNonPenArr.push(att.modifiers.damageNonPen);
+          if (att.modifiers.damagePen) dmgPenArr.push(att.modifiers.damagePen);
+          
+          // 탄약 가격 배수 곱연산
+          let mult = Number(att.modifiers.ammoMultiplier);
+          if (mult && mult > 0) computed.ammoMultiplier *= mult;
         }
       }
+
+      // ★ 추가: 무기가 캐릭터에게 장착(소지)되어 있다면, 지정된 스킬의 lv 값을 가져와 관통력(AP)에 합산합니다.
+      if (this.item.actor && context.system.skill) {
+        const skillKey = context.system.skill;
+        let groupKey = "";
+        // 해당 스킬이 어느 그룹에 있는지 찾기
+        for (let [gKey, skills] of Object.entries(GUNDOG.skillGroups)) {
+          if (skills.includes(skillKey)) { groupKey = gKey; break; }
+        }
+        // 캐릭터의 해당 스킬 lv 값 추출 및 더하기
+        if (groupKey && this.item.actor.system.skills[groupKey]?.[skillKey]) {
+          const skillLv = Number(this.item.actor.system.skills[groupKey][skillKey].lv) || 0;
+          computed.armorPiercingBonus += skillLv;
+        }
+      }
+
+      // 최종 탄약 가격 계산 및 표시 여부 판별
+      computed.finalAmmoPrice = (Number(context.system.ammoPrice) || 0) * computed.ammoMultiplier;
+      computed.showFinalAmmoPrice = computed.ammoMultiplier > 1;
 
       // 부호에 따라 색상을 입혀주는 도우미 함수
       const getModStr = (val) => {
@@ -557,8 +597,8 @@ class GundogItemSheet extends ItemSheet {
       computed.apStr = getModStr(computed.armorPiercingBonus);
       computed.ammoStr = getModStr(computed.ammoMaxBonus);
 
-      computed.damageNonPenBonus = computed.dmgNonPenArr ? computed.dmgNonPenArr.join(" + ") : "";
-      computed.damagePenBonus = computed.dmgPenArr ? computed.dmgPenArr.join(" + ") : "";
+      computed.damageNonPenBonus = dmgNonPenArr.join(" + ");
+      computed.damagePenBonus = dmgPenArr.join(" + ");
       context.computed = computed;
     }
     return context;
@@ -566,6 +606,18 @@ class GundogItemSheet extends ItemSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
+
+    // ★ 자물쇠 토글 버튼 클릭 이벤트
+    html.find('.toggle-item-lock').click(ev => {
+      ev.preventDefault();
+      this.item.update({ "system.locked": !this.item.system.locked });
+    });
+
+    // ★ 시트가 잠겨있다면 모든 입력칸 비활성화 및 부착물 해제 버튼 숨기기
+    if (this.item.system.locked) {
+      html.find('input, select, textarea').prop('disabled', true);
+      html.find('.remove-attachment').hide();
+    }
 
     // 부착물 해제
     html.find('.remove-attachment').click(ev => {
@@ -602,6 +654,13 @@ class GundogItemSheet extends ItemSheet {
   // 드롭 이벤트 (이전과 동일)
   async _onDrop(event) {
     event.preventDefault();
+
+    // ★ 잠겨있을 때는 부착물 장착 불가
+    if (this.item.system.locked) {
+      ui.notifications.warn("시트가 잠겨있어 부착물을 장착할 수 없습니다.");
+      return;
+    }
+
     const slotTarget = $(event.target).closest('.attachment-slot');
     if (!slotTarget.length) return;
     const slot = slotTarget.data("slot");
@@ -619,7 +678,7 @@ class GundogItemSheet extends ItemSheet {
     }
 
     if (dropItem.system.attachType !== slot) {
-      const slotNames = { sight: "조준경(상부)", common: "총기 악세서리(공통)", underbarrel: "총기 악세서리(하부)", muzzle: "총구 부착물(오른쪽)" };
+      const slotNames = { sight: "조준경(상부)", common: "총기 악세서리(공통)", underbarrel: "총기 악세서리(하부)", muzzle: "총구 부착물(오른쪽)", magazine: "탄창" };
       ui.notifications.error(`[${dropItem.name}] 아이템은 ${slotNames[dropItem.system.attachType]} 전용입니다.`);
       return;
     }
@@ -650,7 +709,13 @@ class GundogItemSheet extends ItemSheet {
     const rangeLabels = { pointBlank: "지근거리", short: "근거리", medium: "중거리", long: "장거리", sniping: "저격" };
     const rangeLabel = rangeLabels[rangeKey];
 
-    const skillKey = this.item.system.skill; 
+    let skillKey = this.item.system.skill; 
+    
+    // ★ 추가: 클릭한 사거리가 '저격'이라면, 무기 기본스킬을 무시하고 강제로 'sniping' 스킬을 사용합니다.
+    if (rangeKey === "sniping") {
+      skillKey = "sniping";
+    }
+
     let groupKey = "";
     for (let [gKey, skills] of Object.entries(GUNDOG.skillGroups)) {
       if (skills.includes(skillKey)) { groupKey = gKey; break; }
@@ -696,7 +761,8 @@ class GundogItemSheet extends ItemSheet {
 
     let baseTarget = Number(actorSkill.targetValue) || 0;
     let sniperText = "";
-    if (skillKey === "sniping" && (sBonus > 0 || sPenalty > 0)) {
+    // ★ 수정: 사거리가 '저격'일 때만 부착물의 저격 전용 보너스/페널티를 합산합니다.
+    if (rangeKey === "sniping" && (sBonus > 0 || sPenalty > 0)) {
       baseTarget = baseTarget + sBonus - sPenalty;
       sniperText = `<br><span style="color:#17a2b8; font-size:11px;">(부착물 저격 보정: +${sBonus} / -${sPenalty} 적용됨)</span>`;
     }
@@ -768,9 +834,37 @@ class GundogItemSheet extends ItemSheet {
           </div>
         </div>
 
-        <div style="display:flex; gap:10px;">
-          <button type="button" id="custom-damage-btn" style="flex:2; background:#d9534f; color:white; border:none; border-radius:3px; height:36px; cursor:pointer; font-weight:bold; font-size:13px;">
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+          <button type="button" id="custom-damage-btn" style="width:100%; background:#d9534f; color:white; border:none; border-radius:3px; height:36px; cursor:pointer; font-weight:bold; font-size:13px;">
             <i class="fas fa-dice"></i> 데미지 굴림
+          </button>
+        </div>
+
+        <hr style="margin:20px 0; border-top:1px dashed #ccc;">
+
+        <h3 style="border-bottom:2px solid #6f42c1; padding-bottom:5px; margin-bottom:15px; color:#6f42c1;">
+          <i class="fas fa-skull-crossbones"></i> 대미지 페널티 굴림 (2d9)
+        </h3>
+        
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px; padding:8px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px;">
+          <label style="font-weight:bold; font-size:13px; display:flex; align-items:center; gap:5px;">
+            종류:
+            <select id="penalty-type" style="height:24px; font-size:12px;">
+              <option value="shooting">사격</option>
+              <option value="melee">격투</option>
+              <option value="vehicle">차량</option>
+              <option value="general">범용</option>
+            </select>
+          </label>
+          <label style="font-weight:bold; font-size:13px; display:flex; align-items:center; gap:5px;">
+            보정치:
+            <input type="number" id="penalty-mod" value="0" style="width:50px; text-align:center; height:24px; font-weight:bold; border:1px solid #ccc;"/>
+          </label>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+          <button type="button" id="custom-penalty-btn" style="flex:2; background:#6f42c1; color:white; border:none; border-radius:3px; height:36px; cursor:pointer; font-weight:bold; font-size:13px;">
+            <i class="fas fa-skull"></i> 페널티 굴림
           </button>
           <button type="button" id="custom-close-btn" style="flex:1; border:1px solid #999; border-radius:3px; height:36px; cursor:pointer; background:#f0f0f0; font-weight:bold;">
             닫기
@@ -877,6 +971,196 @@ class GundogItemSheet extends ItemSheet {
 
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this.item.actor }), content: chatContent, type: CONST.CHAT_MESSAGE_TYPES.ROLL, sound: CONFIG.sounds.dice, rolls: [roll]
+          });
+        });
+
+        // ★ 추가: 대미지 페널티 굴림 로직 (0~9 주사위 처리 적용)
+        html.find('#custom-penalty-btn').click(async (ev) => {
+          ev.preventDefault();
+          const pType = html.find('#penalty-type').val();
+          const pMod = Number(html.find('#penalty-mod').val()) || 0;
+
+          // 실제 굴림은 2d10으로 하여 3D 주사위를 띄우되, 10이 나오면 0으로 계산합니다.
+          const roll = await new Roll("2d10").evaluate();
+          
+          let diceTotal = 0;
+          let diceResults = [];
+          roll.terms[0].results.forEach(r => {
+            let val = r.result === 10 ? 0 : r.result; // 10은 0으로 취급
+            diceTotal += val;
+            diceResults.push(val);
+          });
+
+          const total = diceTotal + pMod; // 0~9 범위 2개 합산 + 보정치
+
+          // ==========================================
+          // ★ 대미지 페널티 결과표
+          // ==========================================
+          const penaltyTable = {
+            shooting: [
+              { min: -99, max: 0, effect: "급소를 꿰뚫는 일격. 대상은 [사망]한다.", addDmg: "0", bleed: "0" },
+              { min: 1, max: 1, effect: "과다 출혈로 인해 신체 기능이 거의 마비된다. [추가D] 4D6 / [출혈] 2D6 / [중상]-40% / [몽롱함 판정] 15", addDmg: "4d6", bleed: "2d6" },
+              { min: 2, max: 2, effect: "과다 출혈로 인해 의식이 희미해진다. [추가D] 3D6 / [출혈] 2D6 / [중상]-30% / [몽롱함 판정] 14", addDmg: "3d6", bleed: "2d6" },
+              { min: 3, max: 3, effect: "출혈로 인해 제대로 서 있기조차 힘들다. [추가D] 3D6 / [출혈] 2D6 / [중상]-30% / [몽롱함 판정] 13", addDmg: "3d6", bleed: "2d6" },
+              { min: 4, max: 4, effect: "출혈로 인해 움직일 때마다 고통이 가중된다. [추가D] 3D6 / [출혈] 1D6 / [중상]-20% / [몽롱함 판정] 12", addDmg: "3d6", bleed: "1d6" },
+              { min: 5, max: 5, effect: "출혈로 인해 피가 새어 나오며 전투 지속이 위험해진다. [추가D] 2D6 / [출혈] 1D6 / [중상]-20% / [몽롱함 판정] 11", addDmg: "2d6", bleed: "1d6" },
+              { min: 6, max: 6, effect: "충격 부위를 제대로 쓰지 못한다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 11", addDmg: "2d6", bleed: "0" },
+              { min: 7, max: 7, effect: "극심한 통증으로 시야가 일시적으로 흐려진다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 10", addDmg: "2d6", bleed: "0" },
+              { min: 8, max: 8, effect: "근육이 경직되어 즉각적인 대응이 어렵다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 8", addDmg: "2d6", bleed: "0" },
+              { min: 9, max: 9, effect: "통증으로 신음하며 움직임이 둔해진다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 6", addDmg: "2d6", bleed: "0" },
+              { min: 10, max: 10, effect: "균형을 잃고 크게 휘청인다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 4", addDmg: "2d6", bleed: "0" },
+              { min: 11, max: 11, effect: "팔이나 어깨에 충격을 받아 사격 자세를 유지하기 힘들다. [추가D] 2D6 / [경상]-20%", addDmg: "2d6", bleed: "0" },
+              { min: 12, max: 12, effect: "호흡이 흐트러지며 조준이 어려워진다. [추가D] 1D6 / [경상]-20%", addDmg: "1d6", bleed: "0" },
+              { min: 13, max: 13, effect: "순간적인 통증으로 반응이 한 박자 늦어진다. [추가D] 1D6 / [경상]-10%", addDmg: "1d6", bleed: "0" },
+              { min: 14, max: 14, effect: "충격으로 자세가 크게 흐트러진다. [쇼크]-20%", addDmg: "0", bleed: "0" },
+              { min: 15, max: 15, effect: "충격으로 비틀거린다. [쇼크]-10%", addDmg: "0", bleed: "0" },
+              { min: 16, max: 16, effect: "충격으로 멍해진다. [불안정]", addDmg: "0", bleed: "0" },
+              { min: 17, max: 17, effect: "충격으로 손에 든 무기를 떨어뜨린다. 여럿이라면 무작위로 선택한다.", addDmg: "0", bleed: "0" },
+              { min: 18, max: 99, effect: "불행 중 다행, 페널티는 없었다.", addDmg: "0", bleed: "0" }
+            ],
+            melee: [
+              { min: -99, max: 0, effect: "급소에 대한 강력한 일격. 대상은 [사망]한다.", addDmg: "0", bleed: "0" },
+              { min: 1, max: 1, effect: "치명적인 일격으로 의식이 흐려지며 쓰러진다. [추가D] 4D6 / [출혈] 2D6 / [중상]-40% / [몽롱함 판정] 15", addDmg: "4d6", bleed: "2d6" },
+              { min: 2, max: 2, effect: "과다 출혈로 신체를 지탱하는 것조차 어렵다. [추가D] 3D6 / [출혈] 2D6 / [중상]-30% / [몽롱함 판정] 14", addDmg: "3d6", bleed: "2d6" },
+              { min: 3, max: 3, effect: "출혈로 인해 타격 부위가 심하게 손상된다. [추가D] 3D6 / [출혈] 1D6 / [중상]-20% / [몽롱함 판정] 14 / [불안정]", addDmg: "3d6", bleed: "1d6" },
+              { min: 4, max: 4, effect: "출혈 발생. 피부가 찢어지며 피가 흐르기 시작한다. [추가D] 2D6 / [출혈] 1D6 / [중상]-20% / [몽롱함 판정] 14", addDmg: "2d6", bleed: "1d6" },
+              { min: 5, max: 5, effect: "타격 부위가 붓고 기능이 크게 저하된다. [추가D] 2D6 / [중상]-20% / [몽롱함 판정] 12 / [불안정]", addDmg: "2d6", bleed: "0" },
+              { min: 6, max: 6, effect: "팔이나 다리를 제대로 쓰지 못한다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 11", addDmg: "2d6", bleed: "0" },
+              { min: 7, max: 7, effect: "강한 타격으로 시야가 흔들리고 판단이 흐려진다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 10", addDmg: "2d6", bleed: "0" },
+              { min: 8, max: 8, effect: "근육이 경련을 일으켜 반격이 늦어진다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 8", addDmg: "2d6", bleed: "0" },
+              { min: 9, max: 9, effect: "통증으로 몸을 제대로 가누기 힘들다. [추가D] 2D6 / [경상]-20% / [몽롱함 판정] 6", addDmg: "2d6", bleed: "0" },
+              { min: 10, max: 10, effect: "균형을 잃고 크게 밀려난다. [추가D] 1D6 / [경상]-20% / [몽롱함 판정] 6", addDmg: "1d6", bleed: "0" },
+              { min: 11, max: 11, effect: "뼈나 관절에 충격이 가해져 움직임이 둔해진다. [추가D] 1D6 / [경상]-10% / [몽롱함 판정] 6", addDmg: "1d6", bleed: "0" },
+              { min: 12, max: 12, effect: "숨이 턱 막히며 순간적으로 행동이 멈춘다. [추가D] 1D6 / [경상]-10% / [불안정]", addDmg: "1d6", bleed: "0" },
+              { min: 13, max: 13, effect: "타격을 제대로 흡수하지 못해 몸이 굳는다. [추가D] 1D6 / [경상]-10%", addDmg: "1d6", bleed: "0" },
+              { min: 14, max: 14, effect: "충격으로 자세가 크게 흐트러진다. [쇼크]-20%", addDmg: "0", bleed: "0" },
+              { min: 15, max: 15, effect: "충격으로 비틀거린다. [쇼크]-10%", addDmg: "0", bleed: "0" },
+              { min: 16, max: 16, effect: "충격으로 멍해진다. [불안정]", addDmg: "0", bleed: "0" },
+              { min: 17, max: 17, effect: "충격으로 손에 든 무기를 떨어뜨린다. 여럿이라면 무작위로 선택한다.", addDmg: "0", bleed: "0" },
+              { min: 18, max: 99, effect: "불행 중 다행, 페널티는 없었다.", addDmg: "0", bleed: "0" }
+            ],
+            vehicle: [
+              { min: -99, max: 0, effect: "[크래시]한다. [체이스]에서 제외]", addDmg: "0", bleed: "0" },
+              { min: 1, max: 1, effect: "[차량D] 4D6 / [탑승자D] 3D6 / [조작성]-40% / [스핀 판정]", addDmg: "4d6", bleed: "3d6" },
+              { min: 2, max: 2, effect: "[차량D] 3D6 / [탑승자D] 3D6 / [조작성]-30% / [스핀 판정]", addDmg: "3d6", bleed: "3d6" },
+              { min: 3, max: 3, effect: "[탑승자D] 3D6 / [조작성]-20% / [스핀 판정]", addDmg: "0", bleed: "3d6" },
+              { min: 4, max: 4, effect: "[차량D] 3D6 / [조작성]-20% / [스핀 판정]", addDmg: "3d6", bleed: "0" },
+              { min: 5, max: 5, effect: "[탑승자D] 3D6 / [조작성]-10% / [스핀 판정]", addDmg: "0", bleed: "3d6" },
+              { min: 6, max: 6, effect: "[차량D] 3D6 / [조작성]-10% / [스핀 판정]", addDmg: "3d6", bleed: "0" },
+              { min: 7, max: 7, effect: "[탑승자D] 2D6 / [스피드]-2 / [스핀 판정]", addDmg: "0", bleed: "2d6" },
+              { min: 8, max: 8, effect: "[차량D] 2D6 / [스피드]-2 / [스핀 판정]", addDmg: "2d6", bleed: "0" },
+              { min: 9, max: 9, effect: "[탑승자D] 2D6 / [조종판정]-20% / [스핀 판정]", addDmg: "0", bleed: "2d6" },
+              { min: 10, max: 10, effect: "[차량D] 2D6 / [조종판정]-20% / [스핀 판정]", addDmg: "2d6", bleed: "0" },
+              { min: 11, max: 11, effect: "[탑승자D] 2D6 / [조종판정]-20%", addDmg: "0", bleed: "2d6" },
+              { min: 12, max: 12, effect: "[차량D] 2D6 / [조종판정]-20%", addDmg: "2d6", bleed: "0" },
+              { min: 13, max: 13, effect: "[차량D] 1D6 / [조종판정]-20%", addDmg: "1d6", bleed: "0" },
+              { min: 14, max: 14, effect: "[차량D] 1D6 / [조종판정]-10%", addDmg: "1d6", bleed: "0" },
+              { min: 15, max: 15, effect: "공격이 탑승자를 스친다. 무작위로 선택한 탑승자 1명에게 [쇼크]-20%", addDmg: "0", bleed: "0" },
+              { min: 16, max: 16, effect: "공격이 탑승자에게 맞을 뻔했다. 무작위로 선택한 탑승자 1명에게 [쇼크]-10%", addDmg: "0", bleed: "0" },
+              { min: 17, max: 17, effect: "차량이 구불구불 달린다. 탑승자 전원은 <운동> 성공판정. 실패하면 [불안정]", addDmg: "0", bleed: "0" },
+              { min: 18, max: 99, effect: "불행 중 다행, 페널티는 없었다.", addDmg: "0", bleed: "0" }
+            ],
+            general: [
+              { min: -99, max: 0, effect: "치명상을 입었다. 대상은 [사망]한다.", addDmg: "0", bleed: "0" },
+              { min: 1, max: 1, effect: "[추가D] 4D6 / [출혈] 2D6 / [중상]-40% / [몽롱함 판정] 15", addDmg: "4d6", bleed: "2d6" },
+              { min: 2, max: 2, effect: "[추가D] 3D6 / [출혈] 2D6 / [중상]-30% / [몽롱함 판정] 14", addDmg: "3d6", bleed: "2d6" },
+              { min: 3, max: 3, effect: "[추가D] 2D6 / [출혈] 1D6 / [중상]-30% / [몽롱함 판정] 13 / [불안정]", addDmg: "2d6", bleed: "1d6" },
+              { min: 4, max: 4, effect: "[추가D] 2D6 / [출혈] 1D6 / [중상]-30% / [몽롱함 판정] 12", addDmg: "2d6", bleed: "1d6" },
+              { min: 5, max: 5, effect: "[추가D] 2D6 / [중상]-20% / [몽롱함 판정] 12 / [불안정]", addDmg: "2d6", bleed: "0" },
+              { min: 6, max: 6, effect: "[추가D] 1D6 / [중상]-20% / [몽롱함 판정] 11", addDmg: "1d6", bleed: "0" },
+              { min: 7, max: 7, effect: "[추가D] 1D6 / [경상]-30% / [몽롱함 판정] 10", addDmg: "1d6", bleed: "0" },
+              { min: 8, max: 8, effect: "[추가D] 1D6 / [경상]-30% / [몽롱함 판정] 8", addDmg: "1d6", bleed: "0" },
+              { min: 9, max: 9, effect: "[추가D] 1D6 / [경상]-30% / [몽롱함 판정] 6", addDmg: "1d6", bleed: "0" },
+              { min: 10, max: 10, effect: "[추가D] 1D6 / [경상]-20% / [몽롱함 판정] 6", addDmg: "1d6", bleed: "0" },
+              { min: 11, max: 11, effect: "[경상]-20% / [몽롱함 판정] 6", addDmg: "0", bleed: "0" },
+              { min: 12, max: 12, effect: "[경상]-20% / [불안정]", addDmg: "0", bleed: "0" },
+              { min: 13, max: 13, effect: "[경상]-20%", addDmg: "0", bleed: "0" },
+              { min: 14, max: 14, effect: "[경상]-10%", addDmg: "0", bleed: "0" },
+              { min: 15, max: 15, effect: "충격으로 자세가 크게 흐트러진다. [쇼크]-20%", addDmg: "0", bleed: "0" },
+              { min: 16, max: 16, effect: "충격으로 비틀거린다. [쇼크]-10%", addDmg: "0", bleed: "0" },
+              { min: 17, max: 17, effect: "충격으로 멍해진다 [불안정]", addDmg: "0", bleed: "0" },
+              { min: 18, max: 99, effect: "불행 중 다행, 페널티는 없었다.", addDmg: "0", bleed: "0" }
+            ]
+          };
+
+          const typeLabels = { shooting: "사격", melee: "격투", vehicle: "차량", general: "범용" };
+          const currentTable = penaltyTable[pType];
+          
+          // 결과값(total)이 포함되는 구간 찾기
+          let resultData = currentTable[currentTable.length - 1]; 
+          for (let row of currentTable) {
+            if (total >= row.min && total <= row.max) {
+              resultData = row;
+              break;
+            }
+          }
+
+          // 표기용 텍스트 강제 고정 (2d9)
+          let detailString = `2d9[${diceResults.join(", ")}]`;
+          if (pMod > 0) detailString += ` + ${pMod}`;
+          else if (pMod < 0) detailString += ` - ${Math.abs(pMod)}`;
+
+          // ==========================================
+          // ★ 추가 대미지와 출혈 주사위 자동 굴림
+          // ==========================================
+          let rollsToSync = [roll]; // 3D 다이스 애니메이션 연동
+          let addDmgDetail = "없음";
+          let bleedDetail = '<span style="color:red;">없음</span>';
+
+          // 주사위 눈금만 추출해서 콤마로 이어붙여주는 도우미 함수
+          const getDiceDetails = (r) => {
+            let results = [];
+            for (let term of r.terms) {
+              if (term.faces && term.results) {
+                results.push(...term.results.map(res => res.result));
+              }
+            }
+            return results.join(", ");
+          };
+
+          if (resultData.addDmg !== "0") {
+            const addRoll = await new Roll(resultData.addDmg).evaluate();
+            rollsToSync.push(addRoll);
+            const diceStr = getDiceDetails(addRoll);
+            addDmgDetail = `${resultData.addDmg} <i class="fas fa-arrow-right" style="margin:0 3px; color:#999;"></i> <strong style="font-size:15px; color:#d9534f;">+${addRoll.total} <span style="font-size:12px; font-weight:normal; color:#555;">[${diceStr}]</span></strong>`;
+          }
+          
+          if (resultData.bleed !== "0") {
+            const bleedRoll = await new Roll(resultData.bleed).evaluate();
+            rollsToSync.push(bleedRoll);
+            const diceStr = getDiceDetails(bleedRoll);
+            bleedDetail = `<span style="color:red;">${resultData.bleed} <i class="fas fa-arrow-right" style="margin:0 3px; color:#999;"></i> <strong style="font-size:15px;">${bleedRoll.total} <span style="font-size:12px; font-weight:normal; color:#777;">[${diceStr}]</span></strong></span>`;
+          }
+
+          // ★ 선택한 타입이 '차량(vehicle)'이면 '탑승자', 아니면 '출혈'로 라벨 텍스트 지정
+          const bleedLabel = (pType === "vehicle") ? "탑승자" : "출혈";
+
+          const chatContent = `
+          <div class="dice-roll gundog-roll">
+            <div class="dice-result">
+              <div class="dice-formula" style="background:#6f42c1; color:white; border-radius:4px 4px 0 0;"><i class="fas fa-skull"></i> ${typeLabels[pType]} 대미지 페널티</div>
+              <div class="dice-tooltip" style="padding:5px; background:#fff; border:1px solid #ccc; font-size:12px; margin-bottom:5px; word-break:break-all;">
+                페널티 굴림: ( ${detailString} )
+              </div>
+              <h4 class="dice-total" style="color:#6f42c1; font-size:20px;">판정값 ${total}</h4>
+              <div style="margin-top:5px; padding:10px; border:1px solid #6f42c1; background:#f8f0ff; border-radius:4px; font-size:13px; text-align:left;">
+                <div style="font-weight:bold; color:#d9534f; margin-bottom:6px; border-bottom:1px dotted #d9534f; padding-bottom:4px;">
+                  ${resultData.effect}
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span><strong>추가 대미지:</strong> ${addDmgDetail}</span>
+                  <span><strong>${bleedLabel}:</strong> ${bleedDetail}</span>
+                </div>
+              </div>
+            </div>
+          </div>`;
+
+          await ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({ actor: this.item.actor }), 
+            content: chatContent, 
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL, 
+            sound: CONFIG.sounds.dice, 
+            rolls: rollsToSync 
           });
         });
 

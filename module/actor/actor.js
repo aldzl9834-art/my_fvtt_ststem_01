@@ -44,6 +44,40 @@ export class GundogActor extends Actor {
     // 전문분야 면제 리스트 합치기
     const exemptSpecialties = [...(mainClassData.specialties || []), ...(subClassData.specialties || [])];
 
+    // ==========================================
+    // ★ 장착 중인 방어구 보정치 미리 계산하기
+    // ==========================================
+    let armorMods = {
+      groups: { shooting: 0, fighting: 0, expertise: 0 },
+      skills: { urbanAction: 0, fieldcraft: 0, detection: 0, situationalAwareness: 0 },
+      movement: { base: 0, cautious: 0, normal: 0, sprint: 0 }
+    };
+
+    // 1. 캐릭터가 가진 아이템 중 '장착 중인 방어구'의 보정치를 싹 긁어옵니다.
+    for (let item of this.items) {
+      if (item.type === "armor" && item.system.equipped) {
+        const mods = item.system.modifiers || {};
+        
+        if (mods.skillGroups) {
+          armorMods.groups.shooting += Number(mods.skillGroups.shooting) || 0;
+          armorMods.groups.fighting += Number(mods.skillGroups.fighting) || 0;
+          armorMods.groups.expertise += Number(mods.skillGroups.expertise) || 0;
+        }
+        if (mods.skills) {
+          armorMods.skills.urbanAction += Number(mods.skills.urbanAction) || 0;
+          armorMods.skills.fieldcraft += Number(mods.skills.fieldcraft) || 0;
+          armorMods.skills.detection += Number(mods.skills.detection) || 0;
+          armorMods.skills.situationalAwareness += Number(mods.skills.situationalAwareness) || 0;
+        }
+        if (mods.movement) {
+          armorMods.movement.base += Number(mods.movement.base) || 0;
+          armorMods.movement.cautious += Number(mods.movement.cautious) || 0;
+          armorMods.movement.normal += Number(mods.movement.normal) || 0;
+          armorMods.movement.sprint += Number(mods.movement.sprint) || 0;
+        }
+      }
+    }
+
     // 3. 스킬 목표값 연산
     for (let [groupKey, group] of Object.entries(system.skills)) {
       
@@ -71,9 +105,8 @@ export class GundogActor extends Actor {
         let skillBonus = Number(skill.bonus) || 0;
         let skillPenalty = Number(skill.penalty) || 0; // 양수로 입력해도 빼기로 계산됨
         
-        // TODO: 나중에 아이템(무기, 장비 등) 기능이 추가되면 여기서 장착 중인 아이템의 보정치를 가져옵니다.
-        // 예시: let itemMod = this.items.filter(i => i.type === 'weapon' && i.system.equipped).reduce(...);
-        let itemMod = 0; 
+        // 장착된 방어구의 스킬 그룹 보정치와 개별 스킬 보정치를 합산합니다.
+        let itemMod = (armorMods.groups[groupKey] || 0) + (armorMods.skills[skillKey] || 0);
         
         // 시트에 표시하기 위해 임시 저장
         skill.itemMod = itemMod;
@@ -116,14 +149,14 @@ export class GundogActor extends Actor {
     
     system.profile.hp.max = ((physicalTotal + constitutionTotal) * 3) + (toughnessArtsCount * 5);
 
-    // [이동력 계산] Mobility = 민첩 + athletics(운동) Lv
+    // [이동력 계산] Mobility = 민첩 + athletics(운동) Lv + 방어구 기본 이동력 보정치
     let quicknessTotal = system.capabilities.quickness?.total || 0;
     let athleticsLv = Number(system.skills.exercise?.athletics?.lv) || 0;
-    let mobility = quicknessTotal + athleticsLv;
+    let mobility = quicknessTotal + athleticsLv + armorMods.movement.base;
 
-    system.profile.movement.careful = Math.ceil(mobility / 2); // 소수점 올림
-    system.profile.movement.normal = mobility;
-    system.profile.movement.sprint = (mobility * 2) + 20;
+    system.profile.movement.careful = Math.ceil(mobility / 2) + armorMods.movement.cautious; // 소수점 올림 + 신중한 이동 보정
+    system.profile.movement.normal = mobility + armorMods.movement.normal; // 일반 이동 보정
+    system.profile.movement.sprint = (mobility * 2) + 20 + armorMods.movement.sprint; // 전력질주 보정
 
     // ==========================================
     // ★ 5. 유지비 (Maintenance Cost) 연산 (뼈대) ★
