@@ -123,17 +123,34 @@
     }
   },
   "Item": {
+    "types": ["weapon", "armor", "attachment"],
     "weapon": {
       "description": "",
-      "weaponType": "handgun",
-      "damage": "1d10",
-      "range": "10m",
-      "ammo": {
-        "value": 0,
-        "max": 0
+      "weaponType": "핸드건",
+      "skill": "handgun",
+      "firingMode": "단발",
+      "reliability": "3",
+      "range": 10,
+      "noiseLevel": 3,
+      "requiredStr": { "oneHand": 0, "twoHands": 0 },
+      "portability": { "x": 0, "y": 0 },
+      "rangeModifiers": {
+        "buffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0 },
+        "penalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0 }
       },
+      "armorPiercing": 0,
+      "damageNonPenetrating": "1d10",
+      "damagePenetrating": "1d10",
+      "ammo": { "value": 0, "max": 0 },
       "concealability": "",
-      "equipped": false
+      "equipped": false,
+      
+      "attachments": {
+        "sight": [],
+        "common": [],
+        "underbarrel": [],
+        "muzzle": []
+      }
     },
     "armor": {
       "description": "",
@@ -141,6 +158,22 @@
       "defense": 0,
       "penalty": 0,
       "equipped": false
+    },
+    "attachment": {
+      "description": "",
+      "attachType": "sight", 
+      "modifiers": {
+        "rangeBuffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0 },
+        "rangePenalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0 },
+        "reliability": 0,
+        "noiseLevel": 0,
+        "snipingBonus": 0,
+        "snipingPenalty": 0,
+        "damageNonPen": 0,
+        "damagePen": 0,
+        "armorPiercing": 0,
+        "ammoMax": 0
+      }
     }
   }
 }
