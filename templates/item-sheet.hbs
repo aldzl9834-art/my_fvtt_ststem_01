@@ -38,13 +38,13 @@
           <option value="더블 액션" {{#if (eq system.firingMode "더블 액션")}}selected{{/if}}>더블 액션</option>
           <option value="연사" {{#if (eq system.firingMode "연사")}}selected{{/if}}>연사</option>
         </select>
-        <label style="font-weight:bold; font-size:12px; color:#333;">신뢰성 {{#if computed.reliability}}<span style="color:blue;">(+{{computed.reliability}})</span>{{/if}}</label>
+        <label style="font-weight:bold; font-size:12px; color:#333;">신뢰성 {{{computed.relStr}}}</label>
         <input type="text" name="system.reliability" value="{{system.reliability}}"/>
         <label style="font-weight:bold; font-size:12px; color:#333;">사정거리</label>
         <div style="display:flex; align-items:center; gap:4px;">
             <input type="text" name="system.range" value="{{system.range}}" style="width:60px; text-align:center;"/> <span style="font-size:12px;">m</span>
         </div>
-        <label style="font-weight:bold; font-size:12px; color:#333;">소음 레벨 {{#if computed.noiseLevel}}<span style="color:blue;">(+{{computed.noiseLevel}})</span>{{/if}}</label>
+        <label style="font-weight:bold; font-size:12px; color:#333;">소음 레벨 {{{computed.noiseStr}}}</label>
         <input type="text" name="system.noiseLevel" value="{{system.noiseLevel}}" style="width:60px;"/>
       </div>
 
@@ -61,33 +61,37 @@
       </div>
 
       <h4 style="margin:15px 0 5px 0; font-size:12px; color:#0056b3; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-crosshairs"></i> 사거리별 명중 수정치</h4>
-      <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:2px; text-align:center; font-size:11px; margin-bottom:15px;">
+      <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:2px; text-align:center; font-size:11px; margin-bottom:15px;">
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">지근거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">근거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">중거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">장거리</div>
+        <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0; color:#17a2b8;">저격</div>
 
         <div style="border:1px solid #ccc; color:blue; padding:4px 0; background:#f4f8ff;">+{{computed.rangeBuffs.pointBlank}}</div>
         <div style="border:1px solid #ccc; color:blue; padding:4px 0; background:#f4f8ff;">+{{computed.rangeBuffs.short}}</div>
         <div style="border:1px solid #ccc; color:blue; padding:4px 0; background:#f4f8ff;">+{{computed.rangeBuffs.medium}}</div>
         <div style="border:1px solid #ccc; color:blue; padding:4px 0; background:#f4f8ff;">+{{computed.rangeBuffs.long}}</div>
+        <div style="border:1px solid #ccc; color:blue; padding:4px 0; background:#f4f8ff;">+{{computed.rangeBuffs.sniping}}</div>
 
         <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.pointBlank" value="{{system.rangeModifiers.penalties.pointBlank}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.short" value="{{system.rangeModifiers.penalties.short}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.medium" value="{{system.rangeModifiers.penalties.medium}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.long" value="{{system.rangeModifiers.penalties.long}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.sniping" value="{{system.rangeModifiers.penalties.sniping}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
 
         <a class="roll-weapon" data-range="pointBlank" style="background:#222; color:white; padding:4px 0; border-radius:2px; cursor:pointer;"><i class="fas fa-dice"></i> 판정</a>
         <a class="roll-weapon" data-range="short" style="background:#222; color:white; padding:4px 0; border-radius:2px; cursor:pointer;"><i class="fas fa-dice"></i> 판정</a>
         <a class="roll-weapon" data-range="medium" style="background:#222; color:white; padding:4px 0; border-radius:2px; cursor:pointer;"><i class="fas fa-dice"></i> 판정</a>
         <a class="roll-weapon" data-range="long" style="background:#222; color:white; padding:4px 0; border-radius:2px; cursor:pointer;"><i class="fas fa-dice"></i> 판정</a>
+        <a class="roll-weapon" data-range="sniping" style="background:#17a2b8; color:white; padding:4px 0; border-radius:2px; cursor:pointer;"><i class="fas fa-dice"></i> 판정</a>
       </div>
 
       <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:10px; padding:10px; background:#fefefe; border:1px dashed #ccc; border-radius:4px;">
-        <label style="font-weight:bold; font-size:12px; color:#d9534f;">관통력 (AP) {{#if computed.armorPiercing}}<span style="color:blue;">(+{{computed.armorPiercing}})</span>{{/if}}</label>
+        <label style="font-weight:bold; font-size:12px; color:#d9534f;">관통력 (AP) {{{computed.apStr}}}</label>
         <input type="text" name="system.armorPiercing" value="{{system.armorPiercing}}" style="text-align:center; font-weight:bold; color:#d9534f;"/>
 
-        <label style="font-weight:bold; font-size:12px; color:#333;">탄약 {{#if computed.ammoMax}}<span style="color:blue;">(+{{computed.ammoMax}})</span>{{/if}}</label>
+        <label style="font-weight:bold; font-size:12px; color:#333;">탄약 {{{computed.ammoStr}}}</label>
         <div style="display:flex; gap:5px; align-items:center;">
           <input type="text" name="system.ammo.value" value="{{system.ammo.value}}" style="width:50px; text-align:center;"/> /
           <input type="text" name="system.ammo.max" value="{{system.ammo.max}}" style="width:50px; text-align:center;"/>
@@ -186,6 +190,7 @@
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>근거리</span> <input type="number" name="system.modifiers.rangeBuffs.short" value="{{system.modifiers.rangeBuffs.short}}" style="width:40px; text-align:center;"/></div>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>중거리</span> <input type="number" name="system.modifiers.rangeBuffs.medium" value="{{system.modifiers.rangeBuffs.medium}}" style="width:40px; text-align:center;"/></div>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>장거리</span> <input type="number" name="system.modifiers.rangeBuffs.long" value="{{system.modifiers.rangeBuffs.long}}" style="width:40px; text-align:center;"/></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:3px; color:#17a2b8; font-weight:bold;"><span>저격</span> <input type="number" name="system.modifiers.rangeBuffs.sniping" value="{{system.modifiers.rangeBuffs.sniping}}" style="width:40px; text-align:center;"/></div>
         </div>
 
         <div>
@@ -194,6 +199,7 @@
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>근거리</span> <input type="number" name="system.modifiers.rangePenalties.short" value="{{system.modifiers.rangePenalties.short}}" style="width:40px; text-align:center;"/></div>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>중거리</span> <input type="number" name="system.modifiers.rangePenalties.medium" value="{{system.modifiers.rangePenalties.medium}}" style="width:40px; text-align:center;"/></div>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>장거리</span> <input type="number" name="system.modifiers.rangePenalties.long" value="{{system.modifiers.rangePenalties.long}}" style="width:40px; text-align:center;"/></div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:3px; color:#17a2b8; font-weight:bold;"><span>저격</span> <input type="number" name="system.modifiers.rangePenalties.sniping" value="{{system.modifiers.rangePenalties.sniping}}" style="width:40px; text-align:center;"/></div>
         </div>
       </div>
 
@@ -206,11 +212,8 @@
         <label>저격 스킬 보너스(+)</label><input type="number" name="system.modifiers.snipingBonus" value="{{system.modifiers.snipingBonus}}" style="width:50px; text-align:center;"/>
         <label>저격 스킬 페널티(-)</label><input type="number" name="system.modifiers.snipingPenalty" value="{{system.modifiers.snipingPenalty}}" style="width:50px; text-align:center;"/>
         
-        <label>비관통 데미지 증가</label><input type="number" name="system.modifiers.damageNonPen" value="{{system.modifiers.damageNonPen}}" style="width:50px; text-align:center;"/>
-<label>관통 데미지 증가</label><input type="number" name="system.modifiers.damagePen" value="{{system.modifiers.damagePen}}" style="width:50px; text-align:center;"/>
-
-<label>비관통 데미지 증가</label><input type="text" name="system.modifiers.damageNonPen" value="{{system.modifiers.damageNonPen}}" placeholder="예: 1d6" style="width:50px; text-align:center;"/>
-<label>관통 데미지 증가</label><input type="text" name="system.modifiers.damagePen" value="{{system.modifiers.damagePen}}" placeholder="예: 1d6" style="width:50px; text-align:center;"/>
+        <label>비관통 데미지 증가</label><input type="text" name="system.modifiers.damageNonPen" value="{{system.modifiers.damageNonPen}}" placeholder="예: 1d6" style="width:50px; text-align:center;"/>
+        <label>관통 데미지 증가</label><input type="text" name="system.modifiers.damagePen" value="{{system.modifiers.damagePen}}" placeholder="예: 1d6" style="width:50px; text-align:center;"/>
         
         <label>관통력(AP) 보너스</label><input type="number" name="system.modifiers.armorPiercing" value="{{system.modifiers.armorPiercing}}" style="width:50px; text-align:center;"/>
         <label>최대 탄약 증가</label><input type="number" name="system.modifiers.ammoMax" value="{{system.modifiers.ammoMax}}" style="width:50px; text-align:center;"/>

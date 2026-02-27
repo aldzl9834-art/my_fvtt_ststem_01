@@ -135,8 +135,8 @@
       "requiredStr": { "oneHand": 0, "twoHands": 0 },
       "portability": { "x": 0, "y": 0 },
       "rangeModifiers": {
-        "buffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0 },
-        "penalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0 }
+        "buffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
+        "penalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 }
       },
       "armorPiercing": 0,
       "damageNonPenetrating": "1d10",
@@ -163,8 +163,8 @@
       "description": "",
       "attachType": "sight", 
       "modifiers": {
-        "rangeBuffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0 },
-        "rangePenalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0 },
+        "rangeBuffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
+        "rangePenalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
         "reliability": 0,
         "noiseLevel": 0,
         "snipingBonus": 0,
