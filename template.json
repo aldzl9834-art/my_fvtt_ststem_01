@@ -169,8 +169,8 @@
         "noiseLevel": 0,
         "snipingBonus": 0,
         "snipingPenalty": 0,
-        "damageNonPen": 0,
-        "damagePen": 0,
+        "damageNonPen": "",
+        "damagePen": "",
         "armorPiercing": 0,
         "ammoMax": 0
       }

@@ -17,7 +17,7 @@ Hooks.once("init", () => {
   // 아이템 시트 등록
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("gundog", GundogItemSheet, { 
-    types: ["weapon", "armor"],
+    types: ["weapon", "armor" , "attachment"],
     makeDefault: true 
   });
 });
@@ -499,7 +499,18 @@ class GundogItemSheet extends ItemSheet {
     const context = super.getData();
     context.system = this.item.system; 
 
-    if (this.item.type === "weapon") {
+    context.isWeapon = (this.item.type === "weapon");
+    context.isArmor = (this.item.type === "armor");
+    context.isAttachment = (this.item.type === "attachment");
+
+    if (context.isWeapon) {
+      context.safeAttachments = {
+        sight: Array.isArray(context.system.attachments?.sight) ? context.system.attachments.sight : [],
+        common: Array.isArray(context.system.attachments?.common) ? context.system.attachments.common : [],
+        underbarrel: Array.isArray(context.system.attachments?.underbarrel) ? context.system.attachments.underbarrel : [],
+        muzzle: Array.isArray(context.system.attachments?.muzzle) ? context.system.attachments.muzzle : []
+      };
+
       let computed = {
         rangeBuffs: duplicate(context.system.rangeModifiers?.buffs || {}),
         rangePenalties: duplicate(context.system.rangeModifiers?.penalties || {}),
@@ -509,31 +520,42 @@ class GundogItemSheet extends ItemSheet {
         ammoMax: Number(context.system.ammo?.max) || 0,
         snipingBonus: 0,
         snipingPenalty: 0,
-        damageNonPenBonus: 0,
-        damagePenBonus: 0
+        damageNonPenBonus: "",
+        damagePenBonus: ""
       };
+      
+      let dmgNonPenArr = [];
+      let dmgPenArr = [];
 
-      const atts = context.system.attachments || {};
+      const atts = context.safeAttachments;
       for (let slot in atts) {
-        if (Array.isArray(atts[slot])) {
-          for (let att of atts[slot]) {
-            if (!att.modifiers) continue;
-            ['pointBlank', 'short', 'medium', 'long'].forEach(k => {
-              computed.rangeBuffs[k] = (Number(computed.rangeBuffs[k]) || 0) + (Number(att.modifiers.rangeBuffs?.[k]) || 0);
-              computed.rangePenalties[k] = (Number(computed.rangePenalties[k]) || 0) + (Number(att.modifiers.rangePenalties?.[k]) || 0);
-            });
-            computed.reliability += Number(att.modifiers.reliability) || 0;
-            computed.noiseLevel += Number(att.modifiers.noiseLevel) || 0;
-            computed.armorPiercing += Number(att.modifiers.armorPiercing) || 0;
-            computed.ammoMax += Number(att.modifiers.ammoMax) || 0;
-            computed.snipingBonus += Number(att.modifiers.snipingBonus) || 0;
-            computed.snipingPenalty += Number(att.modifiers.snipingPenalty) || 0;
-            computed.damageNonPenBonus += Number(att.modifiers.damageNonPen) || 0;
-            computed.damagePenBonus += Number(att.modifiers.damagePen) || 0;
-          }
+        for (let att of atts[slot]) {
+          if (!att.modifiers) continue;
+          ['pointBlank', 'short', 'medium', 'long'].forEach(k => {
+            computed.rangeBuffs[k] = (Number(computed.rangeBuffs[k]) || 0) + (Number(att.modifiers.rangeBuffs?.[k]) || 0);
+            computed.rangePenalties[k] = (Number(computed.rangePenalties[k]) || 0) + (Number(att.modifiers.rangePenalties?.[k]) || 0);
+          });
+          computed.reliability += Number(att.modifiers.reliability) || 0;
+          computed.noiseLevel += Number(att.modifiers.noiseLevel) || 0;
+          computed.armorPiercing += Number(att.modifiers.armorPiercing) || 0;
+          computed.ammoMax += Number(att.modifiers.ammoMax) || 0;
+          computed.snipingBonus += Number(att.modifiers.snipingBonus) || 0;
+          computed.snipingPenalty += Number(att.modifiers.snipingPenalty) || 0;
+          computed.damageNonPenBonus += Number(att.modifiers.damageNonPen) || "";
+          computed.damagePenBonus += Number(att.modifiers.damagePen) || "";
+
+          // 수정된 코드: 배열에 주사위 문자열(예: "1d6")을 담아 나중에 합칩니다.
+          if (!computed.dmgNonPenArr) computed.dmgNonPenArr = [];
+          if (!computed.dmgPenArr) computed.dmgPenArr = [];
+          
+          if (att.modifiers.damageNonPen) computed.dmgNonPenArr.push(att.modifiers.damageNonPen);
+          if (att.modifiers.damagePen) computed.dmgPenArr.push(att.modifiers.damagePen);
         }
       }
+      computed.damageNonPenBonus = computed.dmgNonPenArr ? computed.dmgNonPenArr.join(" + ") : "";
+      computed.damagePenBonus = computed.dmgPenArr ? computed.dmgPenArr.join(" + ") : "";
       context.computed = computed;
+
     }
     return context;
   }
@@ -553,9 +575,22 @@ class GundogItemSheet extends ItemSheet {
       this.item.update({ [`system.attachments.${slot}`]: currentArr });
     });
 
+    html.find('.attachment-edit').click(ev => {
+      ev.preventDefault();
+      const itemId = ev.currentTarget.dataset.id;
+      if (!itemId) return;
+
+      // 장착된 아이템의 원본 데이터를 찾아 창을 띄웁니다.
+      let attachedItem = this.item.actor ? this.item.actor.items.get(itemId) : game.items.get(itemId);
+      if (!attachedItem) attachedItem = game.items.get(itemId);
+
+      if (attachedItem) attachedItem.sheet.render(true);
+      else ui.notifications.warn("원본 부착물 아이템을 찾을 수 없습니다.");
+    });
+
     html.find('.roll-weapon').click(this._onRollWeapon.bind(this));
   }
-
+  
   // ★ 수정: 배열에 부착물 추가
   async _onDrop(event) {
     event.preventDefault();
@@ -629,7 +664,8 @@ class GundogItemSheet extends ItemSheet {
     let wBuff = Number(this.item.system.rangeModifiers.buffs[rangeKey]) || 0;
     let wPenalty = Number(this.item.system.rangeModifiers.penalties[rangeKey]) || 0;
     let sBonus = 0; let sPenalty = 0;
-    let dmgNonPenBonus = 0; let dmgPenBonus = 0;
+    let dmgNonPenArr = [];
+    let dmgPenArr = [];
 
     for (let slot in this.item.system.attachments) {
       const arr = this.item.system.attachments[slot];
@@ -642,9 +678,14 @@ class GundogItemSheet extends ItemSheet {
           sPenalty += Number(att.modifiers.snipingPenalty) || 0;
           dmgNonPenBonus += Number(att.modifiers.damageNonPen) || 0;
           dmgPenBonus += Number(att.modifiers.damagePen) || 0;
+
+          if (att.modifiers.damageNonPen) dmgNonPenArr.push(att.modifiers.damageNonPen);
+          if (att.modifiers.damagePen) dmgPenArr.push(att.modifiers.damagePen);
         }
       }
     }
+    let dmgNonPenBonus = dmgNonPenArr.join(" + ");
+    let dmgPenBonus = dmgPenArr.join(" + ");
 
     let baseTarget = Number(actorSkill.targetValue) || 0;
     
@@ -799,7 +840,8 @@ class GundogItemSheet extends ItemSheet {
           if (!baseDamage || baseDamage.trim() === "") baseDamage = "0";
 
           const extraHits = Number(html.find('#extra-hits').val()) || 0;
-          let formula = `${baseDamage} + ${bonusDamage}`;
+          let formula = baseDamage;
+          if (bonusDamage) formula += ` + ${bonusDamage}`; // 예: 1d10 + 1d6
           if (extraHits > 0) formula += ` + ${extraHits}d6`;
 
           const roll = await new Roll(formula).evaluate();

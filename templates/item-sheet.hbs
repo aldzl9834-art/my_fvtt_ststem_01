@@ -14,7 +14,7 @@
 
   <div class="sheet-body" style="border:1px solid #ccc; padding:10px; background:#fff; border-radius:4px;">
     
-    {{#if (eq item.type "weapon")}}
+    {{#if isWeapon}}
       <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">무기 프로필</h3>
       <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:15px;">
         <label style="font-weight:bold; font-size:12px; color:#333;">무기 분류</label>
@@ -102,38 +102,46 @@
 
       <h4 style="margin:15px 0 5px 0; font-size:12px; color:#0056b3; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-puzzle-piece"></i> 부착물 (다중 장착 가능 / 아이템 드롭)</h4>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+        
         <div class="attachment-slot" data-slot="sight" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
           <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">조준경 (상부)</div>
           {{#each safeAttachments.sight as |att index|}}
             <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
-              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span><a class="remove-attachment" data-slot="sight" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
+              <span class="attachment-edit" data-id="{{att.id}}" style="font-weight:bold; color:#28a745; cursor:pointer;" title="클릭하여 상세 보기">{{att.name}}</span>
+              <a class="remove-attachment" data-slot="sight" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
             </div>
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
         </div>
+
         <div class="attachment-slot" data-slot="common" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
           <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">총기 악세서리 (공통)</div>
           {{#each safeAttachments.common as |att index|}}
             <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
-              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span><a class="remove-attachment" data-slot="common" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
+              <span class="attachment-edit" data-id="{{att.id}}" style="font-weight:bold; color:#28a745; cursor:pointer;" title="클릭하여 상세 보기">{{att.name}}</span>
+              <a class="remove-attachment" data-slot="common" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
             </div>
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
         </div>
+
         <div class="attachment-slot" data-slot="underbarrel" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
           <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">총기 악세서리 (하부)</div>
           {{#each safeAttachments.underbarrel as |att index|}}
             <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
-              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span><a class="remove-attachment" data-slot="underbarrel" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
+              <span class="attachment-edit" data-id="{{att.id}}" style="font-weight:bold; color:#28a745; cursor:pointer;" title="클릭하여 상세 보기">{{att.name}}</span>
+              <a class="remove-attachment" data-slot="underbarrel" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
             </div>
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
         </div>
+
         <div class="attachment-slot" data-slot="muzzle" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
           <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">총구 부착물 (오른쪽)</div>
           {{#each safeAttachments.muzzle as |att index|}}
             <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
-              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span><a class="remove-attachment" data-slot="muzzle" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
+              <span class="attachment-edit" data-id="{{att.id}}" style="font-weight:bold; color:#28a745; cursor:pointer;" title="클릭하여 상세 보기">{{att.name}}</span>
+              <a class="remove-attachment" data-slot="muzzle" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
             </div>
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
@@ -141,7 +149,7 @@
       </div>
     {{/if}}
 
-    {{#if (eq item.type "armor")}}
+    {{#if isArmor}}
       <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">방어구 프로필</h3>
       <div style="display:grid; grid-template-columns: 100px 1fr; gap:8px; align-items:center;">
         <label style="font-weight:bold; font-size:12px;">방어 부위</label>
@@ -158,7 +166,7 @@
       </div>
     {{/if}}
 
-    {{#if (eq item.type "attachment")}}
+    {{#if isAttachment}}
       <h3 style="background:#28a745; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">부착물 효과 (Modifier) 설정</h3>
       
       <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
@@ -199,7 +207,10 @@
         <label>저격 스킬 페널티(-)</label><input type="number" name="system.modifiers.snipingPenalty" value="{{system.modifiers.snipingPenalty}}" style="width:50px; text-align:center;"/>
         
         <label>비관통 데미지 증가</label><input type="number" name="system.modifiers.damageNonPen" value="{{system.modifiers.damageNonPen}}" style="width:50px; text-align:center;"/>
-        <label>관통 데미지 증가</label><input type="number" name="system.modifiers.damagePen" value="{{system.modifiers.damagePen}}" style="width:50px; text-align:center;"/>
+<label>관통 데미지 증가</label><input type="number" name="system.modifiers.damagePen" value="{{system.modifiers.damagePen}}" style="width:50px; text-align:center;"/>
+
+<label>비관통 데미지 증가</label><input type="text" name="system.modifiers.damageNonPen" value="{{system.modifiers.damageNonPen}}" placeholder="예: 1d6" style="width:50px; text-align:center;"/>
+<label>관통 데미지 증가</label><input type="text" name="system.modifiers.damagePen" value="{{system.modifiers.damagePen}}" placeholder="예: 1d6" style="width:50px; text-align:center;"/>
         
         <label>관통력(AP) 보너스</label><input type="number" name="system.modifiers.armorPiercing" value="{{system.modifiers.armorPiercing}}" style="width:50px; text-align:center;"/>
         <label>최대 탄약 증가</label><input type="number" name="system.modifiers.ammoMax" value="{{system.modifiers.ammoMax}}" style="width:50px; text-align:center;"/>

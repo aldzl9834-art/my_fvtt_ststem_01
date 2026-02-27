@@ -1,1 +1,9 @@
-{}
+{
+  "TYPES": {
+    "Item": {
+      "weapon": "무기",
+      "armor": "방어구",
+      "attachment": "총기 부착물"
+    }
+  }
+}
