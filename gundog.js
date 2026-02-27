@@ -575,6 +575,13 @@ class GundogItemSheet extends ItemSheet {
       return;
     }
 
+    // ★ 추가: 드롭한 슬롯과 부착물의 '장착 부위'가 일치하는지 검사합니다.
+    if (dropItem.system.attachType !== slot) {
+      const slotNames = { sight: "조준경(상부)", common: "총기 악세서리(공통)", underbarrel: "총기 악세서리(하부)", muzzle: "총구 부착물(오른쪽)" };
+      ui.notifications.error(`[${dropItem.name}] 아이템은 ${slotNames[dropItem.system.attachType]} 전용입니다. 현재 슬롯에 장착할 수 없습니다.`);
+      return;
+    }
+
     // 부착물의 모든 수정치를 배열에 저장
     const newAttachment = {
       id: dropItem.id,

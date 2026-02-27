@@ -15,47 +15,35 @@
   <div class="sheet-body" style="border:1px solid #ccc; padding:10px; background:#fff; border-radius:4px;">
     
     {{#if (eq item.type "weapon")}}
-      
       <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">무기 프로필</h3>
       <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:15px;">
         <label style="font-weight:bold; font-size:12px; color:#333;">무기 분류</label>
-        <input type="text" name="system.weaponType" value="{{system.weaponType}}" placeholder="예: 핸드건, 기관단총"/>
-        
+        <input type="text" name="system.weaponType" value="{{system.weaponType}}"/>
         <label style="font-weight:bold; font-size:12px; color:#333;">사용 스킬</label>
         <select name="system.skill">
-            <option value="handgun" {{#if (eq system.skill "handgun")}}selected{{/if}}>핸드건 (Handgun)</option>
-            <option value="smg" {{#if (eq system.skill "smg")}}selected{{/if}}>기관단총 (SMG)</option>
-            <option value="rifle" {{#if (eq system.skill "rifle")}}selected{{/if}}>라이플 (Rifle)</option>
-            <option value="heavyWeaponry" {{#if (eq system.skill "heavyWeaponry")}}selected{{/if}}>중화기 (Heavy Weaponry)</option>
-            <option value="sniping" {{#if (eq system.skill "sniping")}}selected{{/if}}>저격 (Sniping)</option>
-            <option value="meleeCombat" {{#if (eq system.skill "meleeCombat")}}selected{{/if}}>무기전투 (Melee)</option>
-            <option value="throwing" {{#if (eq system.skill "throwing")}}selected{{/if}}>투척 (Throwing)</option>
+            <option value="handgun" {{#if (eq system.skill "handgun")}}selected{{/if}}>핸드건</option>
+            <option value="smg" {{#if (eq system.skill "smg")}}selected{{/if}}>기관단총</option>
+            <option value="rifle" {{#if (eq system.skill "rifle")}}selected{{/if}}>라이플</option>
+            <option value="heavyWeaponry" {{#if (eq system.skill "heavyWeaponry")}}selected{{/if}}>중화기</option>
+            <option value="sniping" {{#if (eq system.skill "sniping")}}selected{{/if}}>저격</option>
+            <option value="meleeCombat" {{#if (eq system.skill "meleeCombat")}}selected{{/if}}>무기전투</option>
+            <option value="throwing" {{#if (eq system.skill "throwing")}}selected{{/if}}>투척</option>
         </select>
       </div>
 
-      <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:15px;">
+      <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:10px;">
         <label style="font-weight:bold; font-size:12px; color:#333;">사격 모드</label>
         <select name="system.firingMode">
           <option value="단발" {{#if (eq system.firingMode "단발")}}selected{{/if}}>단발</option>
           <option value="더블 액션" {{#if (eq system.firingMode "더블 액션")}}selected{{/if}}>더블 액션</option>
-          <option value="싱글 액션" {{#if (eq system.firingMode "싱글 액션")}}selected{{/if}}>싱글 액션</option>
-          <option value="펌프 액션" {{#if (eq system.firingMode "펌프 액션")}}selected{{/if}}>펌프 액션</option>
-          <option value="레버 액션" {{#if (eq system.firingMode "레버 액션")}}selected{{/if}}>레버 액션</option>
-          <option value="2연발" {{#if (eq system.firingMode "2연발")}}selected{{/if}}>2연발</option>
-          <option value="볼트 액션" {{#if (eq system.firingMode "볼트 액션")}}selected{{/if}}>볼트 액션</option>
-          <option value="2점사" {{#if (eq system.firingMode "2점사")}}selected{{/if}}>2점사</option>
-          <option value="3점사" {{#if (eq system.firingMode "3점사")}}selected{{/if}}>3점사</option>
           <option value="연사" {{#if (eq system.firingMode "연사")}}selected{{/if}}>연사</option>
         </select>
-
         <label style="font-weight:bold; font-size:12px; color:#333;">신뢰성 {{#if computed.reliability}}<span style="color:blue;">(+{{computed.reliability}})</span>{{/if}}</label>
         <input type="text" name="system.reliability" value="{{system.reliability}}"/>
-
         <label style="font-weight:bold; font-size:12px; color:#333;">사정거리</label>
         <div style="display:flex; align-items:center; gap:4px;">
             <input type="text" name="system.range" value="{{system.range}}" style="width:60px; text-align:center;"/> <span style="font-size:12px;">m</span>
         </div>
-
         <label style="font-weight:bold; font-size:12px; color:#333;">소음 레벨 {{#if computed.noiseLevel}}<span style="color:blue;">(+{{computed.noiseLevel}})</span>{{/if}}</label>
         <input type="text" name="system.noiseLevel" value="{{system.noiseLevel}}" style="width:60px;"/>
       </div>
@@ -99,7 +87,7 @@
         <label style="font-weight:bold; font-size:12px; color:#d9534f;">관통력 (AP) {{#if computed.armorPiercing}}<span style="color:blue;">(+{{computed.armorPiercing}})</span>{{/if}}</label>
         <input type="text" name="system.armorPiercing" value="{{system.armorPiercing}}" style="text-align:center; font-weight:bold; color:#d9534f;"/>
 
-        <label style="font-weight:bold; font-size:12px; color:#333;">탄약 (현재/최대) {{#if computed.ammoMax}}<span style="color:blue;">(+{{computed.ammoMax}})</span>{{/if}}</label>
+        <label style="font-weight:bold; font-size:12px; color:#333;">탄약 {{#if computed.ammoMax}}<span style="color:blue;">(+{{computed.ammoMax}})</span>{{/if}}</label>
         <div style="display:flex; gap:5px; align-items:center;">
           <input type="text" name="system.ammo.value" value="{{system.ammo.value}}" style="width:50px; text-align:center;"/> /
           <input type="text" name="system.ammo.max" value="{{system.ammo.max}}" style="width:50px; text-align:center;"/>
@@ -114,61 +102,76 @@
 
       <h4 style="margin:15px 0 5px 0; font-size:12px; color:#0056b3; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-puzzle-piece"></i> 부착물 (다중 장착 가능 / 아이템 드롭)</h4>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-        
         <div class="attachment-slot" data-slot="sight" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
           <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">조준경 (상부)</div>
-          {{#each system.attachments.sight as |att index|}}
+          {{#each safeAttachments.sight as |att index|}}
             <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
-              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span>
-              <a class="remove-attachment" data-slot="sight" data-index="{{index}}" style="color:#dc3545;"><i class="fas fa-times"></i></a>
+              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span><a class="remove-attachment" data-slot="sight" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
             </div>
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
         </div>
-
         <div class="attachment-slot" data-slot="common" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
           <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">총기 악세서리 (공통)</div>
-          {{#each system.attachments.common as |att index|}}
+          {{#each safeAttachments.common as |att index|}}
             <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
-              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span>
-              <a class="remove-attachment" data-slot="common" data-index="{{index}}" style="color:#dc3545;"><i class="fas fa-times"></i></a>
+              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span><a class="remove-attachment" data-slot="common" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
             </div>
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
         </div>
-
         <div class="attachment-slot" data-slot="underbarrel" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
           <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">총기 악세서리 (하부)</div>
-          {{#each system.attachments.underbarrel as |att index|}}
+          {{#each safeAttachments.underbarrel as |att index|}}
             <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
-              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span>
-              <a class="remove-attachment" data-slot="underbarrel" data-index="{{index}}" style="color:#dc3545;"><i class="fas fa-times"></i></a>
+              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span><a class="remove-attachment" data-slot="underbarrel" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
             </div>
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
         </div>
-
         <div class="attachment-slot" data-slot="muzzle" style="border:1px dashed #999; padding:8px; background:#f4f4f4; border-radius:4px;">
           <div style="font-size:11px; font-weight:bold; color:#666; margin-bottom:4px; text-align:center;">총구 부착물 (오른쪽)</div>
-          {{#each system.attachments.muzzle as |att index|}}
+          {{#each safeAttachments.muzzle as |att index|}}
             <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1px solid #ccc; padding:2px 5px; margin-bottom:2px; border-radius:3px; font-size:11px;">
-              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span>
-              <a class="remove-attachment" data-slot="muzzle" data-index="{{index}}" style="color:#dc3545;"><i class="fas fa-times"></i></a>
+              <span style="font-weight:bold; color:#28a745;">{{att.name}}</span><a class="remove-attachment" data-slot="muzzle" data-index="{{index}}" style="color:#dc3545; cursor:pointer;"><i class="fas fa-times"></i></a>
             </div>
           {{/each}}
           <div style="font-size:10px; color:#aaa; text-align:center; margin-top:5px;">여기에 드롭...</div>
         </div>
-
       </div>
-
     {{/if}}
 
+    {{#if (eq item.type "armor")}}
+      <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">방어구 프로필</h3>
+      <div style="display:grid; grid-template-columns: 100px 1fr; gap:8px; align-items:center;">
+        <label style="font-weight:bold; font-size:12px;">방어 부위</label>
+        <select name="system.armorType" style="height:26px;">
+          <option value="body" {{#if (eq system.armorType "body")}}selected{{/if}}>몸통 (Body)</option>
+          <option value="head" {{#if (eq system.armorType "head")}}selected{{/if}}>머리 (Head)</option>
+        </select>
+        
+        <label style="font-weight:bold; font-size:12px;">방어력 (Defense)</label>
+        <input type="text" name="system.defense" value="{{system.defense}}" data-dtype="Number" style="width:100px; text-align:center;"/>
+        
+        <label style="font-weight:bold; font-size:12px;">행동 페널티</label>
+        <input type="text" name="system.penalty" value="{{system.penalty}}" data-dtype="Number" style="width:100px; text-align:center;"/>
+      </div>
+    {{/if}}
 
     {{#if (eq item.type "attachment")}}
       <h3 style="background:#28a745; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">부착물 효과 (Modifier) 설정</h3>
       
+      <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        <label style="font-weight:bold; font-size:12px; color:#333;">장착 부위 (타입)</label>
+        <select name="system.attachType" style="height:26px;">
+          <option value="sight" {{#if (eq system.attachType "sight")}}selected{{/if}}>조준경 (상부)</option>
+          <option value="common" {{#if (eq system.attachType "common")}}selected{{/if}}>총기 악세서리 (공통)</option>
+          <option value="underbarrel" {{#if (eq system.attachType "underbarrel")}}selected{{/if}}>총기 악세서리 (하부)</option>
+          <option value="muzzle" {{#if (eq system.attachType "muzzle")}}selected{{/if}}>총구 부착물 (오른쪽)</option>
+        </select>
+      </div>
+
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; font-size:12px;">
-        
         <div>
           <h4 style="color:blue; border-bottom:1px solid #ccc; margin-bottom:5px;">명중 버프 (+)</h4>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>지근거리</span> <input type="number" name="system.modifiers.rangeBuffs.pointBlank" value="{{system.modifiers.rangeBuffs.pointBlank}}" style="width:40px; text-align:center;"/></div>
@@ -178,20 +181,19 @@
         </div>
 
         <div>
-          <h4 style="color:red; border-bottom:1px solid #ccc; margin-bottom:5px;">페널티 (무거워짐 등) (+)</h4>
+          <h4 style="color:red; border-bottom:1px solid #ccc; margin-bottom:5px;">명중 페널티 (-)</h4>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>지근거리</span> <input type="number" name="system.modifiers.rangePenalties.pointBlank" value="{{system.modifiers.rangePenalties.pointBlank}}" style="width:40px; text-align:center;"/></div>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>근거리</span> <input type="number" name="system.modifiers.rangePenalties.short" value="{{system.modifiers.rangePenalties.short}}" style="width:40px; text-align:center;"/></div>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>중거리</span> <input type="number" name="system.modifiers.rangePenalties.medium" value="{{system.modifiers.rangePenalties.medium}}" style="width:40px; text-align:center;"/></div>
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>장거리</span> <input type="number" name="system.modifiers.rangePenalties.long" value="{{system.modifiers.rangePenalties.long}}" style="width:40px; text-align:center;"/></div>
         </div>
-
       </div>
 
       <hr style="margin:15px 0;">
 
       <div style="display:grid; grid-template-columns: 120px 1fr 120px 1fr; gap:8px; align-items:center;">
         <label>신뢰성 보너스</label><input type="number" name="system.modifiers.reliability" value="{{system.modifiers.reliability}}" style="width:50px; text-align:center;"/>
-        <label>소음 레벨 감소</label><input type="number" name="system.modifiers.noiseLevel" value="{{system.modifiers.noiseLevel}}" style="width:50px; text-align:center;"/>
+        <label>소음 레벨 변동</label><input type="number" name="system.modifiers.noiseLevel" value="{{system.modifiers.noiseLevel}}" style="width:50px; text-align:center;"/>
         
         <label>저격 스킬 보너스(+)</label><input type="number" name="system.modifiers.snipingBonus" value="{{system.modifiers.snipingBonus}}" style="width:50px; text-align:center;"/>
         <label>저격 스킬 페널티(-)</label><input type="number" name="system.modifiers.snipingPenalty" value="{{system.modifiers.snipingPenalty}}" style="width:50px; text-align:center;"/>
