@@ -8,9 +8,16 @@ Hooks.once("init", () => {
 
   CONFIG.Actor.documentClass = GundogActor;
 
+  // 액터 시트 등록
   Actors.unregisterSheet("core", ActorSheet);
   Actors.registerSheet("gundog", GundogActorSheet, { 
     types: ["character"], 
+    makeDefault: true 
+  });
+  // 아이템 시트 등록
+  Items.unregisterSheet("core", ItemSheet);
+  Items.registerSheet("gundog", GundogItemSheet, { 
+    types: ["weapon", "armor"],
     makeDefault: true 
   });
 });
@@ -28,7 +35,7 @@ class GundogActorSheet extends ActorSheet {
     });
   }
 
-  async getData() {
+ async getData() {
     const context = super.getData();
     context.system = this.actor.system;
 
@@ -55,18 +62,6 @@ class GundogActorSheet extends ActorSheet {
     context.gundogCareerList = GUNDOG.careerList; //경력 리스트
     context.gundogSkillNames = GUNDOG.skillNames; //스킬 이름 리스트
     context.gundogAffiliations = GUNDOG.affiliations; //소속 데이터
-
-    // 백스토리와 노트 값이 비어있을 때를 대비한 안전한 텍스트 변환
-    const backstory = this.actor.system.profile.backstory || "";
-    const notes = this.actor.system.profile.notes || "";
-    
-    // ★ 추가: ProseMirror 에디터를 위한 백 스토리 및 특이사항 텍스트 변환
-    context.enrichedBackstory = await TextEditor.enrichHTML(this.actor.system.profile.backstory, {
-      async: true, secrets: this.actor.isOwner, rollData: context.rollData
-    });
-    context.enrichedNotes = await TextEditor.enrichHTML(this.actor.system.profile.notes, {
-      async: true, secrets: this.actor.isOwner, rollData: context.rollData
-    });
 
     // 경력 스킬 그룹화
     context.careerDisplay = {};
@@ -112,7 +107,26 @@ class GundogActorSheet extends ActorSheet {
       };
     }
 
-    
+    // ==========================================
+    // ★ 추가: 아이템(장비) 분류 로직
+    // ==========================================
+    context.weapons = [];
+    context.headArmors = [];
+    context.bodyArmors = [];
+
+    // 액터가 소지한 모든 아이템을 반복하며 종류별로 분류합니다.
+    for (let item of this.actor.items) {
+      if (item.type === "weapon") {
+        context.weapons.push(item);
+      } else if (item.type === "armor") {
+        if (item.system.armorType === "head") {
+          context.headArmors.push(item);
+        } else {
+          // 기본값은 몸통(body)으로 처리
+          context.bodyArmors.push(item);
+        }
+      }
+    }
 
     return context;
   }
@@ -164,6 +178,28 @@ class GundogActorSheet extends ActorSheet {
       }
       // 직접 DB를 업데이트합니다.
       await this.actor.update({ [field]: val });
+    });
+
+    // 1. 아이템 수정 (연필 아이콘 클릭 시 아이템 시트 열기)
+    html.find('.item-edit').click(ev => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      if (item) item.sheet.render(true);
+    });
+
+    // 2. 아이템 삭제 (휴지통 아이콘 클릭)
+    html.find('.item-delete').click(ev => {
+      const li = $(ev.currentTarget).parents(".item");
+      this.actor.deleteEmbeddedDocuments("Item", [li.data("itemId")]);
+    });
+
+    // 3. 장착 상태 토글 (체크박스 아이콘 클릭)
+    html.find('.item-equip').click(ev => {
+      const li = $(ev.currentTarget).parents(".item");
+      const item = this.actor.items.get(li.data("itemId"));
+      if (item) {
+        item.update({"system.equipped": !item.system.equipped});
+      }
     });
     
   }
@@ -438,5 +474,26 @@ class GundogActorSheet extends ActorSheet {
       content,
       type: CONST.CHAT_MESSAGE_TYPES.ROLL
     });
+  }
+}
+
+// 아이템 데이터와 HTML을 연결해주는 ItemSheet 클래스
+
+class GundogItemSheet extends ItemSheet {
+
+  static get defaultOptions() {
+    return foundry.utils.mergeObject(super.defaultOptions, {
+      classes: ["gundog", "sheet", "item"],
+      template: "systems/gundog/templates/item-sheet.hbs", // 방금 만든 파일 경로
+      width: 450,
+      height: 400,
+      resizable: false
+    });
+  }
+
+  getData() {
+    const context = super.getData();
+    context.system = this.item.system; // HBS 파일에서 system.방어력 등으로 접근 가능하게 만듦
+    return context;
   }
 }

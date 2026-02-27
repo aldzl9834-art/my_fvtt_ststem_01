@@ -130,22 +130,13 @@
         <div><label style="font-size:11px; color:#666; font-weight:bold;">머리색</label><input type="text" name="system.profile.hairColor" value="{{system.profile.hairColor}}" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">눈색</label><input type="text" name="system.profile.eyeColor" value="{{system.profile.eyeColor}}" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">피부색</label><input type="text" name="system.profile.skinColor" value="{{system.profile.skinColor}}" style="height:24px; font-size:12px;"/></div>
-
-        <div style="grid-column: span 4; margin-top:10px;">
-          <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">백 스토리 (Backstory)</label>
-          <div class="editor-container" style="height: 150px; border: 1px solid #ddd; background: #fafafa; overflow: hidden;">
-            {{editor enrichedBackstory target="system.profile.backstory" button=true editable=editable engine="prosemirror"}}
-          </div>
+        
+        <div>
+          <label style="font-size:11px; color:#dc3545; font-weight:bold;">유지비 (Maintenance)</label>
+          <input type="text" value="{{system.profile.maintenanceCost}}" style="height:24px; font-size:12px; border-color:#dc3545; background-color:#f4f4f4; text-align:center; font-weight:bold;" readonly title="생활 랭크, 주거, 차량, 커넥션 등의 유지비 합산 (자동 계산)"/>
         </div>
-
-        <div style="grid-column: span 4; margin-top:5px;">
-          <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">기타 특이 사항 (Notes)</label>
-          <div class="editor-container" style="height: 100px; border: 1px solid #ddd; background: #fafafa; overflow: hidden;">
-            {{editor enrichedNotes target="system.profile.notes" button=true editable=editable engine="prosemirror"}}
-          </div>
-        </div>
-
-        <div style="grid-column: span 4; margin-top: 10px;">
+        
+        <div></div> <div style="grid-column: span 4; margin-top: 10px;">
           <label style="font-size:11px; color:#666; font-weight:bold;">경력 (최대 5개 / 클릭하여 선택)</label>
           <div style="display:flex; gap:10px; margin-top:4px;">
             {{#each system.profile.careers as |career slotId|}}
@@ -178,6 +169,16 @@
           </div>
         </div>
 
+        <div style="grid-column: span 4; margin-top:10px;">
+          <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">백 스토리 (Backstory)</label>
+          <textarea name="system.profile.backstory" style="width:100%; height:120px; padding:8px; border:1px solid #ddd; border-radius:4px; background:#fafafa; resize:none; font-family:inherit; font-size:12px;">{{system.profile.backstory}}</textarea>
+        </div>
+
+        <div style="grid-column: span 4; margin-top:5px;">
+          <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">기타 특이 사항 (Notes)</label>
+          <textarea name="system.profile.notes" style="width:100%; height:80px; padding:8px; border:1px solid #ddd; border-radius:4px; background:#fafafa; resize:none; font-family:inherit; font-size:12px;">{{system.profile.notes}}</textarea>
+        </div>
+
       </div>
     </div>
 
@@ -204,7 +205,95 @@
       </div>
     </div>
 
-    <div class="tab equipment" data-group="primary" data-tab="equipment"><h3 style="padding: 10px; text-align:center; color:#666;">장비(무기/방어구 등)가 표시될 공간입니다.</h3></div>
+    <div class="tab equipment" data-group="primary" data-tab="equipment">
+      <div style="display:flex; gap:10px;">
+        
+        <div style="flex:1; border:1px solid #ccc; padding:5px; background:#fff; border-radius:4px;">
+          <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">무기 (Weapons)</h3>
+          
+          <div style="display:flex; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:4px;">
+            <div style="flex:0 0 25px; text-align:center;">장착</div>
+            <div style="flex:2;">무기명</div>
+            <div style="flex:1; text-align:center;">데미지</div>
+            <div style="flex:1; text-align:center;">탄약</div>
+            <div style="flex:0 0 40px; text-align:center;">관리</div>
+          </div>
+
+          {{#each weapons as |item|}}
+          <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; font-size:11px; align-items:center; border-bottom:1px solid #eee; padding:4px 0;">
+            <div style="flex:0 0 25px; text-align:center;">
+              <a class="item-equip" style="color:{{#if item.system.equipped}}#28a745{{else}}#ccc{{/if}};">
+                <i class="{{#if item.system.equipped}}fas fa-check-square{{else}}far fa-square{{/if}}"></i>
+              </a>
+            </div>
+            <div class="item-name item-edit" style="flex:2; font-weight:bold; cursor:pointer; color:#0056b3;">{{item.name}}</div>
+            <div style="flex:1; text-align:center;">{{item.system.damage}}</div>
+            <div style="flex:1; text-align:center;">{{item.system.ammo.value}} / {{item.system.ammo.max}}</div>
+            <div style="flex:0 0 40px; text-align:center;">
+              <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
+              <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+
+        <div style="flex:1; display:flex; flex-direction:column; gap:10px;">
+          
+          <div style="border:1px solid #ccc; padding:5px; background:#fff; border-radius:4px;">
+            <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">머리 방어구 (Head)</h3>
+            <div style="display:flex; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:4px;">
+              <div style="flex:0 0 25px; text-align:center;">장착</div>
+              <div style="flex:2;">방어구명</div>
+              <div style="flex:1; text-align:center;">방어력</div>
+              <div style="flex:0 0 40px; text-align:center;">관리</div>
+            </div>
+            {{#each headArmors as |item|}}
+            <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; font-size:11px; align-items:center; border-bottom:1px solid #eee; padding:4px 0;">
+              <div style="flex:0 0 25px; text-align:center;">
+                <a class="item-equip" style="color:{{#if item.system.equipped}}#28a745{{else}}#ccc{{/if}};">
+                  <i class="{{#if item.system.equipped}}fas fa-check-square{{else}}far fa-square{{/if}}"></i>
+                </a>
+              </div>
+              <div class="item-name item-edit" style="flex:2; font-weight:bold; cursor:pointer; color:#0056b3;">{{item.name}}</div>
+              <div style="flex:1; text-align:center;">{{item.system.defense}}</div>
+              <div style="flex:0 0 40px; text-align:center;">
+                <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
+                <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+              </div>
+            </div>
+            {{/each}}
+          </div>
+
+          <div style="border:1px solid #ccc; padding:5px; background:#fff; border-radius:4px;">
+            <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">몸통 방어구 (Body)</h3>
+            <div style="display:flex; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:4px;">
+              <div style="flex:0 0 25px; text-align:center;">장착</div>
+              <div style="flex:2;">방어구명</div>
+              <div style="flex:1; text-align:center;">방어력</div>
+              <div style="flex:0 0 40px; text-align:center;">관리</div>
+            </div>
+            {{#each bodyArmors as |item|}}
+            <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; font-size:11px; align-items:center; border-bottom:1px solid #eee; padding:4px 0;">
+              <div style="flex:0 0 25px; text-align:center;">
+                <a class="item-equip" style="color:{{#if item.system.equipped}}#28a745{{else}}#ccc{{/if}};">
+                  <i class="{{#if item.system.equipped}}fas fa-check-square{{else}}far fa-square{{/if}}"></i>
+                </a>
+              </div>
+              <div class="item-name item-edit" style="flex:2; font-weight:bold; cursor:pointer; color:#0056b3;">{{item.name}}</div>
+              <div style="flex:1; text-align:center;">{{item.system.defense}}</div>
+              <div style="flex:0 0 40px; text-align:center;">
+                <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
+                <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+              </div>
+            </div>
+            {{/each}}
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    
     <div class="tab items" data-group="primary" data-tab="items"><h3 style="padding: 10px; text-align:center; color:#666;">일반 아이템 및 소지품이 표시될 공간입니다.</h3></div>
     <div class="tab class-arts" data-group="primary" data-tab="class-arts"><h3 style="padding: 10px; text-align:center; color:#666;">직업 고유의 클래스 아츠가 표시될 공간입니다.</h3></div>
   </section>

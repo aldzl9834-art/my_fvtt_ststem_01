@@ -124,5 +124,16 @@ export class GundogActor extends Actor {
     system.profile.movement.careful = Math.ceil(mobility / 2); // 소수점 올림
     system.profile.movement.normal = mobility;
     system.profile.movement.sprint = (mobility * 2) + 20;
+
+    // ==========================================
+    // ★ 5. 유지비 (Maintenance Cost) 연산 (뼈대) ★
+    // ==========================================
+    
+    // TODO: 추후 Item 시스템이 연동되면 생활 랭크, 주거, 차량, 차고, 커넥션 등의 아이템을 필터링하여 합산합니다.
+    let baseMaintenance = 0; // 기타 기본 유지비
+    let itemMaintenance = 0; // 아이템에 의한 유지비 합산액
+    
+    // 최종 유지비 계산
+    system.profile.maintenanceCost = baseMaintenance + itemMaintenance;
   }
 }

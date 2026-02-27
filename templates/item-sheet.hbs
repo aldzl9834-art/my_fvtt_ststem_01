@@ -1,0 +1,61 @@
+<form class="gundog-item-sheet" autocomplete="off" style="padding: 10px; background: #f9f9f9; height: 100%;">
+  
+  <header class="sheet-header" style="display:flex; gap:15px; margin-bottom:15px; padding-bottom:10px; border-bottom:2px solid #222;">
+    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="80" width="80" style="border:2px solid #000; background:#fff;"/>
+    <div class="header-fields" style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+      <h1 class="charname" style="margin:0;">
+        <input name="name" type="text" value="{{item.name}}" placeholder="아이템 이름" style="font-weight:bold; font-size:24px; border:none; border-bottom:1px solid #ccc; background:transparent;"/>
+      </h1>
+      <div style="margin-top:5px; font-weight:bold; color:#666; font-size:12px; text-transform:uppercase;">
+        아이템 타입: {{item.type}}
+      </div>
+    </div>
+  </header>
+
+  <div class="sheet-body" style="border:1px solid #ccc; padding:10px; background:#fff; border-radius:4px;">
+    
+    {{#if (eq item.type "weapon")}}
+      <div style="display:grid; grid-template-columns: 100px 1fr; gap:8px; align-items:center;">
+        <label style="font-weight:bold; font-size:12px;">무기 분류</label>
+        <input type="text" name="system.weaponType" value="{{system.weaponType}}" placeholder="예: 핸드건, 라이플, 중화기"/>
+        
+        <label style="font-weight:bold; font-size:12px;">데미지</label>
+        <input type="text" name="system.damage" value="{{system.damage}}" placeholder="예: 1d10, 2d6+2"/>
+        
+        <label style="font-weight:bold; font-size:12px;">사거리</label>
+        <input type="text" name="system.range" value="{{system.range}}" placeholder="예: 10m, 50m"/>
+        
+        <label style="font-weight:bold; font-size:12px;">탄약 (현재/최대)</label>
+        <div style="display:flex; gap:5px; align-items:center;">
+          <input type="text" name="system.ammo.value" value="{{system.ammo.value}}" data-dtype="Number" style="width:50px; text-align:center;"/> /
+          <input type="text" name="system.ammo.max" value="{{system.ammo.max}}" data-dtype="Number" style="width:50px; text-align:center;"/>
+        </div>
+
+        <label style="font-weight:bold; font-size:12px;">은닉성</label>
+        <input type="text" name="system.concealability" value="{{system.concealability}}" placeholder="예: 높음, 낮음"/>
+      </div>
+    {{/if}}
+
+    {{#if (eq item.type "armor")}}
+      <div style="display:grid; grid-template-columns: 100px 1fr; gap:8px; align-items:center;">
+        <label style="font-weight:bold; font-size:12px;">방어 부위</label>
+        <select name="system.armorType" style="height:26px;">
+          <option value="body" {{#if (eq system.armorType "body")}}selected{{/if}}>몸통 (Body)</option>
+          <option value="head" {{#if (eq system.armorType "head")}}selected{{/if}}>머리 (Head)</option>
+        </select>
+        
+        <label style="font-weight:bold; font-size:12px;">방어력 (Defense)</label>
+        <input type="text" name="system.defense" value="{{system.defense}}" data-dtype="Number" style="width:100px; text-align:center;"/>
+        
+        <label style="font-weight:bold; font-size:12px;">행동 페널티</label>
+        <input type="text" name="system.penalty" value="{{system.penalty}}" data-dtype="Number" style="width:100px; text-align:center;"/>
+      </div>
+    {{/if}}
+
+    <div style="margin-top:15px;">
+      <label style="font-weight:bold; font-size:12px; display:block; border-bottom:1px solid #ddd; padding-bottom:3px; margin-bottom:5px;">설명</label>
+      <textarea name="system.description" style="width:100%; height:100px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none;">{{system.description}}</textarea>
+    </div>
+
+  </div>
+</form>
