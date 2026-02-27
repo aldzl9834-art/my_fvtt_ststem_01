@@ -21,8 +21,9 @@ class GundogActorSheet extends ActorSheet {
     return foundry.utils.mergeObject(super.defaultOptions, {
       classes: ["gundog", "sheet", "actor"],
       template: "systems/gundog/templates/actor-sheet.hbs",
-      width: 650,
-      height: 700,
+      width: 850,            // ★ 가로 크기 850px 고정
+      height: 750,           // 세로 크기 기본값 지정
+      resizable: false,      // ★ 시트 크기 조절(드래그) 비활성화
       tabs: [{ navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "profile" }]
     });
   }
@@ -30,6 +31,10 @@ class GundogActorSheet extends ActorSheet {
   async getData() {
     const context = super.getData();
     context.system = this.actor.system;
+
+    // 에디터 활성화를 위한 필수 권한 데이터 명시
+    context.editable = this.isEditable;
+    context.owner = this.actor.isOwner;
     
     // ★ HTML 시트에서 드롭다운 메뉴를 그릴 수 있도록 클래스 데이터를 전달합니다.
     context.gundogClasses = GUNDOG.classes;
@@ -50,6 +55,10 @@ class GundogActorSheet extends ActorSheet {
     context.gundogCareerList = GUNDOG.careerList; //경력 리스트
     context.gundogSkillNames = GUNDOG.skillNames; //스킬 이름 리스트
     context.gundogAffiliations = GUNDOG.affiliations; //소속 데이터
+
+    // 백스토리와 노트 값이 비어있을 때를 대비한 안전한 텍스트 변환
+    const backstory = this.actor.system.profile.backstory || "";
+    const notes = this.actor.system.profile.notes || "";
     
     // ★ 추가: ProseMirror 에디터를 위한 백 스토리 및 특이사항 텍스트 변환
     context.enrichedBackstory = await TextEditor.enrichHTML(this.actor.system.profile.backstory, {

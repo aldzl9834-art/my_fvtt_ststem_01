@@ -119,31 +119,29 @@
         
         <div><label style="font-size:11px; color:#666; font-weight:bold;">국적</label><input type="text" name="system.profile.nationality" value="{{system.profile.nationality}}" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">직업</label><input type="text" name="system.profile.occupation" value="{{system.profile.occupation}}" style="height:24px; font-size:12px;"/></div>
-        <div><label style="font-size:11px; color:#666; font-weight:bold;">소속 단체</label><input type="text" name="system.profile.affiliation" value="{{system.profile.affiliation}}" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">성별</label><input type="text" name="system.profile.gender" value="{{system.profile.gender}}" style="height:24px; font-size:12px;"/></div>
-
         <div><label style="font-size:11px; color:#666; font-weight:bold;">혈액형</label><input type="text" name="system.profile.bloodType" value="{{system.profile.bloodType}}" style="height:24px; font-size:12px;"/></div>
+
         <div><label style="font-size:11px; color:#666; font-weight:bold;">나이</label><input type="text" name="system.profile.age" value="{{system.profile.age}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">신장 (cm)</label><input type="text" name="system.profile.height" value="{{system.profile.height}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">체중 (kg)</label><input type="text" name="system.profile.weight" value="{{system.profile.weight}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#0056b3; font-weight:bold;">예금 (Bank)</label><input type="text" name="system.profile.wealth.bank" value="{{system.profile.wealth.bank}}" data-dtype="Number" style="height:24px; font-size:12px; border-color:#0056b3;"/></div>
 
         <div><label style="font-size:11px; color:#666; font-weight:bold;">머리색</label><input type="text" name="system.profile.hairColor" value="{{system.profile.hairColor}}" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">눈색</label><input type="text" name="system.profile.eyeColor" value="{{system.profile.eyeColor}}" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">피부색</label><input type="text" name="system.profile.skinColor" value="{{system.profile.skinColor}}" style="height:24px; font-size:12px;"/></div>
-        
-        <div><label style="font-size:11px; color:#0056b3; font-weight:bold;">예금 (Bank)</label><input type="text" name="system.profile.wealth.bank" value="{{system.profile.wealth.bank}}" data-dtype="Number" style="height:24px; font-size:12px; border-color:#0056b3;"/></div>
 
         <div style="grid-column: span 4; margin-top:10px;">
           <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">백 스토리 (Backstory)</label>
-          <div style="min-height: 120px; border: 1px solid #ddd; padding: 5px; background: #fafafa;">
-            {{editor enrichedBackstory target="system.profile.backstory" button=true owner=owner editable=editable engine="prosemirror"}}
+          <div class="editor-container" style="height: 150px; border: 1px solid #ddd; background: #fafafa; overflow: hidden;">
+            {{editor enrichedBackstory target="system.profile.backstory" button=true editable=editable engine="prosemirror"}}
           </div>
         </div>
 
         <div style="grid-column: span 4; margin-top:5px;">
           <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">기타 특이 사항 (Notes)</label>
-          <div style="min-height: 80px; border: 1px solid #ddd; padding: 5px; background: #fafafa;">
-            {{editor enrichedNotes target="system.profile.notes" button=true owner=owner editable=editable engine="prosemirror"}}
+          <div class="editor-container" style="height: 100px; border: 1px solid #ddd; background: #fafafa; overflow: hidden;">
+            {{editor enrichedNotes target="system.profile.notes" button=true editable=editable engine="prosemirror"}}
           </div>
         </div>
 
