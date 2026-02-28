@@ -1,4 +1,30 @@
 {
+  "GUNDOG": {
+    "SkillGroup": {
+      "Shooting": "사격계",
+      "Fighting": "격투계",
+      "Expertise": "기술계"
+    },
+    "Skill": {
+      "Handgun": "핸드건",
+      "SMG": "기관단총",
+      "Rifle": "라이플",
+      "HeavyWeaponry": "중화기",
+      "Sniping": "저격",
+      "MeleeCombat": "무기전투",
+      "Throwing": "투척",
+      "UrbanAction": "시가지 행동",
+      "Fieldcraft": "국지 행동",
+      "Detection": "감지",
+      "SituationalAwareness": "상황파악"
+    },
+    "Sheet": {
+      "Profile": "프로필",
+      "Inventory": "인벤토리",
+      "Skill": "스킬",
+      "Vehicle": "차량"
+    }
+  },
   "TYPES": {
     "Item": {
       "weapon": "무기",
@@ -6,4 +32,4 @@
       "attachment": "총기 부착물"
     }
   }
-}
+} 

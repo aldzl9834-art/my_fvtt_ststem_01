@@ -95,10 +95,7 @@
           <div style="font-weight:bold; font-size: 11px; margin-bottom: 4px;">{{lookup ../capabilityLabels key}}</div>
           <div style="display: flex; gap: 3px; width: 100%; text-align: center;">
             <div style="flex:1;"><label style="font-size:9px; color:#666;">Val</label><input type="text" name="system.capabilities.{{key}}.value" value="{{cap.value}}" data-dtype="Number" style="height:20px; text-align:center; font-size:11px;"/></div>
-            <div style="flex:1;"><label style="font-size:9px; color:#666;">Mod</label><input type="text" name="system.capabilities.{{key}}.mod" value="{{cap.mod}}" data-dtype="Number" style="height:20px; text-align:center; font-size:11px;"/></div>
-            <div style="flex:1;"><label style="font-size:9px; color:#666;">Exp</label><input type="text" name="system.capabilities.{{key}}.exp" value="{{cap.exp}}" data-dtype="Number" style="height:20px; text-align:center; font-size:11px;"/></div>
           </div>
-          <div style="font-size:13px; font-weight:bold; color:#d9534f; margin-top:4px;">Total: {{cap.total}}</div>
         </div>
       {{/each}}
     </div>
@@ -136,37 +133,108 @@
           <input type="text" value="{{totalMaintenanceCost}}" style="height:24px; font-size:12px; border-color:#dc3545; background-color:#f4f4f4; text-align:center; font-weight:bold;" readonly title="생활 랭크, 주거, 차량, 커넥션 등의 유지비 합산 (자동 계산)"/>
         </div>
         
-        <div></div> <div style="grid-column: span 4; margin-top: 10px;">
-          <label style="font-size:11px; color:#666; font-weight:bold;">경력 (최대 5개 / 클릭하여 선택)</label>
-          <div style="display:flex; gap:10px; margin-top:4px;">
-            {{#each system.profile.careers as |career slotId|}}
-              <div class="career-slot" data-slot="{{slotId}}" style="flex:1; height:40px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; background:#f9f9f9; position:relative;">
-                {{#if career.name}}
-                  <div style="font-weight:bold; font-size:12px; color:#222;">{{lookup (lookup @root.careerDisplay slotId) 'label'}}</div>
-                  <div style="font-size:10px; color:#0056b3;">{{lookup (lookup @root.careerDisplay slotId) 'skill1'}}, {{lookup (lookup @root.careerDisplay slotId) 'skill2'}}</div>
-                  <a class="reset-career" data-slot="{{slotId}}" style="position:absolute; top:2px; right:4px; font-size:11px; color:#dc3545; z-index:10;" title="경력 초기화"><i class="fas fa-trash"></i></a>
+        <div style="grid-column: span 4; margin-top: 10px; display: grid; grid-template-columns: 6fr 4fr; gap: 15px;">
+          
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            
+            <div>
+              <label style="font-size:11px; color:#666; font-weight:bold;">경력 (최대 5개 / 클릭하여 선택)</label>
+              <div style="display:flex; gap:5px; margin-top:4px;">
+                {{#each system.profile.careers as |career slotId|}}
+                  <div class="career-slot" data-slot="{{slotId}}" style="flex:1; height:45px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; background:#f9f9f9; position:relative;">
+                    {{#if career.name}}
+                      <div style="font-weight:bold; font-size:11px; color:#222; text-align:center; margin-bottom:2px;">{{lookup (lookup @root.careerDisplay slotId) 'label'}}</div>
+                      <div style="font-size:9px; color:#0056b3; line-height:1.1; text-align:center;">
+                        {{lookup (lookup @root.careerDisplay slotId) 'skill1'}}<br>{{lookup (lookup @root.careerDisplay slotId) 'skill2'}}
+                      </div>
+                      <a class="reset-career" data-slot="{{slotId}}" style="position:absolute; top:2px; right:4px; font-size:10px; color:#dc3545; z-index:10;" title="경력 초기화"><i class="fas fa-trash"></i></a>
+                    {{else}}
+                      <div style="font-size:11px; color:#999;"><i class="fas fa-plus"></i> 추가</div>
+                    {{/if}}
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:11px; color:#666; font-weight:bold;">보너스 스킬 (3개 선택 / 클릭하여 추가)</label>
+              <div class="bonus-skill-slot" style="margin-top:4px; height:40px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; background:#f9f9f9; position:relative;">
+                {{#if system.profile.bonusSkills.skill1}}
+                  <div style="font-weight:bold; font-size:11px; color:#0056b3; text-align:center;">
+                    {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill1}}, 
+                    {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill2}}, 
+                    {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill3}}
+                  </div>
+                  <a class="reset-bonus-skills" style="position:absolute; top:2px; right:4px; font-size:10px; color:#dc3545; z-index:10;" title="보너스 스킬 초기화"><i class="fas fa-trash"></i></a>
                 {{else}}
-                  <div style="font-size:11px; color:#999;"><i class="fas fa-plus"></i> 추가</div>
+                  <div style="font-size:11px; color:#999;"><i class="fas fa-plus"></i> 보너스 스킬 선택</div>
                 {{/if}}
               </div>
-            {{/each}}
-          </div>
-        </div>
+            </div>
 
-        <div style="grid-column: span 4; margin-top: 5px;">
-          <label style="font-size:11px; color:#666; font-weight:bold;">보너스 스킬 (3개 선택 / 클릭하여 추가)</label>
-          <div class="bonus-skill-slot" style="margin-top:4px; height:40px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; background:#f9f9f9; position:relative;">
-            {{#if system.profile.bonusSkills.skill1}}
-              <div style="font-weight:bold; font-size:12px; color:#0056b3;">
-                {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill1}}, 
-                {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill2}}, 
-                {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill3}}
-              </div>
-              <a class="reset-bonus-skills" style="position:absolute; top:2px; right:4px; font-size:11px; color:#dc3545; z-index:10;" title="보너스 스킬 초기화"><i class="fas fa-trash"></i></a>
-            {{else}}
-              <div style="font-size:11px; color:#999;"><i class="fas fa-plus"></i> 보너스 스킬 선택</div>
-            {{/if}}
           </div>
+
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            
+            <div style="flex:1; display:flex; flex-direction:column;">
+              <label style="font-size:11px; color:#666; font-weight:bold;">신념 (Beliefs)</label>
+              <div style="flex:1; display:flex; flex-direction:column; gap:4px; margin-top:4px; min-height:45px; overflow-y:auto; border:1px dashed #999; border-radius:4px; background:#f9f9f9; padding:4px;">
+                {{#each beliefs as |item|}}
+                <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; flex-direction:column; gap:2px; padding:4px 6px; border-bottom:1px solid #ddd; background:#fff; border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                  
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="item-name item-edit" style="font-weight:bold; font-size:15px; cursor:pointer; color:#0056b3; line-height:1;" title="[상세 설정] {{item.system.details}}">{{item.name}}</span>
+                    <div style="display:flex; gap:5px; flex-shrink:0;">
+                      <a class="item-edit" style="color:#666; cursor:pointer;" title="수정"><i class="fas fa-edit"></i></a>
+                      <a class="item-delete" style="color:#dc3545; cursor:pointer;" title="삭제"><i class="fas fa-trash"></i></a>
+                    </div>
+                  </div>
+
+                  {{#if item.system.description}}
+                  <div style="margin-top:2px; font-size:12px; color:#333; line-height:1.3; background:#f4f4f4; padding:4px; border-radius:2px; word-break:keep-all; white-space:pre-wrap; border-left:2px solid #0056b3; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">{{item.system.description}}</div>
+                  {{/if}}
+
+                </div>
+                {{/each}}
+                {{#unless beliefs}}
+                  <div style="text-align:center; color:#aaa; font-size:10px; margin-top:10px;">드래그하여 추가</div>
+                {{/unless}}
+              </div>
+            </div>
+
+            <div style="flex:1; display:flex; flex-direction:column;">
+              <label style="font-size:11px; color:#666; font-weight:bold;">특징 (Traits)</label>
+              <div style="flex:1; display:flex; flex-direction:column; gap:4px; margin-top:4px; min-height:20px; overflow-y:auto; border:1px dashed #999; border-radius:4px; background:#f9f9f9; padding:4px;">
+                {{#each traits as |item|}}
+                <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; flex-direction:column; gap:2px; padding:4px 6px; border-bottom:1px solid #ddd; background:#fff; border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                  
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="item-name item-edit" style="font-weight:bold; font-size:15px; cursor:pointer; color:#0056b3; line-height:1;" title="[상세 설정] {{item.system.details}}">{{item.name}}</span>
+                    <div style="display:flex; gap:5px; flex-shrink:0;">
+                      <a class="item-edit" style="color:#666; cursor:pointer;" title="수정"><i class="fas fa-edit"></i></a>
+                      <a class="item-delete" style="color:#dc3545; cursor:pointer;" title="삭제"><i class="fas fa-trash"></i></a>
+                    </div>
+                  </div>
+                  
+                  <div style="display:flex; gap:8px; font-size:11px; color:#555; line-height:1;">
+                    <div><span style="font-weight:bold; color:#17a2b8;">RP 수정:</span> {{item.system.rpModifier}}</div>
+                    <div><span style="font-weight:bold; color:#dc3545;">유지 코스트:</span> {{item.system.maintenanceCost}}</div>
+                  </div>
+                  
+                  {{#if item.system.description}}
+                  <div style="margin-top:1px; font-size:12px; color:#333; line-height:1.3; background:#f4f4f4; padding:4px; border-radius:2px; word-break:keep-all; white-space:pre-wrap; border-left:2px solid #17a2b8; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">{{item.system.description}}</div>
+                  {{/if}}
+
+                </div>
+                {{/each}}
+                {{#unless traits}}
+                  <div style="text-align:center; color:#aaa; font-size:10px; margin-top:10px;">드래그하여 추가</div>
+                {{/unless}}
+              </div>
+            </div>
+
+          </div>
+
         </div>
 
         <div style="grid-column: span 4; margin-top:10px;">
@@ -303,77 +371,76 @@
 
     
     <div class="tab items" data-group="primary" data-tab="items" style="padding:10px;">
-      <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 10px 0; font-size:13px;">CP 관리표 (10 x 10)</h3>
       
       <div style="display:flex; gap:15px; align-items:flex-start;">
         
-        <div style="flex: 0 0 440px; display:flex; flex-direction:column;">
+        <div style="flex: 0 0 440px; display:flex; flex-direction:column; gap:20px;">
           
-          <div style="display:flex; margin-left:40px; margin-bottom:5px; align-items:center;">
-            <div style="font-size:12px; font-weight:bold; color:#0056b3; margin-right:5px;">→ 크기(체격) 한계:</div>
-            <input type="number" name="system.profile.inventoryMax.x" data-field="system.profile.inventoryMax.x" value="{{#if system.profile.inventoryMax.x}}{{system.profile.inventoryMax.x}}{{else}}10{{/if}}" data-dtype="Number" class="sync-input" style="width:40px; height:20px; text-align:center; font-weight:bold; border:1px solid #0056b3; border-radius:3px; background:#e8f4ff; color:#0056b3;"/>
-          </div>
-          
-          <div style="display:flex; margin-left:40px; height:15px; margin-bottom:2px;">
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">1</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">2</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">3</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">4</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">5</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">6</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">7</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">8</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">9</div>
-            <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">10</div>
-          </div>
-
-          <div style="display:flex;">
-            <div style="width:40px; display:flex; position:relative;">
-              <div style="position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center;">
-                <div style="writing-mode: vertical-rl; font-size:12px; font-weight:bold; color:#d9534f; letter-spacing: 2px;">↓ 무게(근력)</div>
-                <input type="number" name="system.profile.inventoryMax.y" data-field="system.profile.inventoryMax.y" value="{{#if system.profile.inventoryMax.y}}{{system.profile.inventoryMax.y}}{{else}}10{{/if}}" data-dtype="Number" class="sync-input" style="width:26px; height:20px; text-align:center; font-size:11px; font-weight:bold; border:1px solid #d9534f; border-radius:3px; margin-top:5px; margin-left:5px; padding:0; background:#fff4f4; color:#d9534f;"/>
-              </div>
-              <div style="margin-left:20px; display:flex; flex-direction:column; width:20px;">
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">1</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">2</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">3</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">4</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">5</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">6</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">7</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">8</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">9</div>
-                <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">10</div>
-              </div>
+          <div>
+            <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 10px 0; font-size:13px;">CP 관리표 (10 x 10)</h3>
+            
+            <div style="display:flex; margin-left:40px; margin-bottom:5px; align-items:center;">
+              <div style="font-size:12px; font-weight:bold; color:#0056b3; margin-right:5px;">→ 크기(체격) 한계:</div>
+              <input type="number" name="system.profile.inventoryMax.x" data-field="system.profile.inventoryMax.x" value="{{#if system.profile.inventoryMax.x}}{{system.profile.inventoryMax.x}}{{else}}10{{/if}}" data-dtype="Number" class="sync-input" style="width:40px; height:20px; text-align:center; font-weight:bold; border:1px solid #0056b3; border-radius:3px; background:#e8f4ff; color:#0056b3;"/>
+            </div>
+            
+            <div style="display:flex; margin-left:40px; height:15px; margin-bottom:2px;">
+              <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">1</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">2</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">3</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">4</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">5</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">6</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">7</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">8</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">9</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">10</div>
             </div>
 
-            <div class="cp-grid-wrapper" style="position:relative; width:400px; height:400px; background:#e8e8e8; border:2px solid #555; box-shadow:inset 0 0 10px rgba(0,0,0,0.1); flex-shrink:0;">
-              
-              <div style="display:grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); width:100%; height:100%; position:absolute; top:0; left:0; pointer-events:none;">
-                {{#each gridCells}}
-                  <div style="border-right:1px solid #ccc; border-bottom:1px solid #ccc; box-sizing:border-box; background:{{#if isActive}}transparent{{else}}rgba(0, 0, 0, 0.6){{/if}};"></div>
+            <div style="display:flex;">
+              <div style="width:40px; display:flex; position:relative;">
+                <div style="position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center;">
+                  <div style="writing-mode: vertical-rl; font-size:12px; font-weight:bold; color:#d9534f; letter-spacing: 2px;">↓ 무게(근력)</div>
+                  <input type="number" name="system.profile.inventoryMax.y" data-field="system.profile.inventoryMax.y" value="{{#if system.profile.inventoryMax.y}}{{system.profile.inventoryMax.y}}{{else}}10{{/if}}" data-dtype="Number" class="sync-input" style="width:26px; height:20px; text-align:center; font-size:11px; font-weight:bold; border:1px solid #d9534f; border-radius:3px; margin-top:5px; margin-left:5px; padding:0; background:#fff4f4; color:#d9534f;"/>
+                </div>
+                <div style="margin-left:20px; display:flex; flex-direction:column; width:20px;">
+                  <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">1</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">2</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">3</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">4</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">5</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">6</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">7</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">8</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">9</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">10</div>
+                </div>
+              </div>
+
+              <div class="cp-grid-wrapper" style="position:relative; width:400px; height:400px; background:#e8e8e8; border:2px solid #555; box-shadow:inset 0 0 10px rgba(0,0,0,0.1); flex-shrink:0;">
+                <div style="display:grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); width:100%; height:100%; position:absolute; top:0; left:0; pointer-events:none;">
+                  {{#each gridCells}}
+                    <div style="border-right:1px solid #ccc; border-bottom:1px solid #ccc; box-sizing:border-box; background:{{#if isActive}}transparent{{else}}rgba(0, 0, 0, 0.6){{/if}};"></div>
+                  {{/each}}
+                </div>
+                
+                {{#each gridItems}}
+                  <div class="cp-grid-item" data-item-id="{{id}}" draggable="true" style="position:absolute; left:{{left}}px; top:{{top}}px; width:{{w}}px; height:{{h}}px; background:rgba(0, 86, 179, 0.85); border:1px solid #002752; color:white; font-size:10px; font-weight:bold; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:grab; overflow:hidden; box-shadow:2px 2px 5px rgba(0,0,0,0.4); z-index:10; user-select:none;">
+                    {{#if isWearable}}{{#if (eq type "attachment")}}<div style="color:#a2f1ff; font-size:9px; margin-bottom:2px;"><i class="fas fa-link"></i> 부착됨</div>{{/if}}{{/if}}
+                    <div style="word-break:keep-all; font-size:16px;">{{gridLabel}}</div>
+                  </div>
                 {{/each}}
               </div>
-              
-              {{#each gridItems}}
-                <div class="cp-grid-item" data-item-id="{{id}}" draggable="true" style="position:absolute; left:{{left}}px; top:{{top}}px; width:{{w}}px; height:{{h}}px; background:rgba(0, 86, 179, 0.85); border:1px solid #002752; color:white; font-size:10px; font-weight:bold; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:grab; overflow:hidden; box-shadow:2px 2px 5px rgba(0,0,0,0.4); z-index:10; user-select:none;">
-                  
-                  {{#if isWearable}}
-                    {{#if (eq type "attachment")}}
-                      <div style="color:#a2f1ff; font-size:9px; margin-bottom:2px;"><i class="fas fa-link"></i> 부착됨</div>
-                    {{/if}}
-                  {{/if}}
-                  
-                  <div style="word-break:keep-all; font-size:16px;">{{gridLabel}}</div>
-                </div>
-              {{/each}}
             </div>
           </div>
+
+          <div>
+            <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 10px 0; font-size:13px;">가방 (Bag) 4 x 4</h3>
+            <div style="margin-left:60px; display:flex;">
+              <div class="bag-grid-wrapper" style="position:relative; width:160px; height:160px; background:#e8e8e8; border:2px solid #555; box-shadow:inset 0 0 10px rgba(0,0,0,0.1); flex-shrink:0;">
+                <div style="display:grid; grid-template-columns: repeat(4, 40px); grid-template-rows: repeat(4, 40px); width:100%; height:100%; position:absolute; top:0; left:0; pointer-events:none;">
+                  {{#each bagGridCells}}
+                    <div style="border-right:1px solid #ccc; border-bottom:1px solid #ccc; box-sizing:border-box; background:transparent;"></div>
+                  {{/each}}
+                </div>
+                
+                {{#each bagGridItems}}
+                  <div class="cp-grid-item" data-item-id="{{id}}" draggable="true" style="position:absolute; left:{{left}}px; top:{{top}}px; width:{{w}}px; height:{{h}}px; background:rgba(40, 167, 69, 0.85); border:1px solid #1e7e34; color:white; font-size:10px; font-weight:bold; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:grab; overflow:hidden; box-shadow:2px 2px 5px rgba(0,0,0,0.4); z-index:10; user-select:none;">
+                    {{#if isWearable}}{{#if (eq type "attachment")}}<div style="color:#a2f1ff; font-size:9px; margin-bottom:2px;"><i class="fas fa-link"></i> 부착됨</div>{{/if}}{{/if}}
+                    <div style="word-break:keep-all; font-size:16px;">{{gridLabel}}</div>
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <div style="flex:1; display:flex; flex-direction:column; gap:10px; height:440px;">
+        <div style="flex:1; height:650px;">
           
-          <div class="unplaced-item-list" style="flex:1; border:2px dashed #999; padding:10px; background:#fafafa; border-radius:4px; overflow-y:auto; position:relative;">
+          <div class="unplaced-item-list" style="height:100%; border:2px dashed #999; padding:10px; background:#fafafa; border-radius:4px; overflow-y:auto; position:relative; box-sizing:border-box;">
             <h4 style="margin:0 0 10px 0; color:#0056b3; border-bottom:1px solid #0056b3; padding-bottom:5px;"><i class="fas fa-box-open"></i> 보유중인 아이템</h4>
             {{#each unplacedItems}}
               <div class="unplaced-item" data-item-id="{{id}}" draggable="true" style="border:1px solid #ccc; background:#fff; padding:6px; margin-bottom:6px; border-radius:3px; cursor:grab; display:flex; justify-content:space-between; align-items:center; box-shadow:1px 1px 3px rgba(0,0,0,0.1);">
@@ -382,23 +449,17 @@
                   <span style="font-weight:bold; font-size:12px; color:#fff; background:#0056b3; width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:3px; flex-shrink:0;">{{gridLabel}}</span>
                   
                   <span style="font-weight:bold; color:#333; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{name}}">
-                    {{#if isWearable}}
-                      {{#if (eq type "attachment")}}
-                        <i class="fas fa-link" style="color:#17a2b8; margin-right:4px;" title="무기에 부착됨"></i>
-                      {{else}}
-                        <i class="fas fa-tshirt" style="color:#28a745; margin-right:4px;" title="착용 아이템"></i>
-                      {{/if}}
-                    {{/if}}
+                    {{#if isWearable}}{{#if (eq type "attachment")}}<i class="fas fa-link" style="color:#17a2b8; margin-right:4px;" title="무기에 부착됨"></i>{{else}}<i class="fas fa-tshirt" style="color:#28a745; margin-right:4px;" title="착용 아이템"></i>{{/if}}{{/if}}
                     {{name}}
                   </span>
                 </div>
                 
                 <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
-                  <span style="font-size:11px; color:#fff; background:{{#if isWearable}}{{#if (eq type "attachment")}}#17a2b8{{else}}#28a745{{/if}}{{else}}{{#if isPlaced}}#0056b3{{else}}#555{{/if}}{{/if}}; padding:2px 6px; border-radius:10px;">
+                  <span style="font-size:11px; color:#fff; background:{{#if isWearable}}{{#if (eq type "attachment")}}#17a2b8{{else}}#28a745{{/if}}{{else}}{{#if isPlaced}}{{#if (eq gType "bag")}}#28a745{{else}}#0056b3{{/if}}{{else}}#555{{/if}}{{/if}}; padding:2px 6px; border-radius:10px;">
                     {{#if isWearable}}
                       {{#if (eq type "attachment")}}부착됨{{else}}착용중{{/if}}
                     {{else}}
-                      {{#if isPlaced}}배치됨{{else}}{{portX}} x {{portY}}{{/if}}
+                      {{#if isPlaced}}{{#if (eq gType "bag")}}가방{{else}}배치됨{{/if}}{{else}}{{portX}} x {{portY}}{{/if}}
                     {{/if}}
                   </span>
                   <a class="unplaced-item-delete" style="color:#dc3545; cursor:pointer;" title="영구 삭제"><i class="fas fa-trash"></i></a>
@@ -410,23 +471,7 @@
               <div style="text-align:center; color:#aaa; font-size:12px; margin-top:20px;">보유중인 아이템이 없습니다.</div>
             {{/unless}}
           </div>
-          </div>
-
-          <div class="trash-item-list" style="flex:0.6; border:2px dashed #dc3545; padding:10px; background:#fff4f4; border-radius:4px; overflow-y:auto; position:relative;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid #dc3545; padding-bottom:5px;">
-              <h4 style="margin:0; color:#dc3545; font-size:13px;"><i class="fas fa-trash-alt"></i> 휴지통</h4>
-              <button type="button" class="empty-trash-btn" style="background:#dc3545; color:white; border:none; border-radius:3px; padding:3px 8px; font-size:11px; cursor:pointer; font-weight:bold;">비우기</button>
-            </div>
-            {{#each trashItems}}
-              <div class="trash-item" data-item-id="{{id}}" draggable="true" style="border:1px solid #dc3545; background:#fff; padding:6px; margin-bottom:6px; border-radius:3px; cursor:grab; display:flex; justify-content:space-between; align-items:center; opacity:0.7;">
-                <span style="font-weight:bold; color:#666; font-size:12px; text-decoration:line-through;">{{name}}</span>
-              </div>
-            {{/each}}
-            {{#unless trashItems}}
-              <div style="text-align:center; color:#dca7a7; font-size:12px; margin-top:15px;">이곳에 드래그하여 버리기</div>
-            {{/unless}}
-          </div>
-
+          
         </div>
       </div>
 
@@ -494,6 +539,51 @@
 
     </div>
 
-    <div class="tab class-arts" data-group="primary" data-tab="class-arts"><h3 style="padding: 10px; text-align:center; color:#666;">직업 고유의 클래스 아츠가 표시될 공간입니다.</h3></div>
+    <div class="tab class-arts" data-group="primary" data-tab="class-arts">
+      <div style="padding:10px;">
+        <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 10px 0; font-size:13px; display:flex; justify-content:space-between; align-items:center;">
+          <span><i class="fas fa-bolt"></i> 클래스 아츠 (Class Arts)</span>
+          <span style="font-size:11px; font-weight:normal; color:#aaa;">※ 최대 8개 ※</span>
+        </h3>
+        
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          {{#each classArts as |art|}}
+          <div class="item" data-item-id="{{art._id}}" style="border:1px solid #ccc; background:#fff; border-radius:4px; padding:10px; position:relative; box-shadow:1px 1px 3px rgba(0,0,0,0.1);">
+            
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:5px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <a class="item-use-toggle" style="font-size:18px; color:{{#if art.system.used}}#dc3545{{else}}#ccc{{/if}}; cursor:pointer;" title="사용 여부 토글 (클릭)">
+                  <i class="fas {{#if art.system.used}}fa-check-square{{else}}fa-square{{/if}}"></i>
+                </a>
+                <div class="item-name item-edit" style="font-weight:bold; font-size:14px; color:#0056b3; cursor:pointer;" title="클릭하여 상세 정보 수정">{{art.name}}</div>
+                {{#if art.system.artsGroup}}
+                  <div style="font-size:10px; color:#fff; background:#555; padding:2px 6px; border-radius:10px;">{{lookup (lookup @root.gundogClasses art.system.artsGroup) 'label'}}</div>
+                {{/if}}
+              </div>
+              <div style="display:flex; gap:10px;">
+                <a class="item-edit" title="수정" style="color:#666; cursor:pointer;"><i class="fas fa-edit"></i></a>
+                <a class="item-delete" title="삭제" style="color:#dc3545; cursor:pointer;"><i class="fas fa-trash"></i></a>
+              </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; font-size:11px; margin-bottom:8px;">
+              <div style="background:#f4f4f4; padding:4px; border-radius:3px; text-align:center;"><span style="color:#666; font-weight:bold;">타이밍:</span> <span style="color:#333; font-weight:bold;">{{art.system.timing}}</span></div>
+              <div style="background:#f4f4f4; padding:4px; border-radius:3px; text-align:center;"><span style="color:#666; font-weight:bold;">대상:</span> <span style="color:#333; font-weight:bold;">{{art.system.target}}</span></div>
+              <div style="background:#f4f4f4; padding:4px; border-radius:3px; text-align:center;"><span style="color:#666; font-weight:bold;">지속시간:</span> <span style="color:#333; font-weight:bold;">{{art.system.duration}}</span></div>
+            </div>
+            
+            <div style="font-size:12px; color:#222; background:#fafafa; padding:8px; border:1px solid #eee; border-radius:3px; white-space:pre-wrap; line-height:1.4;">{{art.system.effect}}</div>
+          </div>
+          {{/each}}
+          
+          {{#unless classArts}}
+            <div style="text-align:center; color:#aaa; font-size:12px; margin-top:30px; border:2px dashed #ccc; padding:20px; border-radius:4px;">
+              등록된 클래스 아츠가 없습니다.<br>우측의 아이템 목록에서 클래스 아츠 아이템을 이 시트 위로 드래그 앤 드롭하여 추가하세요.
+            </div>
+          {{/unless}}
+        </div>
+        
+      </div>
+    </div>
   </section>
 </form>

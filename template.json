@@ -4,14 +4,14 @@
     "templates": {
       "capabilities": {
         "capabilities": {
-          "physical": { "value": 0, "mod": 0, "exp": 0 },
-          "dexterity": { "value": 0, "mod": 0, "exp": 0 },
-          "quickness": { "value": 0, "mod": 0, "exp": 0 },
-          "intelligence": { "value": 0, "mod": 0, "exp": 0 },
-          "sense": { "value": 0, "mod": 0, "exp": 0 },
-          "charisma": { "value": 0, "mod": 0, "exp": 0 },
-          "constitution": { "value": 0, "mod": 0, "exp": 0 },
-          "appearance": { "value": 0, "mod": 0, "exp": 0 }
+          "physical": { "value": 0 },
+          "dexterity": { "value": 0 },
+          "quickness": { "value": 0 },
+          "intelligence": { "value": 0 },
+          "sense": { "value": 0 },
+          "charisma": { "value": 0 },
+          "constitution": { "value": 0 },
+          "appearance": { "value": 0 }
         }
       },
       "skills": {
@@ -120,11 +120,23 @@
       ]
     },
     "vehicle": {
-      "templates": []
+      "category": "",
+      "hp": { "value": 0, "max": 0 },
+      "armor": 0,
+      "defense": 0,
+      "handling": 0,
+      "speed": { "normal": 0, "limit": 0 },
+      "size": "",
+      "price": 0,
+      "maintenanceCost": 0,
+      "description": "",
+      "inventoryMax": { "x": 10, "y": 30 },
+      "simplifiedWeightRule": false,
+      "vcp": 0
     }
   },
   "Item": {
-    "types": ["weapon", "armor", "attachment", "item", "upkeepitem", "connection"],
+    "types": ["weapon", "armor", "attachment", "item", "upkeepitem", "connection", "classarts", "belief", "trait", "vehicleAttachment"],
     "weapon": {
       "locked": false,
       "availability": "",
@@ -140,7 +152,7 @@
       "noiseLevel": 3,
       "requiredStr": { "oneHand": 0, "twoHands": 0 },
       "portability": { "x": 0, "y": 0 },
-      "grid": { "x": -1, "y": -1 }, 
+      "grid": { "x": -1, "y": -1, "type": "none" },
       "isWearable": false,
       "rangeModifiers": {
         "buffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
@@ -172,7 +184,7 @@
       "requiredStr": 0,
       "portability": { "x": 0, "y": 0 },
       "equipped": false,
-      "grid": { "x": -1, "y": -1 }, 
+      "grid": { "x": -1, "y": -1, "type": "none" },
       "isWearable": false,
       "modifiers": {
         "skillGroups": {
@@ -201,7 +213,7 @@
       "description": "",
       "attachType": "sight",
       "portability": { "x": 1, "y": 1 },
-      "grid": { "x": -1, "y": -1 },
+      "grid": { "x": -1, "y": -1, "type": "none" },
       "isWearable": false,
       "modifiers": {
         "rangeBuffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
@@ -223,7 +235,7 @@
       "price": 0,
       "description": "",
       "portability": { "x": 1, "y": 1 },
-      "grid": { "x": -1, "y": -1 },
+      "grid": { "x": -1, "y": -1, "type": "none" },
       "isWearable": false,
       "quantity": 1
     },
@@ -243,6 +255,42 @@
       "description": "",
       "job": "",
       "base": ""
+    },
+   "classarts": {
+      "locked": false,
+      "artsGroup": "",
+      "timing": "",
+      "target": "",
+      "duration": "",
+      "effect": "",
+      "used": false
+    },
+    "belief": {
+      "locked": false,
+      "details": "",
+      "description": ""
+    },
+    "trait": {
+      "locked": false,
+      "details": "",
+      "description": "",
+      "rpModifier": 0,
+      "maintenanceCost": 0
+    },
+    "vehicleAttachment": {
+      "locked": false,
+      "attachmentType": "top",
+      "price": 0,
+      "maintenanceCost": 0,
+      "description": "",
+      "modifiers": {
+        "hp": 0,
+        "armor": 0,
+        "defense": 0,
+        "speedNormal": 0,
+        "speedLimit": 0,
+        "handling": 0
+      }
     }
   }
 }
