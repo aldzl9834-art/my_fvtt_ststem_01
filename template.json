@@ -233,10 +233,7 @@
       "price": 0,
       "maintenanceCost": 0,
       "description": "",
-      "portability": { "x": 1, "y": 1 },
-      "grid": { "x": -1, "y": -1 },
-      "isWearable": false,
-      "quantity": 1
+      "location": ""
     },
     "connection": {
       "locked": false,
@@ -244,7 +241,8 @@
       "price": 0,
       "maintenanceCost": 0,
       "description": "",
-      "level": 1
+      "job": "",
+      "base": ""
     }
   }
 }

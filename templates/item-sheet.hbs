@@ -369,24 +369,13 @@
     {{/if}}
 
     {{#if isUpkeepItem}}
-      <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">유지/자산 프로필</h3>
+      <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">유지비 프로필</h3>
       <div style="display:grid; grid-template-columns: 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
         <label style="font-weight:bold; font-size:12px; color:#dc3545;">유지 코스트</label>
         <input type="number" name="system.maintenanceCost" value="{{system.maintenanceCost}}" style="text-align:center; height:24px; border:1px solid #dc3545; border-radius:3px; width:60px; color:#dc3545; font-weight:bold;"/>
         
-        <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
-        <div style="display:flex; align-items:center; gap:5px;">
-          <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
-          <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
-          <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
-          
-          <label style="margin-left:10px; display:flex; align-items:center; gap:4px; font-size:11px; color:#0056b3; cursor:pointer; font-weight:bold;">
-            <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:14px; height:14px;"/> 착용 아이템
-          </label>
-        </div>
-        
-        <label style="font-weight:bold; font-size:12px; color:#333;">수량</label>
-        <input type="number" name="system.quantity" value="{{system.quantity}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px; width:60px;"/>
+        <label style="font-weight:bold; font-size:12px; color:#333;">위치 (속성)</label>
+        <input type="text" name="system.location" value="{{system.location}}" style="height:24px; border:1px solid #ccc; border-radius:3px; width:100%; padding-left:5px;" placeholder="예: 서울시 강남구, 개인 차고 등"/>
       </div>
     {{/if}}
 
@@ -396,8 +385,11 @@
         <label style="font-weight:bold; font-size:12px; color:#dc3545;">유지 코스트</label>
         <input type="number" name="system.maintenanceCost" value="{{system.maintenanceCost}}" style="text-align:center; height:24px; border:1px solid #dc3545; border-radius:3px; width:60px; color:#dc3545; font-weight:bold;"/>
         
-        <label style="font-weight:bold; font-size:12px; color:#333;">레벨 / 등급</label>
-        <input type="number" name="system.level" value="{{system.level}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px; width:60px;"/>
+        <label style="font-weight:bold; font-size:12px; color:#333;">직업</label>
+        <input type="text" name="system.job" value="{{system.job}}" style="height:24px; border:1px solid #ccc; border-radius:3px; width:100%; padding-left:5px;" placeholder="예: 무기상, 경찰, 해커 등"/>
+
+        <label style="font-weight:bold; font-size:12px; color:#333;">본거지</label>
+        <input type="text" name="system.base" value="{{system.base}}" style="height:24px; border:1px solid #ccc; border-radius:3px; width:100%; padding-left:5px;" placeholder="예: 할렘가 펍, 온라인 등"/>
       </div>
     {{/if}}
 

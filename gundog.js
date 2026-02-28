@@ -116,6 +116,12 @@ class GundogActorSheet extends ActorSheet {
     context.gridItems = [];
     context.unplacedItems = [];
     context.trashItems = [];
+    
+    // ★ 추가: 유지 자산 및 커넥션 배열
+    context.upkeepItems = []; 
+    context.connections = []; 
+
+    let totalMaintenance = 0; // ★ 추가: 총 유지비 합산 변수
 
     // ★ 수정: 아이템들을 순서(sort)값에 따라 정렬한 후 반복문을 돌립니다.
     const allSortedItems = Array.from(this.actor.items).sort((a, b) => (a.sort || 0) - (b.sort || 0));
@@ -147,8 +153,18 @@ class GundogActorSheet extends ActorSheet {
         }
       }
 
+      // --- [유지비 및 커넥션 분류] ---
+      if (item.type === "upkeepitem") {
+        totalMaintenance += Number(item.system.maintenanceCost) || 0;
+        context.upkeepItems.push(item);
+      } else if (item.type === "connection") {
+        totalMaintenance += Number(item.system.maintenanceCost) || 0;
+        context.connections.push(item);
+      }
+
       // --- [CP 관리표(인벤토리) 분류] ---
-      if (["weapon", "armor", "item", "upkeepitem", "attachment"].includes(item.type)) {
+      // ★ 수정: upkeepitem을 배열 조건에서 삭제하여 인벤토리에 들어가지 않게 합니다.
+      if (["weapon", "armor", "item", "attachment"].includes(item.type)) {
         let portX = Math.max(1, Number(item.system.portability?.x) || 1); 
         let portY = Math.max(1, Number(item.system.portability?.y) || 1);
         let gx = Number(item.system.grid?.x);
@@ -165,7 +181,6 @@ class GundogActorSheet extends ActorSheet {
           isWearable: item.system.isWearable
         };
 
-        t
         if (gx === -2 && gy === -2) {
           // 휴지통
           context.trashItems.push(itemData);
@@ -193,6 +208,9 @@ class GundogActorSheet extends ActorSheet {
         }
       }
     }
+
+    // ★ 추가: 합산된 총 유지비를 캐릭터 시트로 전달
+    context.totalMaintenanceCost = totalMaintenance;
 
     return context;
   }

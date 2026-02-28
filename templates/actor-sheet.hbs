@@ -133,7 +133,7 @@
         
         <div>
           <label style="font-size:11px; color:#dc3545; font-weight:bold;">유지비 (Maintenance)</label>
-          <input type="text" value="{{system.profile.maintenanceCost}}" style="height:24px; font-size:12px; border-color:#dc3545; background-color:#f4f4f4; text-align:center; font-weight:bold;" readonly title="생활 랭크, 주거, 차량, 커넥션 등의 유지비 합산 (자동 계산)"/>
+          <input type="text" value="{{totalMaintenanceCost}}" style="height:24px; font-size:12px; border-color:#dc3545; background-color:#f4f4f4; text-align:center; font-weight:bold;" readonly title="생활 랭크, 주거, 차량, 커넥션 등의 유지비 합산 (자동 계산)"/>
         </div>
         
         <div></div> <div style="grid-column: span 4; margin-top: 10px;">
@@ -364,7 +364,7 @@
                     {{/if}}
                   {{/if}}
                   
-                  <div style="word-break:keep-all;">{{name}}</div>
+                  <div style="word-break:keep-all; font-size:16px;">{{gridLabel}}</div>
                 </div>
               {{/each}}
             </div>
@@ -377,29 +377,39 @@
             <h4 style="margin:0 0 10px 0; color:#0056b3; border-bottom:1px solid #0056b3; padding-bottom:5px;"><i class="fas fa-box-open"></i> 보유중인 아이템</h4>
             {{#each unplacedItems}}
               <div class="unplaced-item" data-item-id="{{id}}" draggable="true" style="border:1px solid #ccc; background:#fff; padding:6px; margin-bottom:6px; border-radius:3px; cursor:grab; display:flex; justify-content:space-between; align-items:center; box-shadow:1px 1px 3px rgba(0,0,0,0.1);">
-                <span style="font-weight:bold; color:#333; font-size:12px;">
-                  {{#if isWearable}}
-                    {{#if (eq type "attachment")}}
-                      <i class="fas fa-link" style="color:#17a2b8; margin-right:4px;" title="무기에 부착됨"></i>
-                    {{else}}
-                      <i class="fas fa-tshirt" style="color:#28a745; margin-right:4px;" title="착용 아이템"></i>
-                    {{/if}}
-                  {{/if}}
-                  {{name}}
-                </span>
                 
-                <span style="font-size:11px; color:#fff; background:{{#if isWearable}}{{#if (eq type "attachment")}}#17a2b8{{else}}#28a745{{/if}}{{else}}{{#if isPlaced}}#0056b3{{else}}#555{{/if}}{{/if}}; padding:2px 6px; border-radius:10px;">
-                  {{#if isWearable}}
-                    {{#if (eq type "attachment")}}부착됨{{else}}착용중{{/if}}
-                  {{else}}
-                    {{#if isPlaced}}배치됨{{else}}{{portX}} x {{portY}}{{/if}}
-                  {{/if}}
-                </span>
+                <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
+                  <span style="font-weight:bold; font-size:12px; color:#fff; background:#0056b3; width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:3px; flex-shrink:0;">{{gridLabel}}</span>
+                  
+                  <span style="font-weight:bold; color:#333; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{name}}">
+                    {{#if isWearable}}
+                      {{#if (eq type "attachment")}}
+                        <i class="fas fa-link" style="color:#17a2b8; margin-right:4px;" title="무기에 부착됨"></i>
+                      {{else}}
+                        <i class="fas fa-tshirt" style="color:#28a745; margin-right:4px;" title="착용 아이템"></i>
+                      {{/if}}
+                    {{/if}}
+                    {{name}}
+                  </span>
+                </div>
+                
+                <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+                  <span style="font-size:11px; color:#fff; background:{{#if isWearable}}{{#if (eq type "attachment")}}#17a2b8{{else}}#28a745{{/if}}{{else}}{{#if isPlaced}}#0056b3{{else}}#555{{/if}}{{/if}}; padding:2px 6px; border-radius:10px;">
+                    {{#if isWearable}}
+                      {{#if (eq type "attachment")}}부착됨{{else}}착용중{{/if}}
+                    {{else}}
+                      {{#if isPlaced}}배치됨{{else}}{{portX}} x {{portY}}{{/if}}
+                    {{/if}}
+                  </span>
+                  <a class="unplaced-item-delete" style="color:#dc3545; cursor:pointer;" title="영구 삭제"><i class="fas fa-trash"></i></a>
+                </div>
+
               </div>
             {{/each}}
             {{#unless unplacedItems}}
               <div style="text-align:center; color:#aaa; font-size:12px; margin-top:20px;">보유중인 아이템이 없습니다.</div>
             {{/unless}}
+          </div>
           </div>
 
           <div class="trash-item-list" style="flex:0.6; border:2px dashed #dc3545; padding:10px; background:#fff4f4; border-radius:4px; overflow-y:auto; position:relative;">
@@ -420,7 +430,68 @@
         </div>
       </div>
 
+      <div style="display:flex; gap:15px; margin-top:15px;">
+        
+        <div style="flex:1; border:1px solid #ccc; background:#fff; border-radius:4px; padding:10px;">
+          <h4 style="margin:0 0 10px 0; color:#dc3545; border-bottom:1px solid #dc3545; padding-bottom:5px;">
+            <i class="fas fa-home"></i> 유지비
+          </h4>
+          <div style="display:flex; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #eee; padding-bottom:4px; margin-bottom:4px;">
+            <div style="flex:2;">아이템명</div>
+            <div style="flex:1.5; text-align:center;">위치 (속성)</div>
+            <div style="flex:1; text-align:center;">유지비</div>
+            <div style="flex:0 0 40px; text-align:center;">관리</div>
+          </div>
+          {{#each upkeepItems as |item|}}
+          <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; font-size:11px; align-items:center; border-bottom:1px solid #eee; padding:4px 0;">
+            <div class="item-name item-edit" style="flex:2; font-weight:bold; cursor:pointer; color:#0056b3;">{{item.name}}</div>
+            <div style="flex:1.5; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{item.system.location}}">{{item.system.location}}</div>
+            <div style="flex:1; text-align:center; color:#dc3545; font-weight:bold;">{{item.system.maintenanceCost}}</div>
+            <div style="flex:0 0 40px; text-align:center;">
+              <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
+              <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+            </div>
+          </div>
+          {{/each}}
+          {{#unless upkeepItems}}
+            <div style="text-align:center; color:#aaa; font-size:11px; margin-top:10px;">등록된 유지비 항목이 없습니다.</div>
+          {{/unless}}
+        </div>
+
+        <div style="flex:1; border:1px solid #ccc; background:#fff; border-radius:4px; padding:10px;">
+          <h4 style="margin:0 0 10px 0; color:#17a2b8; border-bottom:1px solid #17a2b8; padding-bottom:5px;">
+            <i class="fas fa-users"></i> 커넥션 (Connections)
+          </h4>
+          <div style="display:flex; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #eee; padding-bottom:4px; margin-bottom:4px;">
+            <div style="flex:1.5;">커넥션명</div>
+            <div style="flex:1; text-align:center;">직업</div>
+            <div style="flex:1.5; text-align:center;">본거지</div>
+            <div style="flex:0.8; text-align:center;">유지비</div>
+            <div style="flex:0 0 40px; text-align:center;">관리</div>
+          </div>
+          {{#each connections as |item|}}
+          <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; font-size:11px; align-items:center; border-bottom:1px solid #eee; padding:4px 0;">
+            <div class="item-name item-edit" style="flex:1.5; font-weight:bold; cursor:pointer; color:#0056b3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{item.name}}">{{item.name}}</div>
+            
+            <div style="flex:1; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#444;" title="{{item.system.job}}">{{item.system.job}}</div>
+            
+            <div style="flex:1.5; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#666;" title="{{item.system.base}}">{{item.system.base}}</div>
+            
+            <div style="flex:0.8; text-align:center; color:#dc3545; font-weight:bold;">{{item.system.maintenanceCost}}</div>
+            
+            <div style="flex:0 0 40px; text-align:center;">
+              <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
+              <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+            </div>
+          </div>
+          {{/each}}
+          {{#unless connections}}
+            <div style="text-align:center; color:#aaa; font-size:11px; margin-top:10px;">등록된 커넥션이 없습니다.</div>
+          {{/unless}}
+        </div>
+
       </div>
+
     </div>
 
     <div class="tab class-arts" data-group="primary" data-tab="class-arts"><h3 style="padding: 10px; text-align:center; color:#666;">직업 고유의 클래스 아츠가 표시될 공간입니다.</h3></div>
