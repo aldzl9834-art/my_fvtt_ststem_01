@@ -17,7 +17,7 @@ Hooks.once("init", () => {
   // 아이템 시트 등록
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("gundog", GundogItemSheet, { 
-    types: ["weapon", "armor" , "attachment"],
+    types: ["weapon", "armor", "attachment", "item", "upkeepitem", "connection"],
     makeDefault: true 
   });
 });
@@ -43,10 +43,10 @@ class GundogActorSheet extends ActorSheet {
     context.editable = this.isEditable;
     context.owner = this.actor.isOwner;
     
-    // ★ HTML 시트에서 드롭다운 메뉴를 그릴 수 있도록 클래스 데이터를 전달합니다.
+    // HTML 시트에서 드롭다운 메뉴를 그릴 수 있도록 클래스 데이터를 전달합니다.
     context.gundogClasses = GUNDOG.classes;
     
-    // ★ 추가: 능력치 영문 키값을 한글로 예쁘게 출력하기 위한 라벨 데이터
+    // 능력치 영문 키값을 한글로 예쁘게 출력하기 위한 라벨 데이터
     context.capabilityLabels = {
       physical: "근력 (Physical)",
       dexterity: "재주 (Dexterity)",
@@ -58,48 +58,32 @@ class GundogActorSheet extends ActorSheet {
       appearance: "외견 (Appearance)"
     };
     
-    // ★ 추가: HBS 파일에서 경력 이름을 한글로 매핑하기 위해 넘겨줍니다.
-    context.gundogCareerList = GUNDOG.careerList; //경력 리스트
-    context.gundogSkillNames = GUNDOG.skillNames; //스킬 이름 리스트
-    context.gundogAffiliations = GUNDOG.affiliations; //소속 데이터
+    // HBS 파일에서 경력 이름을 한글로 매핑하기 위해 넘겨줍니다.
+    context.gundogCareerList = GUNDOG.careerList;
+    context.gundogSkillNames = GUNDOG.skillNames;
+    context.gundogAffiliations = GUNDOG.affiliations;
 
     // 경력 스킬 그룹화
     context.careerDisplay = {};
     const careers = context.system.profile.careers || {};
     
     for (let [slotId, career] of Object.entries(careers)) {
-      if (!career.name) continue; // 비어있는 슬롯은 패스
-      
+      if (!career.name) continue; 
       let careerData = GUNDOG.careerList[career.name];
-      
       let getDisplay = (skillKey) => {
         if (!skillKey) return "";
         let skillName = GUNDOG.skillNames[skillKey] || skillKey;
-        
-        // 1. 경력에서 지정한 단일 스킬을 그대로 고른 경우 (예: "rifle")
-        if (careerData && careerData.skills[skillKey]) {
-          return skillName;
-        } 
-        
-        // 2. 그룹 스킬(예: "shooting")을 통해 하위 세부 스킬을 고른 경우
+        if (careerData && careerData.skills[skillKey]) return skillName;
         let parentGroup = null;
         for (let [gKey, skills] of Object.entries(GUNDOG.skillGroups)) {
-          if (skills.includes(skillKey)) {
-            parentGroup = gKey;
-            break;
-          }
+          if (skills.includes(skillKey)) { parentGroup = gKey; break; }
         }
-        
-        // 부모 그룹이 확인되고, 그 경력이 해당 그룹 선택을 허용했다면 포맷팅
         if (parentGroup && careerData && careerData.skills[parentGroup]) {
           let groupName = GUNDOG.groupNames[parentGroup] || parentGroup;
           return `${groupName}[${skillName}]`;
         }
-        
         return skillName;
       };
-
-      // 화면에 뿌려질 최종 글자만 담아서 저장
       context.careerDisplay[slotId] = {
         label: careerData?.label || career.name,
         skill1: getDisplay(career.skill1),
@@ -108,17 +92,39 @@ class GundogActorSheet extends ActorSheet {
     }
 
     // ==========================================
-    // ★ 추가: 아이템(장비) 분류 로직
+    // ★ 1. 장비(Equipment) 탭 분류용 배열 
     // ==========================================
     context.weapons = [];
     context.headArmors = [];
     context.bodyArmors = [];
 
-    // 액터가 소지한 모든 아이템을 반복하며 종류별로 분류합니다.
-    for (let item of this.actor.items) {
+    // ==========================================
+    // ★ 2. 아이템(CP 관리표) 탭 분류용 배열
+    // ==========================================
+    const invMaxX = Number(this.actor.system.profile.inventoryMax?.x) || 10;
+    const invMaxY = Number(this.actor.system.profile.inventoryMax?.y) || 10;
+    
+    context.gridCells = [];
+    for (let i = 0; i < 100; i++) {
+      let x = i % 10;
+      let y = Math.floor(i / 10);
+      context.gridCells.push({
+        isActive: (x < invMaxX && y < invMaxY) // 사용 가능한 칸인지 여부
+      });
+    }
+
+    context.gridItems = [];
+    context.unplacedItems = [];
+    context.trashItems = [];
+
+    // ★ 수정: 아이템들을 순서(sort)값에 따라 정렬한 후 반복문을 돌립니다.
+    const allSortedItems = Array.from(this.actor.items).sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    
+    // 하나의 반복문으로 소지한 모든 아이템을 정확하게 분배합니다.
+    for (let item of allSortedItems) {
+      
+      // --- [장비 탭 분류] ---
       if (item.type === "weapon") {
-        
-        // ★ 추가: 부착물의 최대 탄약 보너스를 미리 계산하여 액터 시트로 넘겨줍니다.
         let computedAmmoMax = 0;
         const atts = item.system.attachments || {};
         for (let slot in atts) {
@@ -130,15 +136,60 @@ class GundogActorSheet extends ActorSheet {
             }
           }
         }
-        item.computedAmmoMax = computedAmmoMax; // HTML에서 출력할 수 있도록 데이터 주입
-
-        context.weapons.push(item);
-      } else if (item.type === "armor") {
+        item.computedAmmoMax = computedAmmoMax;
+        context.weapons.push(item); // 무기는 무기 배열로
+      } 
+      else if (item.type === "armor") {
         if (item.system.armorType === "head") {
-          context.headArmors.push(item);
+          context.headArmors.push(item); // 머리 방어구는 머리 배열로
         } else {
-          // 기본값은 몸통(body)으로 처리
-          context.bodyArmors.push(item);
+          context.bodyArmors.push(item); // 몸통 방어구는 몸통 배열로
+        }
+      }
+
+      // --- [CP 관리표(인벤토리) 분류] ---
+      if (["weapon", "armor", "item", "upkeepitem", "attachment"].includes(item.type)) {
+        let portX = Math.max(1, Number(item.system.portability?.x) || 1); 
+        let portY = Math.max(1, Number(item.system.portability?.y) || 1);
+        let gx = Number(item.system.grid?.x);
+        let gy = Number(item.system.grid?.y);
+
+        let itemData = {
+          id: item.id,
+          name: item.name,
+          type: item.type, // ★ 추가: HTML에서 타입을 판별하기 위해 넘겨줍니다.
+          portX: portX,
+          portY: portY,
+          w: portX * 40,
+          h: portY * 40,
+          isWearable: item.system.isWearable
+        };
+
+        t
+        if (gx === -2 && gy === -2) {
+          // 휴지통
+          context.trashItems.push(itemData);
+        } else {
+          // 휴지통에 없는 모든 아이템은 무조건 '보유중인 아이템' 목록에 띄웁니다.
+          context.unplacedItems.push(itemData);
+
+          // 방어구 등 '몸에 입는 착용 아이템'은 그리드 배치 불가. 
+          // 단, 총기 부착물(attachment)은 예외로 그리드 배치를 허용합니다.
+          let canPlaceInGrid = true;
+          if (item.system.isWearable && item.type !== "attachment") {
+            canPlaceInGrid = false;
+          }
+
+          if (canPlaceInGrid && !isNaN(gx) && gx >= 0 && gy >= 0) {
+            // 인벤토리(CP 관리표)에 배치 완료된 경우
+            itemData.left = gx * 40;
+            itemData.top = gy * 40;
+            itemData.isPlaced = true; // HBS에서 뱃지를 띄우기 위한 신호
+            context.gridItems.push(itemData);
+          } else {
+            // 미배치 상태
+            itemData.isPlaced = false;
+          }
         }
       }
     }
@@ -214,6 +265,256 @@ class GundogActorSheet extends ActorSheet {
       const item = this.actor.items.get(li.data("itemId"));
       if (item) {
         item.update({"system.equipped": !item.system.equipped});
+      }
+    });
+
+    // ==========================================// ==========================================
+    // ★ 추가: CP 관리표 (드래그 앤 드롭 인벤토리) 이벤트 로직
+    // ==========================================
+    
+    // 아이템 더블 클릭 시 시트 열기
+    html.find('.cp-grid-item, .unplaced-item, .trash-item').dblclick(ev => {
+      const item = this.actor.items.get(ev.currentTarget.dataset.itemId);
+      if (item) item.sheet.render(true);
+    });
+
+    // 1. 드래그 시작 (휴지통 아이템 추가)
+    html.find('.cp-grid-item, .unplaced-item, .trash-item').on('dragstart', ev => {
+      ev.originalEvent.dataTransfer.setData("text/plain", JSON.stringify({
+        type: "CPGridItem", actorId: this.actor.id, itemId: ev.currentTarget.dataset.itemId
+      }));
+      setTimeout(() => $(ev.currentTarget).css("opacity", "0.5"), 10);
+    });
+    html.find('.cp-grid-item, .unplaced-item, .trash-item').on('dragend', ev => $(ev.currentTarget).css("opacity", "1.0"));
+
+    // 2. CP 그리드로 드롭 (위치 계산 및 충돌 방지)
+    html.find('.cp-grid-wrapper').on('dragover', ev => ev.preventDefault());
+    html.find('.cp-grid-wrapper').on('drop', async ev => {
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch(err) { return; }
+      
+      // 내 인벤토리 안에서 움직이는 거라면 기본 시트 드롭 기능을 막습니다.
+      if (data && data.type === "CPGridItem" && data.actorId === this.actor.id) {
+        ev.preventDefault();
+        ev.stopPropagation(); 
+
+        const wrapper = $(ev.currentTarget);
+        const offset = wrapper.offset();
+        const mouseX = ev.originalEvent.pageX - offset.left;
+        const mouseY = ev.originalEvent.pageY - offset.top;
+        
+        const dropX = Math.floor(mouseX / 40);
+        const dropY = Math.floor(mouseY / 40);
+        
+        const item = this.actor.items.get(data.itemId);
+        if (item) {
+          // 총기 부착물이 아닌 일반 착용 방어구 등은 드롭 차단
+          if (item.system.isWearable && item.type !== "attachment") {
+            return ui.notifications.warn("착용하는 방어구나 의류는 CP 관리표(칸)에 배치할 수 없습니다!");
+          }
+
+          let pX = Math.max(1, Number(item.system.portability?.x) || 1);
+          let pY = Math.max(1, Number(item.system.portability?.y) || 1);
+          
+          // 기본 외곽선(10x10) 절대 충돌 검사는 유지 (표 밖으로 나가는 것만 방지)
+          if (dropX + pX > 10 || dropY + pY > 10) {
+            return ui.notifications.warn("CP 관리표의 영역을 벗어납니다!");
+          }
+
+          // 다른 아이템과 겹침(Collision) 방지
+          let 일isColliding = false;
+          for (let other of this.actor.items) {
+            if (other.id === item.id) continue;
+            if (["weapon", "armor", "item", "upkeepitem", "attachment"].includes(other.type)) {
+              let oX = Number(other.system.grid?.x);
+              let oY = Number(other.system.grid?.y);
+              if (oX >= 0 && oY >= 0) {
+                let opX = Math.max(1, Number(other.system.portability?.x) || 1);
+                let opY = Math.max(1, Number(other.system.portability?.y) || 1);
+                
+                // 사각형 교차 검사 (AABB)
+                if (dropX < oX + opX && dropX + pX > oX && dropY < oY + opY && dropY + pY > oY) {
+                   isColliding = true; break;
+                }
+              }
+            }
+          }
+
+          if (isColliding) return ui.notifications.warn("다른 아이템과 위치가 겹칩니다! 빈 공간을 찾으세요.");
+          await item.update({"system.grid.x": dropX, "system.grid.y": dropY});
+        }
+      }
+    });
+
+    // 3. 미배치 목록으로 드래그해서 빼기
+    html.find('.unplaced-item-list').on('dragover', ev => { ev.preventDefault(); $(ev.currentTarget).css("background", "#f0f0f0"); });
+    html.find('.unplaced-item-list').on('dragleave', ev => { $(ev.currentTarget).css("background", "#fafafa"); });
+    html.find('.unplaced-item-list').on('drop', async ev => {
+      $(ev.currentTarget).css("background", "#fafafa");
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch(err) { return; }
+      
+      if (data && data.type === "CPGridItem" && data.actorId === this.actor.id) {
+        ev.preventDefault(); ev.stopPropagation();
+        const item = this.actor.items.get(data.itemId);
+        if (item) await item.update({"system.grid.x": -1, "system.grid.y": -1});
+      }
+    });
+
+    // ==========================================
+    // ★ 추가: 보유중인 아이템끼리 순서 변경(스왑) 로직
+    // ==========================================
+    html.find('.unplaced-item').on('dragover', ev => { 
+      ev.preventDefault(); 
+      ev.stopPropagation(); // 부모 리스트의 이벤트 방해를 막음
+      $(ev.currentTarget).css("border", "2px solid #0056b3"); // 드롭 타겟 표시
+    });
+    
+    html.find('.unplaced-item').on('dragleave', ev => { 
+      $(ev.currentTarget).css("border", "1px solid #ccc"); 
+    });
+    
+    html.find('.unplaced-item').on('drop', async ev => {
+      ev.preventDefault(); 
+      ev.stopPropagation();
+      $(ev.currentTarget).css("border", "1px solid #ccc");
+      
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch(err) { return; }
+      
+      if (data && data.type === "CPGridItem" && data.actorId === this.actor.id) {
+        const targetId = ev.currentTarget.dataset.itemId;
+        const sourceId = data.itemId;
+        
+        if (targetId === sourceId) return; // 자기 자신에게 떨어뜨린 경우 무시
+        
+        const sourceItem = this.actor.items.get(sourceId);
+        const targetItem = this.actor.items.get(targetId);
+        
+        if (sourceItem && targetItem) {
+          // 두 아이템의 정렬(Sort) 순서 값을 가져와서 서로 교체합니다.
+          let sourceSort = sourceItem.sort || 0;
+          let targetSort = targetItem.sort || 0;
+          
+          if (sourceSort === targetSort) targetSort += 10000; // 초기값이 우연히 같을 경우 보정
+          
+          let sourceUpdate = { sort: targetSort };
+          
+          // 만약 CP 그리드(왼쪽 표)에 있던 아이템을 다른 아이템 위에 떨어뜨렸다면, 좌표도 해제합니다.
+          if (sourceItem.system.grid?.x !== -1) {
+            sourceUpdate["system.grid.x"] = -1;
+            sourceUpdate["system.grid.y"] = -1;
+          }
+          
+          await targetItem.update({ sort: sourceSort });
+          await sourceItem.update(sourceUpdate);
+        }
+      }
+    });
+
+    // 4. 휴지통으로 드래그해서 버리기 (이하 생략) ...
+    html.find('.trash-item-list').on('dragover', ev => { ev.preventDefault(); $(ev.currentTarget).css("background", "#f8d7da"); });
+    html.find('.trash-item-list').on('dragleave', ev => { $(ev.currentTarget).css("background", "#fff4f4"); });
+    html.find('.trash-item-list').on('drop', async ev => {
+      $(ev.currentTarget).css("background", "#fff4f4");
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch(err) { return; }
+      
+      if (data && data.type === "CPGridItem" && data.actorId === this.actor.id) {
+        ev.preventDefault(); ev.stopPropagation();
+        const item = this.actor.items.get(data.itemId);
+        // 휴지통으로 가면 좌표를 -2, -2로 설정
+        if (item) await item.update({"system.grid.x": -2, "system.grid.y": -2});
+      }
+    });
+
+    // 5. 휴지통 비우기 버튼
+    html.find('.empty-trash-btn').click(async ev => {
+      ev.preventDefault();
+      // 휴지통에 있는 아이템의 ID들을 수집
+      const trashIds = this.actor.items.filter(i => i.system.grid?.x === -2 && i.system.grid?.y === -2).map(i => i.id);
+      if (trashIds.length === 0) return ui.notifications.info("휴지통이 비어있습니다.");
+      
+      let confirm = await Dialog.confirm({
+        title: "휴지통 비우기",
+        content: "<p>휴지통에 있는 모든 아이템을 캐릭터에서 <strong>영구적으로 삭제</strong>하시겠습니까?</p><p style='color:red; font-size:12px;'>※ 장비 탭에 있는 아이템도 함께 삭제됩니다.</p>",
+        yes: () => true,
+        no: () => false,
+        defaultYes: false
+      });
+
+      if (confirm) {
+        await this.actor.deleteEmbeddedDocuments("Item", trashIds);
+        ui.notifications.info(`${trashIds.length}개의 아이템이 성공적으로 삭제되었습니다.`);
+      }
+    });
+
+    // 2. CP 그리드로 드롭 (위치 계산 및 충돌 방지)
+    html.find('.cp-grid-wrapper').on('dragover', ev => ev.preventDefault());
+    html.find('.cp-grid-wrapper').on('drop', async ev => {
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch(err) { return; }
+      
+      // 내 인벤토리 안에서 움직이는 거라면 기본 시트 드롭 기능을 막습니다.
+      if (data && data.type === "CPGridItem" && data.actorId === this.actor.id) {
+        ev.preventDefault();
+        ev.stopPropagation(); 
+
+        const wrapper = $(ev.currentTarget);
+        const offset = wrapper.offset();
+        const mouseX = ev.originalEvent.pageX - offset.left;
+        const mouseY = ev.originalEvent.pageY - offset.top;
+        
+        const dropX = Math.floor(mouseX / 40);
+        const dropY = Math.floor(mouseY / 40);
+        
+        const item = this.actor.items.get(data.itemId);
+        if (item) {
+          let pX = Math.max(1, Number(item.system.portability?.x) || 1);
+          let pY = Math.max(1, Number(item.system.portability?.y) || 1);
+          
+          // 외곽선 충돌 검사
+          if (dropX + pX > 10 || dropY + pY > 10) {
+            return ui.notifications.warn("CP 관리표의 영역을 벗어납니다!");
+          }
+
+          // 다른 아이템과 겹침(Collision) 방지
+          let isColliding = false;
+          for (let other of this.actor.items) {
+            if (other.id === item.id) continue;
+            if (["weapon", "armor", "item", "upkeepitem"].includes(other.type)) {
+              let oX = Number(other.system.grid?.x);
+              let oY = Number(other.system.grid?.y);
+              if (oX >= 0 && oY >= 0) {
+                let opX = Math.max(1, Number(other.system.portability?.x) || 1);
+                let opY = Math.max(1, Number(other.system.portability?.y) || 1);
+                
+                // 사각형 교차 검사 (AABB)
+                if (dropX < oX + opX && dropX + pX > oX && dropY < oY + opY && dropY + pY > oY) {
+                   isColliding = true; break;
+                }
+              }
+            }
+          }
+
+          if (isColliding) return ui.notifications.warn("다른 아이템과 위치가 겹칩니다! 빈 공간을 찾으세요.");
+          await item.update({"system.grid.x": dropX, "system.grid.y": dropY});
+        }
+      }
+    });
+
+    // 3. 미배치 목록으로 드래그해서 빼기
+    html.find('.unplaced-item-list').on('dragover', ev => { ev.preventDefault(); $(ev.currentTarget).css("background", "#f0f0f0"); });
+    html.find('.unplaced-item-list').on('dragleave', ev => { $(ev.currentTarget).css("background", "#fafafa"); });
+    html.find('.unplaced-item-list').on('drop', async ev => {
+      $(ev.currentTarget).css("background", "#fafafa");
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch(err) { return; }
+      
+      if (data && data.type === "CPGridItem" && data.actorId === this.actor.id) {
+        ev.preventDefault(); ev.stopPropagation();
+        const item = this.actor.items.get(data.itemId);
+        if (item) await item.update({"system.grid.x": -1, "system.grid.y": -1});
       }
     });
     
@@ -517,6 +818,9 @@ class GundogItemSheet extends ItemSheet {
     context.isWeapon = (this.item.type === "weapon");
     context.isArmor = (this.item.type === "armor");
     context.isAttachment = (this.item.type === "attachment");
+    context.isItem = (this.item.type === "item");
+    context.isUpkeepItem = (this.item.type === "upkeepitem");
+    context.isConnection = (this.item.type === "connection");
 
     if (context.isWeapon) {
       context.safeAttachments = {

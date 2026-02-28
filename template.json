@@ -72,6 +72,7 @@
             "normal": 0,
             "sprint": 0
           },
+          "inventoryMax": { "x": 10, "y": 10 },
           "wealth": {
             "bank": 0,
             "cash": 0
@@ -123,7 +124,7 @@
     }
   },
   "Item": {
-    "types": ["weapon", "armor", "attachment", "gear"],
+    "types": ["weapon", "armor", "attachment", "item", "upkeepitem", "connection"],
     "weapon": {
       "locked": false,
       "availability": "",
@@ -139,6 +140,8 @@
       "noiseLevel": 3,
       "requiredStr": { "oneHand": 0, "twoHands": 0 },
       "portability": { "x": 0, "y": 0 },
+      "grid": { "x": -1, "y": -1 }, 
+      "isWearable": false,
       "rangeModifiers": {
         "buffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
         "penalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 }
@@ -169,6 +172,8 @@
       "requiredStr": 0,
       "portability": { "x": 0, "y": 0 },
       "equipped": false,
+      "grid": { "x": -1, "y": -1 }, 
+      "isWearable": false,
       "modifiers": {
         "skillGroups": {
           "shooting": 0,
@@ -195,6 +200,9 @@
       "price": 0,
       "description": "",
       "attachType": "sight",
+      "portability": { "x": 1, "y": 1 },
+      "grid": { "x": -1, "y": -1 },
+      "isWearable": false,
       "modifiers": {
         "rangeBuffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
         "rangePenalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
@@ -208,6 +216,35 @@
         "ammoMax": 0,
         "ammoMultiplier": 1
       }
+    },
+    "item": {
+      "locked": false,
+      "availability": "",
+      "price": 0,
+      "description": "",
+      "portability": { "x": 1, "y": 1 },
+      "grid": { "x": -1, "y": -1 },
+      "isWearable": false,
+      "quantity": 1
+    },
+    "upkeepitem": {
+      "locked": false,
+      "availability": "",
+      "price": 0,
+      "maintenanceCost": 0,
+      "description": "",
+      "portability": { "x": 1, "y": 1 },
+      "grid": { "x": -1, "y": -1 },
+      "isWearable": false,
+      "quantity": 1
+    },
+    "connection": {
+      "locked": false,
+      "availability": "",
+      "price": 0,
+      "maintenanceCost": 0,
+      "description": "",
+      "level": 1
     }
   }
 }

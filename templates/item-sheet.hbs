@@ -216,6 +216,10 @@
           <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
           <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
           <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          
+          <label style="margin-left:10px; display:flex; align-items:center; gap:4px; font-size:11px; color:#0056b3; cursor:pointer; font-weight:bold;">
+            <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:14px; height:14px;"/> 착용 아이템
+          </label>
         </div>
 
         <label style="font-weight:bold; font-size:12px; color:#333;">방어 부위</label>
@@ -278,6 +282,19 @@
     {{#if isAttachment}}
       <h3 style="background:#28a745; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">부착물 효과 (Modifier) 설정</h3>
       
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
+          <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          
+          <label style="margin-left:10px; display:flex; align-items:center; gap:4px; font-size:11px; color:#17a2b8; cursor:pointer; font-weight:bold;">
+            <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:14px; height:14px;"/> 무기에 부착됨
+          </label>
+        </div>
+      </div>
+
       <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
         <label style="font-weight:bold; font-size:12px; color:#333;">장착 부위 (타입)</label>
         <select name="system.attachType" style="height:26px;">
@@ -331,6 +348,57 @@
         <label style="color:#d9534f; font-weight:bold;">탄약 가격 배수(x)</label>
         <input type="number" name="system.modifiers.ammoMultiplier" value="{{system.modifiers.ammoMultiplier}}" placeholder="기본 1" style="width:50px; text-align:center; border:2px solid #d9534f;"/>
         <div></div> </div>
+    {{/if}}
+
+    {{#if isItem}}
+      <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">일반 아이템 프로필</h3>
+      <div style="display:grid; grid-template-columns: 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
+          <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          
+          <label style="margin-left:10px; display:flex; align-items:center; gap:4px; font-size:11px; color:#0056b3; cursor:pointer; font-weight:bold;">
+            <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:14px; height:14px;"/> 착용 아이템
+          </label>
+        </div>
+        <label style="font-weight:bold; font-size:12px; color:#333;">수량</label>
+        <input type="number" name="system.quantity" value="{{system.quantity}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px; width:60px;"/>
+      </div>
+    {{/if}}
+
+    {{#if isUpkeepItem}}
+      <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">유지/자산 프로필</h3>
+      <div style="display:grid; grid-template-columns: 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        <label style="font-weight:bold; font-size:12px; color:#dc3545;">유지 코스트</label>
+        <input type="number" name="system.maintenanceCost" value="{{system.maintenanceCost}}" style="text-align:center; height:24px; border:1px solid #dc3545; border-radius:3px; width:60px; color:#dc3545; font-weight:bold;"/>
+        
+        <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
+        <div style="display:flex; align-items:center; gap:5px;">
+          <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
+          <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          
+          <label style="margin-left:10px; display:flex; align-items:center; gap:4px; font-size:11px; color:#0056b3; cursor:pointer; font-weight:bold;">
+            <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:14px; height:14px;"/> 착용 아이템
+          </label>
+        </div>
+        
+        <label style="font-weight:bold; font-size:12px; color:#333;">수량</label>
+        <input type="number" name="system.quantity" value="{{system.quantity}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px; width:60px;"/>
+      </div>
+    {{/if}}
+
+    {{#if isConnection}}
+      <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">커넥션 (인맥) 프로필</h3>
+      <div style="display:grid; grid-template-columns: 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        <label style="font-weight:bold; font-size:12px; color:#dc3545;">유지 코스트</label>
+        <input type="number" name="system.maintenanceCost" value="{{system.maintenanceCost}}" style="text-align:center; height:24px; border:1px solid #dc3545; border-radius:3px; width:60px; color:#dc3545; font-weight:bold;"/>
+        
+        <label style="font-weight:bold; font-size:12px; color:#333;">레벨 / 등급</label>
+        <input type="number" name="system.level" value="{{system.level}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px; width:60px;"/>
+      </div>
     {{/if}}
 
     <div style="margin-top:15px;">
