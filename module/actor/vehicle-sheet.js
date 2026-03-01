@@ -121,6 +121,16 @@ export class GundogVehicleSheet extends ActorSheet {
     super.activateListeners(html);
     if (!this.options.editable) return;
 
+    // ==========================================
+    // ★ 추가: 엔터키 버그 수정
+    // ==========================================
+    html.find('input').on('keydown', function(ev) {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        $(this).blur(); 
+      }
+    });
+
     // 기존 부착물 삭제/편집 이벤트
     html.find('.item-edit').click(ev => {
       const li = $(ev.currentTarget).parents(".item");

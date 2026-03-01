@@ -254,17 +254,27 @@
       <div class="skills-container">
         {{#each system.skills as |group groupKey|}}
           <div class="skill-group" style="border:1px solid #ccc; margin-bottom: 10px; padding: 5px; background: #fff;">
-            <h3 style="background:#222; color:white; padding:3px 8px; margin: 0 0 8px 0; text-transform:uppercase; font-size:13px;">{{groupKey}}</h3>
+            
+            <h3 style="background:#222; color:white; padding:3px 8px; margin: 0 0 8px 0; text-transform:uppercase; font-size:13px;">
+              {{lookup @root.gundogGroupNames groupKey}}
+            </h3>
+            
             <div class="skill-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
               {{#each group as |skill skillKey|}}
                 <div class="skill-row" style="display:flex; gap: 4px; align-items: center; font-size: 11px; border: 1px solid #e0e0e0; padding: 2px 4px; border-radius: 3px;">
-                  <div class="skill-name" style="flex:0 0 70px; font-weight:bold; overflow:hidden; text-overflow:ellipsis;" title="{{skillKey}}">{{skillKey}}</div>
+                  
+                  <div class="skill-name" style="flex:0 0 70px; font-weight:bold; overflow:hidden; text-overflow:ellipsis;" title="{{lookup @root.gundogSkillNames skillKey}}">
+                    {{lookup @root.gundogSkillNames skillKey}}
+                  </div>
+                  
                   <div class="skill-lv" style="flex:1; text-align:center;"><label style="font-size:9px; color:#666; display:block;">Lv</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.lv" value="{{skill.lv}}" data-dtype="Number" style="height:20px; text-align:center;"/></div>
                   <div class="skill-bonus" style="flex:1; text-align:center;"><label style="font-size:9px; color:#28a745; display:block;">(+)</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.bonus" value="{{skill.bonus}}" data-dtype="Number" style="height:20px; text-align:center; border: 1px solid #28a745;"/></div>
                   <div class="skill-penalty" style="flex:1; text-align:center;"><label style="font-size:9px; color:#dc3545; display:block;">(-)</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.penalty" value="{{skill.penalty}}" data-dtype="Number" style="height:20px; text-align:center; border: 1px solid #dc3545;"/></div>
                   <div class="skill-item-mod" style="flex:1; text-align:center;"><label style="font-size:9px; color:#17a2b8; display:block;">Item</label><div style="font-weight:bold; color:#17a2b8; line-height:20px;">{{skill.itemMod}}</div></div>
                   <div class="skill-target-value" style="flex:0 0 35px; text-align:center;"><label style="font-size:9px; display:block;">목표</label><strong style="color:blue; font-size:13px;">{{skill.targetValue}}</strong></div>
-                  <button class="roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}" style="flex:0 0 30px; height:24px; padding:0; cursor:pointer; font-size:10px;" title="판정"><i class="fas fa-dice-d10"></i></button>
+                  
+                  <button type="button" class="roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}" style="flex:0 0 30px; height:24px; padding:0; cursor:pointer; font-size:10px;" title="판정"><i class="fas fa-dice-d10"></i></button>
+                
                 </div>
               {{/each}}
             </div>

@@ -68,6 +68,7 @@ class GundogActorSheet extends ActorSheet {
     // HBS 파일에서 경력 이름을 한글로 매핑하기 위해 넘겨줍니다.
     context.gundogCareerList = GUNDOG.careerList;
     context.gundogSkillNames = GUNDOG.skillNames;
+    context.gundogGroupNames = GUNDOG.groupNames;
     context.gundogAffiliations = GUNDOG.affiliations;
 
     // 경력 스킬 그룹화
@@ -245,8 +246,18 @@ class GundogActorSheet extends ActorSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
+
+    // ==========================================
+    // ★ 추가: 엔터키 버그 수정 (입력 중 첫번째 버튼 강제 클릭 방지)
+    // ==========================================
+    html.find('input').on('keydown', function(ev) {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        $(this).blur(); // 포커스를 해제하여 데이터를 정상적으로 저장시킴
+      }
+    });
+
     html.find(".roll-skill").click(this._onRollSkill.bind(this));
-    
     // ★ 추가: 경력 슬롯 클릭 이벤트 연결
     html.find(".career-slot").click(this._onCareerClick.bind(this));
 
@@ -948,6 +959,16 @@ class GundogItemSheet extends ItemSheet {
 
   activateListeners(html) {
     super.activateListeners(html);
+
+    // ==========================================
+    // ★ 추가: 엔터키 버그 수정
+    // ==========================================
+    html.find('input').on('keydown', function(ev) {
+      if (ev.key === "Enter") {
+        ev.preventDefault();
+        $(this).blur(); 
+      }
+    });
 
     // ★ 자물쇠 토글 버튼 클릭 이벤트
     html.find('.toggle-item-lock').click(ev => {
