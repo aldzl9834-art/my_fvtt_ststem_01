@@ -154,13 +154,13 @@ GUNDOG.skillGroups = {
 
 // 7가지 그룹 스킬의 한글 이름 매핑 (출력용)
 GUNDOG.groupNames = {
-  shooting: "사격계 ①",
-  fighting: "격투계 ①",
-  negotiation: "교섭계 ①",
-  exercise: "운동계 ①",
-  generalEducation: "교양계 ①",
-  perception: "지각계 ①",
-  expertise: "기술계 ①"
+  shooting: "사격계",
+  fighting: "격투계",
+  negotiation: "교섭계",
+  exercise: "운동계",
+  generalEducation: "교양계",
+  perception: "지각계",
+  expertise: "기술계"
 };
 
 GUNDOG.careerList = {

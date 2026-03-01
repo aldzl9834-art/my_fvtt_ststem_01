@@ -29,7 +29,18 @@
     "Item": {
       "weapon": "무기",
       "armor": "방어구",
-      "attachment": "총기 부착물"
-    }
+      "attachment": "총기 부착물",
+      "item" : "아이템",
+      "upkeepitem" : "유지 아이템",
+      "connection" : "커넥션" , 
+      "classarts" : "클래스 아츠",
+      "belief" : "신념",
+      "trait" : "특징",
+      "vehicleAttachment" : "차량 아이템"
+    },
+    "Actor" :{
+    "character": "캐릭터",
+    "vehicle": "차량"
   }
-} 
+  }
+}
