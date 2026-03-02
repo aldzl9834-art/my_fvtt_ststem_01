@@ -1,58 +1,75 @@
 <form class="gundog-item-sheet" autocomplete="off" style="padding: 10px; background: #f9f9f9; height: 100%; overflow-y:auto;">
   
   <header class="sheet-header" style="display:flex; gap:15px; margin-bottom:15px; padding-bottom:10px; border-bottom:2px solid #222;">
-    <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="80" width="80" style="border:2px solid #000; background:#fff;"/>
+    
     <div class="header-fields" style="flex:1; display:flex; flex-direction:column; justify-content:center; position:relative;">
-      <a class="toggle-item-lock" style="position:absolute; top:0; right:0; font-size:18px; color:{{#if system.locked}}#dc3545{{else}}#28a745{{/if}}; cursor:pointer;" title="시트 잠금/해제">
-        <i class="fas {{#if system.locked}}fa-lock{{else}}fa-lock-open{{/if}}"></i>
-      </a>
-      <h1 class="charname" style="margin:0; padding-right:25px;">
-        <input name="name" type="text" value="{{item.name}}" placeholder="아이템 이름" style="font-family:'VITRO_CORE_OTF', sans-serif; font-weight:bold; font-size:24px; border:none; border-bottom:0px solid #ccc; background:transparent;"/>
+      
+      <div class="lock-toggle-container">
+        <span style="font-size: 11px; font-weight: bold; color: #555; margin-right: 6px;">시트 잠금</span>
+        <a class="toggle-item-lock {{#if system.locked}}is-locked{{/if}}" title="시트 잠금/해제">
+          <div class="switch-track">
+            <div class="switch-knob"></div>
+            <span class="switch-text">{{#if system.locked}}ON{{else}}OFF{{/if}}</span>
+          </div>
+        </a>
+      </div>
+
+      <h1 class="charname" style="margin:0;">
+        <input name="name" type="text" value="{{item.name}}" placeholder="아이템 이름" style="font-family:'VITRO_CORE_OTF', sans-serif; font-weight:bold; font-size:24px; border:none; background:transparent; width:100%;"/>
       </h1>
-      <div style="margin-top:5px; font-weight:bold; color:#666; font-size:12px; display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
-        <span style="text-transform:uppercase;">아이템 타입: {{item.type}}</span>
+
+      <div class="header-details-grid">
+        
+        <div class="item-type-row">
+          <span>아이템 타입: {{item.type}}</span>
+        </div>
         
         {{#unless isClassArts}}
         {{#unless isBelief}}
         {{#unless isTrait}}
-        <div style="display:flex; align-items:center; gap:5px;">
-          <label>가격</label>
-          <input type="number" name="system.price" value="{{system.price}}" style="width:60px; height:22px; text-align:center; font-size:11px; border: none; background: transparent;"/>
+        <div class="grid-label">가격</div>
+        <div class="grid-input">
+          <input type="number" name="system.price" value="{{system.price}}" />
         </div>
-        <div style="display:flex; align-items:center; gap:5px;">
-          <label>입수치</label>
-          <input type="text" name="system.availability" value="{{system.availability}}" style="width:20px; height:22px; text-align:center; font-size:11px;"/>
+        
+        <div class="grid-label">입수치</div>
+        <div class="grid-input">
+          <input type="text" name="system.availability" value="{{system.availability}}" />
         </div>
         {{/unless}}
         {{/unless}}
         {{/unless}}
 
         {{#if isWeapon}}
-        <div style="display:flex; align-items:center; gap:5px;">
-          <label>탄알 가격(기본)</label>
-          <input type="number" name="system.ammoPrice" value="{{system.ammoPrice}}" style="width:60px; height:22px; text-align:center; font-size:11px;"/>
+        <div class="grid-label">탄창 가격</div>
+        <div class="grid-input flex-input">
+          <input type="number" name="system.ammoPrice" value="{{system.ammoPrice}}" />
           {{#if computed.showFinalAmmoPrice}}
-            <span style="font-size:11px; color:#d9534f; font-weight:bold; margin-left:5px;">(최종: {{computed.finalAmmoPrice}})</span>
+            <span class="final-ammo-price">(최종: {{computed.finalAmmoPrice}})</span>
           {{/if}}
         </div>
-        <div style="display:flex; align-items:center; gap:5px; border-left:1px solid #ccc; padding-left:15px;">
-          <label>탄알 입수치</label>
-          <input type="text" name="system.ammoAvailability" value="{{system.ammoAvailability}}" style="width:20px; height:22px; text-align:center; font-size:11px;"/>
+        
+        <div class="grid-label">입수치</div>
+        <div class="grid-input">
+          <input type="text" name="system.ammoAvailability" value="{{system.ammoAvailability}}" />
         </div>
         {{/if}}
       </div>
-    </div>
+    </div> <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" style="width:110px; height:82px; object-fit:cover; border:1px solid #cacaca; background:#fff; flex-shrink:0;"/>
+    
   </header>
 
   <div class="sheet-body" style="border:1px solid #ccc; padding:10px; background:#fff; border-radius:4px;">
     
     {{#if isWeapon}}
       <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">무기 프로필</h3>
-      <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:15px;">
-        <label style="font-weight:bold; font-size:12px; color:#333;">무기 분류</label>
-        <input type="text" name="system.weaponType" value="{{system.weaponType}}"/>
-        <label style="font-weight:bold; font-size:12px; color:#333;">사용 스킬</label>
-        <select name="system.skill">
+      
+      <div class="split-grid" style="margin-bottom:15px;">
+        <label>무기 분류</label>
+        <input class="box-style" type="text" name="system.weaponType" value="{{system.weaponType}}"/>
+        
+        <label class="right-label">사용 스킬</label>
+        <select class="box-style" name="system.skill">
             <option value="handgun" {{#if (eq system.skill "handgun")}}selected{{/if}}>핸드건</option>
             <option value="smg" {{#if (eq system.skill "smg")}}selected{{/if}}>기관단총</option>
             <option value="rifle" {{#if (eq system.skill "rifle")}}selected{{/if}}>라이플</option>
@@ -63,36 +80,43 @@
         </select>
       </div>
 
-      <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:10px;">
-        <label style="font-weight:bold; font-size:12px; color:#333;">사격 모드</label>
-        <input type="text" name="system.firingMode" value="{{system.firingMode}}" placeholder="예: 단발, 3점사" style="width:100%; height:24px;"/>
-        <label style="font-weight:bold; font-size:12px; color:#333;">신뢰성</label>
-        <div style="display:flex; align-items:center; border:1px solid #bbb; background:#fff; border-radius:3px; height:24px;">
-          <input type="text" name="system.reliability" value="{{system.reliability}}" style="border:none; background:transparent; width:100%; text-align:center; height:100%; outline:none;"/>
-          <span style="font-weight:bold; font-size:11px; padding-right:4px; white-space:nowrap;">{{{computed.relStr}}}</span>
+      <div class="split-grid" style="margin-bottom:10px;">
+        <label>사격 모드</label>
+        <input class="box-style" type="text" name="system.firingMode" value="{{system.firingMode}}" placeholder="단발, 3점사 등"/>
+        
+        <label class="right-label">신뢰성</label>
+        <div class="flex-container">
+          <input class="box-style" type="text" name="system.reliability" value="{{system.reliability}}"/>
+          <span class="suffix">{{{computed.relStr}}}</span>
         </div>
 
-        <label style="font-weight:bold; font-size:12px; color:#333;">사정거리</label>
-        <div style="display:flex; align-items:center; gap:4px;">
-            <input type="text" name="system.range" value="{{system.range}}" style="width:60px; text-align:center; height:24px;"/>
-            <span style="font-size:12px;">m</span>
+        <label>사정거리</label>
+        <div class="flex-container">
+            <input class="box-style" type="text" name="system.range" value="{{system.range}}"/>
+            <span class="suffix">m</span>
         </div>
+        
+        <label class="right-label">소음 레벨</label>
+        <div class="flex-container">
+          <input class="box-style" type="text" name="system.noiseLevel" value="{{system.noiseLevel}}"/>
+          <span class="suffix">{{{computed.noiseStr}}}</span>
+        </div>
+      </div>
 
-        <label style="font-weight:bold; font-size:12px; color:#333;">소음 레벨</label>
-        <div style="display:flex; align-items:center; border:1px solid #bbb; background:#fff; border-radius:3px; height:24px;">
-          <input type="text" name="system.noiseLevel" value="{{system.noiseLevel}}" style="border:none; background:transparent; width:100%; text-align:center; height:100%; outline:none;"/>
-          <span style="font-weight:bold; font-size:11px; padding-right:4px; white-space:nowrap;">{{{computed.noiseStr}}}</span>
+      <div class="split-grid" style="margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        <label>필요 근력</label>
+        <div class="flex-container multi-input">
+          <span style="font-size:10px; color:#666;">한손</span>
+          <input class="box-style" type="text" name="system.requiredStr.oneHand" value="{{system.requiredStr.oneHand}}"/>
+          <span style="font-size:10px; color:#666;">양손</span>
+          <input class="box-style" type="text" name="system.requiredStr.twoHands" value="{{system.requiredStr.twoHands}}"/>
         </div>
-
-      </div> <div style="display:grid; grid-template-columns: 80px 1fr 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
-        <label style="font-weight:bold; font-size:12px; color:#333;">필요 근력</label>
-        <div style="display:flex; align-items:center; gap:4px;">
-          <span style="font-size:10px; color:#666;">한손</span><input type="text" name="system.requiredStr.oneHand" value="{{system.requiredStr.oneHand}}" style="width:40px; text-align:center;"/>
-          <span style="font-size:10px; color:#666;">양손</span><input type="text" name="system.requiredStr.twoHands" value="{{system.requiredStr.twoHands}}" style="width:40px; text-align:center;"/>
-        </div>
-        <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
-        <div style="display:flex; align-items:center; gap:4px;">
-          <input type="text" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center;"/> * <input type="text" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center;"/>
+        
+        <label class="right-label">휴대치</label>
+        <div class="flex-container multi-input">
+          <input class="box-style" type="text" name="system.portability.x" value="{{system.portability.x}}"/>
+          <span style="font-size:10px; color:#666; font-weight:bold;">X</span>
+          <input class="box-style" type="text" name="system.portability.y" value="{{system.portability.y}}"/>
         </div>
       </div>
 

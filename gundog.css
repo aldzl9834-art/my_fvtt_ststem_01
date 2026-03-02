@@ -27,3 +27,240 @@
     background-color: rgba(255, 255, 255, 0.4) !important;
     border-bottom: 1px solid #0056b3 !important; /* 입력 중일 때만 파란색 밑줄 표시 */
 }
+
+/* 아이템 시트 헤더 세부정보 그리드 레이아웃 */
+.header-details-grid {
+    margin-top: -5px;
+    margin-left: 9px;
+    font-weight: bold;
+    color: #666;
+    font-size: 12px;
+    display: grid;
+    /* [라벨1] [입력칸1] [라벨2] [입력칸2 및 나머지] 비율 고정 */
+    grid-template-columns: 50px 90px 35px 25px; 
+    /* 수정됨: 세로 4px, 가로 5px 간격 (기존 8px, 10px의 절반) */
+    gap: 2px 5px; 
+    align-items: center;
+}
+
+/* 1번째 줄: 아이템 타입 (모든 열 병합) */
+.header-details-grid .item-type-row {
+    grid-column: 1 / -1; /* 첫 번째 칸부터 마지막 칸까지 전체 사용 */
+    text-transform: uppercase;
+    /* 수정됨: 하단 점선 제거 및 둥근 회색 박스 적용 */
+    background-color: #dadada;
+    border-radius: 6px; /* 모서리 둥글게 */
+    padding: 4px 8px; /* 텍스트가 박스에 너무 붙지 않게 안쪽 여백 추가 */
+    margin-bottom: 4px; /* 아래 항목들과의 약간의 간격 */
+    color: #222; /* 회색 배경에서 더 잘 보이도록 글자색 조정 */
+    width: fit-content; /* 텍스트 길이에 맞춰 박스 크기가 결정되도록 설정 */
+}
+
+/* 각 항목의 라벨 (가격, 입수치 등) */
+.header-details-grid .grid-label {
+    /* 수정됨: 오른쪽 정렬에서 왼쪽 정렬로 변경 */
+    text-align: left;
+    color: #333;
+}
+
+/* 각 입력칸을 감싸는 영역 */
+.header-details-grid .grid-input {
+    display: flex;
+    align-items: center;
+}
+
+/* 입력칸(Input) 크기 통일 */
+.header-details-grid .grid-input input {
+    width: 60px;
+    height: 22px;
+    text-align: center;
+    font-size: 13px;
+    border-bottom: 1px solid #ececec !important; /* 밑줄로만 입력칸을 표시 */
+}
+
+/* 탄알 가격 최종 표시 등 가로 배치용 */
+.header-details-grid .flex-input {
+    display: flex;
+    align-items: center;
+    gap: 3px; /* 글자와 입력칸 사이 간격 최소화 */
+    width: 100%; 
+    max-width: 60px; /* 전체 너비가 일정 크기 이상 늘어나지 않도록 제한 */
+}
+
+/* flex-input 내부의 input은 고정 60px를 풀고 유동적으로 변하게 함 */
+.header-details-grid .flex-input input {
+    flex: 1; /* 남은 공간을 알아서 채움 */
+    min-width: 0; /* ★중요: flex 환경에서 input이 공간에 맞춰 줄어들 수 있게 허용 */
+    width: 100% !important; /* 기본 width 60px 덮어쓰기 */
+    padding: 0; /* 불필요한 여백 제거 */
+}
+
+/* (최종: XX) 텍스트 폰트 설정 */
+.header-details-grid .final-ammo-price {
+    font-size: 10px; /* 공간 확보를 위해 폰트 크기를 아주 살짝 축소 */
+    color: #d9534f;
+    font-weight: bold;
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    flex-shrink: 0; /* ★중요: 텍스트 영역은 찌그러지지 않고 크기를 유지함 */
+}
+
+/* ON/OFF 토글 스위치 디자인            */
+.lock-toggle-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2px; /* 아이템 이름과의 간격 */
+}
+
+.toggle-item-lock {
+    display: inline-block;
+    cursor: pointer;
+}
+
+/* 스위치 배경 트랙 (OFF 상태: 회색) */
+.switch-track {
+    position: relative;
+    width: 48px;
+    height: 20px;
+    background-color: #ccc; 
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+
+/* 스위치 배경 트랙 (ON 상태: 잠금 활성화 시 빨간색) */
+.toggle-item-lock.is-locked .switch-track {
+    background-color: #dc3545; 
+}
+
+/* 스위치 동그라미 (Knob) */
+.switch-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+
+/* ON 상태일 때 동그라미 우측으로 이동 */
+.toggle-item-lock.is-locked .switch-knob {
+    transform: translateX(28px);
+}
+
+/* ON/OFF 글자 텍스트 */
+.switch-text {
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    width: 100%;
+    text-align: right; /* OFF일 때는 글자가 오른쪽에 표시됨 */
+    padding-right: 6px;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+/* ON 상태일 때 글자 위치 좌측으로 변경 */
+.toggle-item-lock.is-locked .switch-text {
+    text-align: left;
+    padding-left: 6px;
+    padding-right: 0;
+}
+
+/* ========================================== */
+/* 시트 본문(Body) 세부 디자인 및 다단 그리드 */
+/* ========================================== */
+
+.gundog-item-sheet .sheet-body input,
+.gundog-item-sheet .sheet-body select,
+.gundog-item-sheet .sheet-body textarea {
+    font-family: inherit;
+    font-weight: bold;
+}
+
+/* 좌우 다단 그리드 (왼쪽 답답함 완화: 1.5fr -> 1.2fr로 조정) */
+.gundog-item-sheet .split-grid {
+    display: grid;
+    grid-template-columns: 60px 1.4fr 60px 1fr; 
+    gap: 10px 6px; 
+    align-items: center;
+}
+
+.gundog-item-sheet .split-grid label {
+    font-weight: bold;
+    font-size: 12px;
+    color: #333;
+}
+
+.gundog-item-sheet .split-grid .right-label {
+    position: relative;
+}
+
+.gundog-item-sheet .split-grid .right-label::before {
+    content: "";
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 12px;
+    background-color: #ccc;
+}
+
+/* ========================================== */
+/* 직관적이고 뚜렷한 실제 입력 박스(Input) 스타일 */
+/* ========================================== */
+
+.gundog-item-sheet .split-grid .box-style {
+    width: 80%;
+    max-width: 120px; /* ★ 좌우로 너무 넓어지는 현상 완벽 방지 */
+    height: 24px;
+    background-color: #ffffff00 !important;
+    border: 1px solid #c9c9c9 !important; /* 뚜렷한 회색 테두리 */
+    border-radius: 4px !important;
+    box-sizing: border-box;
+    padding: 0 4px;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 13px;
+    color: #303030;
+    text-align: center;
+    box-shadow: inset 0 1px 3px rgba(211, 211, 211, 0.08) !important; /* 살짝 파인듯한 입력칸 음영 추가 */
+    outline: none !important;
+    justify-self: start; /* 왼쪽으로 가지런히 정렬 */
+}
+
+.gundog-item-sheet .split-grid .box-style:focus {
+    border-color: #0056b3 !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.08), 0 0 3px rgba(0,86,179,0.3) !important;
+}
+
+/* 텍스트(m, 신뢰성 기호 등)가 입력 박스 밖에 가지런히 놓이게 하는 컨테이너 */
+.gundog-item-sheet .split-grid .flex-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    justify-self: start;
+}
+
+/* 텍스트와 함께 쓰일 때의 입력 박스 크기 */
+.gundog-item-sheet .split-grid .flex-container .box-style {
+    width: 40px; /* 단일 숫자 입력에 알맞게 축소 */
+    max-width: 40px;
+}
+
+/* 한손/양손, 장탄수 등 여러 박스가 들어갈 때의 크기 */
+.gundog-item-sheet .split-grid .flex-container.multi-input .box-style {
+    width: 40px;
+    max-width: 40px;
+}
+
+.gundog-item-sheet .split-grid .suffix {
+    font-size: 11px;
+    font-weight: bold;
+    white-space: nowrap;
+}
