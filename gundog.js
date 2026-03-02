@@ -29,6 +29,56 @@ Hooks.once("init", () => {
   });
 });
 
+// 채팅 메시지 내부의 버튼 클릭 이벤트 처리
+Hooks.on("renderChatMessage", (message, html, data) => {
+  html.find('.gundog-chat-btn').click(async ev => {
+    ev.preventDefault();
+    const formula = ev.currentTarget.dataset.formula;
+    const title = ev.currentTarget.dataset.title;
+    const actorId = ev.currentTarget.dataset.actorId;
+    
+    // 주사위를 굴린 캐릭터 정보 찾기
+    const actor = game.actors.get(actorId);
+    const speaker = actor ? ChatMessage.getSpeaker({ actor }) : ChatMessage.getSpeaker();
+
+    // 주사위 굴림 평가
+    const roll = await new Roll(formula).evaluate();
+    
+    // 주사위 상세 결과값(눈금) 파싱
+    let detailParts = [];
+    for (let term of roll.terms) {
+      if (term.faces && term.results) {
+        let diceResults = term.results.map(r => r.result).join(", ");
+        detailParts.push(`${term.number}d${term.faces}[${diceResults}]`);
+      } else if (term.operator) detailParts.push(term.operator);
+      else if (term.number !== undefined) detailParts.push(term.number);
+      else detailParts.push(term.expression || term.term || "");
+    }
+    let detailString = detailParts.join(" ");
+
+    // 새로운 채팅 메시지 카드 생성
+    const chatContent = `
+    <div class="dice-roll gundog-roll">
+      <div class="dice-result">
+        <div class="dice-formula" style="background:#d9534f; color:white; border-radius:4px 4px 0 0;"><i class="fas fa-tint"></i> ${title}</div>
+        <div class="dice-formula" style="font-size:12px; border-top:none; font-weight:bold; color:#d9534f;">대미지 굴림</div>
+        <div class="dice-tooltip" style="padding:5px; background:#fff; border:1px solid #ccc; font-size:12px; margin-bottom:5px; word-break:break-all;">
+          결과: ( ${detailString} )
+        </div>
+        <h4 class="dice-total" style="color:#d9534f;">총 ${roll.total} 데미지</h4>
+      </div>
+    </div>`;
+
+    await ChatMessage.create({
+      speaker: speaker,
+      content: chatContent,
+      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+      sound: CONFIG.sounds.dice,
+      rolls: [roll]
+    });
+  });
+});
+
 class GundogActorSheet extends ActorSheet {
 
   static get defaultOptions() {
@@ -798,13 +848,14 @@ class GundogActorSheet extends ActorSheet {
 
     const targetValue = skill.targetValue;
 
-    const tensRoll = await new Roll("1d10").evaluate();
-    const onesRoll = await new Roll("1d10").evaluate();
-
-    const tensValue = (tensRoll.total % 10) * 10;
-    const onesValue = onesRoll.total % 10;
-    const total = (tensValue + onesValue) === 0 ? 100 : (tensValue + onesValue);
-    const achievement = (tensValue / 10) + onesValue;
+    // ★ 수정: 1d100으로 굴리고 3D 주사위용 데이터 생성
+    const roll = await new Roll("1d100").evaluate();
+    const total = roll.total;
+    
+    // 1d100 결과에서 10의 자리와 1의 자리 및 달성치 연산
+    const tensValue = total === 100 ? 0 : Math.floor(total / 10) * 10;
+    const onesValue = total === 100 ? 0 : total % 10;
+    const achievement = Math.floor(tensValue / 10) + onesValue;
 
     const isSuccess = total <= targetValue;
     const resultText = isSuccess ? "성공 (SUCCESS)" : "실패 (FAILURE)";
@@ -832,7 +883,9 @@ class GundogActorSheet extends ActorSheet {
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker({ actor: this.actor }),
       content,
-      type: CONST.CHAT_MESSAGE_TYPES.ROLL
+      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+      sound: CONFIG.sounds.dice,
+      rolls: [roll] // ★ 핵심: 3D 주사위(Dice So Nice!)에 데이터를 전달합니다
     });
   }
 }
@@ -848,7 +901,7 @@ class GundogItemSheet extends ItemSheet {
       classes: ["gundog", "sheet", "item"],
       template: "systems/gundog/templates/item-sheet.hbs",
       width: 465,
-      height: 620,
+      height: 670,
       resizable: false,
       dragDrop: [{ dragSelector: null, dropSelector: ".attachment-slot" }]
     });
@@ -1258,12 +1311,14 @@ class GundogItemSheet extends ItemSheet {
           ev.preventDefault();
           const finalTargetValue = initialTarget + (Number(bInput.val()) || 0) - (Number(pInput.val()) || 0);
 
-          const tensRoll = await new Roll("1d10").evaluate();
-          const onesRoll = await new Roll("1d10").evaluate();
-          const tensValue = (tensRoll.total % 10) * 10;
-          const onesValue = onesRoll.total % 10;
-          const total = (tensValue + onesValue) === 0 ? 100 : (tensValue + onesValue);
-          const achievement = (tensValue / 10) + onesValue;
+          // ★ 수정: 1d100으로 굴리고 3D 주사위용 데이터 생성
+          const roll = await new Roll("1d100").evaluate();
+          const total = roll.total;
+          
+          const tensValue = total === 100 ? 0 : Math.floor(total / 10) * 10;
+          const onesValue = total === 100 ? 0 : total % 10;
+          const achievement = Math.floor(tensValue / 10) + onesValue;
+          
           const isSuccess = total <= finalTargetValue;
           const resultText = isSuccess ? "명중 (HIT)" : "빗나감 (MISS)";
           const resultColor = isSuccess ? "#28a745" : "#dc3545";
@@ -1290,7 +1345,11 @@ class GundogItemSheet extends ItemSheet {
           </div>`;
 
           await ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({ actor: this.item.actor }), content: chatContent, type: CONST.CHAT_MESSAGE_TYPES.ROLL, sound: CONFIG.sounds.dice
+            speaker: ChatMessage.getSpeaker({ actor: this.item.actor }), 
+            content: chatContent, 
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL, 
+            sound: CONFIG.sounds.dice,
+            rolls: [roll] // ★ 핵심: 3D 주사위 연동
           });
         });
 
@@ -1337,7 +1396,7 @@ class GundogItemSheet extends ItemSheet {
           });
         });
 
-        // ★ 추가: 대미지 페널티 굴림 로직 (0~9 주사위 처리 적용)
+       // ★ 추가: 대미지 페널티 굴림 로직 (0~9 주사위 처리 적용)
         html.find('#custom-penalty-btn').click(async (ev) => {
           ev.preventDefault();
           const pType = html.find('#penalty-type').val();
@@ -1449,7 +1508,6 @@ class GundogItemSheet extends ItemSheet {
           const typeLabels = { shooting: "사격", melee: "격투", vehicle: "차량", general: "범용" };
           const currentTable = penaltyTable[pType];
           
-          // 결과값(total)이 포함되는 구간 찾기
           let resultData = currentTable[currentTable.length - 1]; 
           for (let row of currentTable) {
             if (total >= row.min && total <= row.max) {
@@ -1458,46 +1516,31 @@ class GundogItemSheet extends ItemSheet {
             }
           }
 
-          // 표기용 텍스트 강제 고정 (2d9)
           let detailString = `2d9[${diceResults.join(", ")}]`;
           if (pMod > 0) detailString += ` + ${pMod}`;
           else if (pMod < 0) detailString += ` - ${Math.abs(pMod)}`;
 
           // ==========================================
-          // ★ 추가 대미지와 출혈 주사위 자동 굴림
+          // ★ 수동 굴림 버튼 생성 로직
           // ==========================================
-          let rollsToSync = [roll]; // 3D 다이스 애니메이션 연동
+          let rollsToSync = [roll]; // 2d9 주사위만 3D 애니메이션 연동
           let addDmgDetail = "없음";
           let bleedDetail = '<span style="color:red;">없음</span>';
-
-          // 주사위 눈금만 추출해서 콤마로 이어붙여주는 도우미 함수
-          const getDiceDetails = (r) => {
-            let results = [];
-            for (let term of r.terms) {
-              if (term.faces && term.results) {
-                results.push(...term.results.map(res => res.result));
-              }
-            }
-            return results.join(", ");
-          };
-
-          if (resultData.addDmg !== "0") {
-            const addRoll = await new Roll(resultData.addDmg).evaluate();
-            rollsToSync.push(addRoll);
-            const diceStr = getDiceDetails(addRoll);
-            addDmgDetail = `${resultData.addDmg} <i class="fas fa-arrow-right" style="margin:0 3px; color:#999;"></i> <strong style="font-size:15px; color:#d9534f;">+${addRoll.total} <span style="font-size:12px; font-weight:normal; color:#555;">[${diceStr}]</span></strong>`;
-          }
           
-          if (resultData.bleed !== "0") {
-            const bleedRoll = await new Roll(resultData.bleed).evaluate();
-            rollsToSync.push(bleedRoll);
-            const diceStr = getDiceDetails(bleedRoll);
-            bleedDetail = `<span style="color:red;">${resultData.bleed} <i class="fas fa-arrow-right" style="margin:0 3px; color:#999;"></i> <strong style="font-size:15px;">${bleedRoll.total} <span style="font-size:12px; font-weight:normal; color:#777;">[${diceStr}]</span></strong></span>`;
-          }
-
-          // ★ 선택한 타입이 '차량(vehicle)'이면 '탑승자', 아니면 '출혈'로 라벨 텍스트 지정
+          const actorId = this.item.actor ? this.item.actor.id : "";
           const bleedLabel = (pType === "vehicle") ? "탑승자" : "출혈";
 
+          // 추가 대미지 버튼 생성
+          if (resultData.addDmg !== "0") {
+            addDmgDetail = `<button type="button" class="gundog-chat-btn" data-formula="${resultData.addDmg}" data-title="추가 대미지" data-actor-id="${actorId}" style="height:24px; line-height:12px; font-size:11px; padding:0 8px; background:#d9534f; color:white; border:none; border-radius:3px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.2);"><i class="fas fa-dice"></i> ${resultData.addDmg} 굴림</button>`;
+          }
+          
+          // 출혈(탑승자) 대미지 버튼 생성
+          if (resultData.bleed !== "0") {
+            bleedDetail = `<button type="button" class="gundog-chat-btn" data-formula="${resultData.bleed}" data-title="${bleedLabel} 대미지" data-actor-id="${actorId}" style="height:24px; line-height:12px; font-size:11px; padding:0 8px; background:#dc3545; color:white; border:none; border-radius:3px; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.2);"><i class="fas fa-tint"></i> ${resultData.bleed} 굴림</button>`;
+          }
+
+          // 채팅창에 띄울 내용 조합
           const chatContent = `
           <div class="dice-roll gundog-roll">
             <div class="dice-result">
@@ -1518,6 +1561,7 @@ class GundogItemSheet extends ItemSheet {
             </div>
           </div>`;
 
+          // 주사위 굴림 결과 메시지 출력
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this.item.actor }), 
             content: chatContent, 
