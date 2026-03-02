@@ -852,10 +852,11 @@ class GundogActorSheet extends ActorSheet {
     const roll = await new Roll("1d100").evaluate();
     const total = roll.total;
     
+    const skillLv = Number(skill.lv) || 0;
     // 1d100 결과에서 10의 자리와 1의 자리 및 달성치 연산
     const tensValue = total === 100 ? 0 : Math.floor(total / 10) * 10;
     const onesValue = total === 100 ? 0 : total % 10;
-    const achievement = Math.floor(tensValue / 10) + onesValue;
+    const achievement = Math.floor(tensValue / 10) + onesValue + skillLv;
 
     const isSuccess = total <= targetValue;
     const resultText = isSuccess ? "성공 (SUCCESS)" : "실패 (FAILURE)";
@@ -869,7 +870,7 @@ class GundogActorSheet extends ActorSheet {
     <div class="dice-roll gundog-roll">
       <div class="dice-result">
         <div class="dice-formula">${skillKey.toUpperCase()} 판정 (목표: 1d100 <= ${targetValue})</div>
-        <div class="dice-formula">10의 자리 (${tensValue}) + 1의 자리 (${onesValue})</div>
+        <div class="dice-formula">10의 자리 (${tensValue}) + 1의 자리 (${onesValue}) + 스킬 Lv(${skillLv})</div>
         <h4 class="dice-total">${total}</h4>
         <div style="background:${resultColor}; color:white; padding:5px; text-align:center;">
           ${resultText}
@@ -1189,8 +1190,14 @@ class GundogItemSheet extends ItemSheet {
 
     const content = `
       <form style="padding:10px;">
-        <h3 style="border-bottom:2px solid #222; padding-bottom:5px; margin-bottom:15px;">
-          <i class="fas fa-crosshairs"></i> ${this.item.name} (${rangeLabel} 사격)
+        
+        <h3 style="border-bottom:2px solid #222; padding-bottom:8px; margin-bottom:15px; display:flex; flex-direction:column; gap:4px; line-height:1.2;">
+          <div style="font-size:12px; color:#666; font-weight:normal;">
+            <i class="fas fa-user" style="color:#0056b3;"></i> ${this.item.actor.name}
+          </div>
+          <div style="font-size:16px;">
+            <i class="fas fa-crosshairs"></i> ${this.item.name} <span style="color:#d9534f; font-size:14px;">(${rangeLabel})</span>
+          </div>
         </h3>
         
         <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:13px; color:#555;">
@@ -1222,7 +1229,7 @@ class GundogItemSheet extends ItemSheet {
         </div>
 
         <button type="button" id="custom-roll-btn" style="width:100%; margin-top:10px; background:#0056b3; color:white; border:none; border-radius:3px; height:36px; cursor:pointer; font-weight:bold; font-size:13px;">
-          <i class="fas fa-dice-d10"></i> 명중 판정 굴림 (반복 가능)
+          <i class="fas fa-dice-d10"></i> 명중 판정 굴림
         </button>
 
         <hr style="margin:20px 0; border-top:1px dashed #ccc;">
@@ -1317,10 +1324,30 @@ class GundogItemSheet extends ItemSheet {
           
           const tensValue = total === 100 ? 0 : Math.floor(total / 10) * 10;
           const onesValue = total === 100 ? 0 : total % 10;
-          const achievement = Math.floor(tensValue / 10) + onesValue;
+          
+          // 1. 기존 달성치 연산 (주사위 눈금 + 스킬 Lv)
+          const skillLv = Number(actorSkill.lv) || 0;
+          const achievement = Math.floor(tensValue / 10) + onesValue + skillLv;
+          
+          // 2. 무기의 기본 관통력(AP) 및 부착물 관통력 보너스 가져오기
+          const baseAP = Number(this.item.system.armorPiercing) || 0;
+          let attachAP = 0;
+          for (let slot in this.item.system.attachments) {
+            const arr = this.item.system.attachments[slot];
+            if (Array.isArray(arr)) {
+              for (let att of arr) {
+                if (att.modifiers && att.modifiers.armorPiercing) {
+                  attachAP += Number(att.modifiers.armorPiercing) || 0;
+                }
+              }
+            }
+          }
+          
+          // 3. 최종 관통력 (달성치 + 기본 AP + 부착물 AP)
+          const finalPiercing = achievement + baseAP + attachAP;
           
           const isSuccess = total <= finalTargetValue;
-          const resultText = isSuccess ? "명중 (HIT)" : "빗나감 (MISS)";
+          const resultText = isSuccess ? "명중" : "빗나감";
           const resultColor = isSuccess ? "#28a745" : "#dc3545";
 
           let resultType = "NORMAL";
@@ -1334,12 +1361,12 @@ class GundogItemSheet extends ItemSheet {
                 <i class="fas fa-crosshairs"></i> ${this.item.name} (${rangeLabel})
               </div>
               <div class="dice-formula" style="font-size:12px; border-top:none;">
-                ${GUNDOG.skillNames[skillKey]} 판정 (목표값: ${finalTargetValue})
+                ${GUNDOG.skillNames[skillKey]} 판정 (성공률: ${finalTargetValue})
               </div>
-              <div class="dice-formula">주사위: ${tensValue} + ${onesValue}</div>
+              <div class="dice-formula">주사위 값: ${tensValue} + ${onesValue}</div>
               <h4 class="dice-total">${total}</h4>
               <div style="background:${resultColor}; color:white; padding:6px; text-align:center; font-weight:bold; font-size:14px; border-radius:0 0 4px 4px;">
-                ${resultText} ${isSuccess ? ` | 달성치(${achievement})` : ""} ${resultType === "CRITICAL" ? " 🔥CRITICAL" : ""} ${resultType === "FUMBLE" ? " 💀FUMBLE" : ""}
+                ${resultText} ${isSuccess ? ` | 관통력(${finalPiercing})` : ""} ${resultType === "CRITICAL" ? " 🔥CRITICAL" : ""} ${resultType === "FUMBLE" ? " 💀FUMBLE" : ""}
               </div>
             </div>
           </div>`;

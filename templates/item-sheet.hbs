@@ -1,11 +1,15 @@
 <form class="gundog-item-sheet" autocomplete="off" style="padding: 10px; background: #f9f9f9; height: 100%; overflow-y:auto;">
   
-  <header class="sheet-header" style="display:flex; gap:15px; margin-bottom:15px; padding-bottom:10px; border-bottom:2px solid #222;">
+  <header class="sheet-header" style="display:flex; margin-bottom:15px; padding-bottom:10px; border-bottom:2px solid #222; position:relative; min-height:170px;">
     
+    <div class="header-bg-image">
+      <img src="{{item.img}}" data-edit="img" title="{{item.name}}"/>
+    </div>
+
     <div class="header-fields" style="flex:1; display:flex; flex-direction:column; justify-content:center; position:relative;">
       
       <div class="lock-toggle-container">
-        <span style="font-size: 11px; font-weight: bold; color: #555; margin-right: 6px;">시트 잠금</span>
+        <span style="font-size: 11px; font-weight: bold; color: #555; margin-right: 6px;">잠금</span>
         <a class="toggle-item-lock {{#if system.locked}}is-locked{{/if}}" title="시트 잠금/해제">
           <div class="switch-track">
             <div class="switch-knob"></div>
@@ -55,14 +59,13 @@
         </div>
         {{/if}}
       </div>
-    </div> <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" style="width:110px; height:82px; object-fit:cover; border:1px solid #cacaca; background:#fff; flex-shrink:0;"/>
-    
+  
   </header>
 
   <div class="sheet-body" style="border:1px solid #ccc; padding:10px; background:#fff; border-radius:4px;">
     
     {{#if isWeapon}}
-      <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">무기 프로필</h3>
+      <h3 style="background:#222; color:white; padding:4px 8px; font-size:13px; margin:0 0 10px 0;">무기 프로필</h3>
       
       <div class="split-grid" style="margin-bottom:15px;">
         <label>무기 분류</label>
@@ -103,7 +106,7 @@
         </div>
       </div>
 
-      <div class="split-grid" style="margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+      <div class="split-grid" style="margin-bottom:15px; padding-bottom:20px; border-bottom:1px dashed #ccc;">
         <label>필요 근력</label>
         <div class="flex-container multi-input">
           <span style="font-size:10px; color:#666;">한손</span>
@@ -120,8 +123,8 @@
         </div>
       </div>
 
-      <h4 style="margin:15px 0 5px 0; font-size:12px; color:#0056b3; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-crosshairs"></i> 사거리별 명중 수정치</h4>
-      <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:2px; text-align:center; font-size:11px; margin-bottom:15px;">
+      <h4 style="margin:15px 0 5px 0; font-size:12px; color:#0056b3; border-bottom:1px solid #ccc; padding-bottom:6px;"><i class="fas fa-crosshairs"></i> 거리별 명중 수정치</h4>
+      <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:2px; text-align:center; font-size:12px; margin-bottom:15px;">
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">지근거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">근거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">중거리</div>

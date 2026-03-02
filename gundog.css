@@ -249,18 +249,57 @@
 
 /* 텍스트와 함께 쓰일 때의 입력 박스 크기 */
 .gundog-item-sheet .split-grid .flex-container .box-style {
-    width: 40px; /* 단일 숫자 입력에 알맞게 축소 */
-    max-width: 40px;
+    width: 60px; /* 단일 숫자 입력에 알맞게 축소 */
+    max-width: 60px;
 }
 
 /* 한손/양손, 장탄수 등 여러 박스가 들어갈 때의 크기 */
 .gundog-item-sheet .split-grid .flex-container.multi-input .box-style {
-    width: 40px;
-    max-width: 40px;
+    width: 35px;
+    max-width: 35px;
 }
 
 .gundog-item-sheet .split-grid .suffix {
     font-size: 11px;
     font-weight: bold;
     white-space: nowrap;
+}
+
+/* ========================================== */
+/* 헤더 백그라운드 이미지 (그라데이션 효과)      */
+/* ========================================== */
+
+.gundog-item-sheet .header-bg-image {
+    position: absolute;
+    top: 0;
+    right: -10px; /* 우측 여백에 딱 맞게 살짝 밀어줌 */
+    width: 280px;
+    height: 170px;
+    z-index: 0; /* 다른 글자나 입력칸 뒤(바닥)에 깔리도록 설정 */
+    
+    /* 핵심: 좌측(투명)에서 우측(불투명 검정)으로 변하는 그라데이션 마스크 */
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 50%);
+    mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 50%);
+    
+    opacity: 0.45; /* 이미지가 너무 진해서 텍스트를 가리지 않도록 살짝 투명도 적용 */
+}
+
+/* 이미지 태그 자체의 테두리를 없애고 박스에 꽉 채움 */
+.gundog-item-sheet .header-bg-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* 비율이 깨지지 않게 가득 채움 */
+    border: none !important;
+    background: transparent !important;
+    cursor: pointer; /* 클릭해서 이미지 변경 가능하도록 유지 */
+}
+
+/* 배경 이미지가 글자를 가릴 때를 대비해 라벨들에 텍스트 그림자(흰색)를 살짝 줌 */
+.gundog-item-sheet .header-details-grid .grid-label,
+.gundog-item-sheet .header-details-grid span {
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.9);
+}
+
+.gundog-item-sheet .sheet-header {
+    overflow: hidden; /* 헤더 밖으로 삐져나간 배경 이미지를 잘라내어 스크롤 방지 */
 }
