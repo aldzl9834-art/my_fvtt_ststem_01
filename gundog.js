@@ -9,6 +9,12 @@ Hooks.once("init", () => {
 
   CONFIG.Actor.documentClass = GundogActor;
 
+  // ★ 추가: 컴뱃 트래커 이니셔티브(선공) 굴림 공식 설정
+  CONFIG.Combat.initiative = {
+    formula: "@initiativeBase", // actor.js에서 연산한 최종 스탯값만 가져옵니다
+    decimals: 0
+  };
+
   // 액터 시트 등록
   Actors.unregisterSheet("core", ActorSheet);
   Actors.registerSheet("gundog", GundogActorSheet, { 
@@ -78,6 +84,49 @@ Hooks.on("renderChatMessage", (message, html, data) => {
     });
   });
 });
+
+// ★ 매 라운드 시작 시 이니셔티브 초기화
+Hooks.on("updateCombat", async (combat, updateData, options, userId) => {
+  // 중복 실행을 막기 위해 GM(마스터)의 클라이언트에서만 1번 처리합니다.
+  if (!game.user.isGM) return;
+
+  // 라운드 값이 이전 라운드보다 증가했는지 확인 (새 라운드 시작)
+  if (updateData.round !== undefined && updateData.round > combat.previous.round) {
+    // 트래커에 있는 모든 인원의 이니셔티브 값을 초기화(null) 합니다.
+    await combat.resetAll();
+  }
+});
+
+Hooks.on("preCreateCombatant", (combatant, data, options, userId) => {
+  if (combatant.actor) {
+    const initBase = combatant.actor.system.initiativeBase || 0;
+    
+    // 전투원에 추가되자마자 주사위 굴림 없이 즉시 값을 설정합니다.
+    combatant.update({ initiative: initBase });
+  }
+});
+
+// ==========================================
+// ★ 2. 라운드 변경 시 이니셔티브를 빈칸이 아닌 '기본 스탯'으로 원상복구
+// ==========================================
+Hooks.on("updateCombat", async (combat, updateData, options, userId) => {
+  if (!game.user.isGM) return;
+
+  // 다음 라운드로 넘어갔을 때 작동합니다.
+  if (updateData.round !== undefined && updateData.round > combat.previous.round) {
+    
+    // 이전 라운드에서 매크로로 받은 '선공 보너스(+100)'를 모두 떼어내고, 다시 기본 스탯으로 되돌립니다.
+    const updates = combat.combatants.map(c => {
+      const base = c.actor ? (c.actor.system.initiativeBase || 0) : 0;
+      return { _id: c.id, initiative: base };
+    });
+    
+    await combat.updateEmbeddedDocuments("Combatant", updates);
+    ui.notifications.info(`[라운드 ${updateData.round}] 새 라운드 시작! 기본 스탯 순서로 자동 재정렬되었습니다.`);
+  }
+});
+
+
 
 class GundogActorSheet extends ActorSheet {
 
@@ -954,23 +1003,26 @@ class GundogItemSheet extends ItemSheet {
       const atts = context.safeAttachments;
       for (let slot in atts) {
         for (let att of atts[slot]) {
-          if (!att.modifiers) continue;
+          // ★ 수정: 인벤토리(actor)에 있는 실시간 부착물 원본 데이터를 불러옵니다.
+          let liveItem = this.item.actor ? this.item.actor.items.get(att.id) : game.items.get(att.id);
+          let mods = liveItem ? liveItem.system.modifiers : att.modifiers;
+
+          if (!mods) continue;
           ['pointBlank', 'short', 'medium', 'long', 'sniping'].forEach(k => {
-            computed.rangeBuffs[k] = (Number(computed.rangeBuffs[k]) || 0) + (Number(att.modifiers.rangeBuffs?.[k]) || 0);
-            computed.rangePenalties[k] = (Number(computed.rangePenalties[k]) || 0) + (Number(att.modifiers.rangePenalties?.[k]) || 0);
+            computed.rangeBuffs[k] = (Number(computed.rangeBuffs[k]) || 0) + (Number(mods.rangeBuffs?.[k]) || 0);
+            computed.rangePenalties[k] = (Number(computed.rangePenalties[k]) || 0) + (Number(mods.rangePenalties?.[k]) || 0);
           });
-          computed.reliabilityBonus += Number(att.modifiers.reliability) || 0;
-          computed.noiseLevelBonus += Number(att.modifiers.noiseLevel) || 0;
-          computed.armorPiercingBonus += Number(att.modifiers.armorPiercing) || 0;
-          computed.ammoMaxBonus += Number(att.modifiers.ammoMax) || 0;
-          computed.snipingBonus += Number(att.modifiers.snipingBonus) || 0;
-          computed.snipingPenalty += Number(att.modifiers.snipingPenalty) || 0;
+          computed.reliabilityBonus += Number(mods.reliability) || 0;
+          computed.noiseLevelBonus += Number(mods.noiseLevel) || 0;
+          computed.armorPiercingBonus += Number(mods.armorPiercing) || 0;
+          computed.ammoMaxBonus += Number(mods.ammoMax) || 0;
+          computed.snipingBonus += Number(mods.snipingBonus) || 0;
+          computed.snipingPenalty += Number(mods.snipingPenalty) || 0;
           
-         if (att.modifiers.damageNonPen) dmgNonPenArr.push(att.modifiers.damageNonPen);
-          if (att.modifiers.damagePen) dmgPenArr.push(att.modifiers.damagePen);
+          if (mods.damageNonPen) dmgNonPenArr.push(mods.damageNonPen);
+          if (mods.damagePen) dmgPenArr.push(mods.damagePen);
           
-          // 탄약 가격 배수 곱연산
-          let mult = Number(att.modifiers.ammoMultiplier);
+          let mult = Number(mods.ammoMultiplier);
           if (mult && mult > 0) computed.ammoMultiplier *= mult;
         }
       }
@@ -1161,14 +1213,18 @@ class GundogItemSheet extends ItemSheet {
       const arr = this.item.system.attachments[slot];
       if (Array.isArray(arr)) {
         for (let att of arr) {
-          if (!att.modifiers) continue;
-          wBuff += Number(att.modifiers.rangeBuffs?.[rangeKey]) || 0;
-          wPenalty += Number(att.modifiers.rangePenalties?.[rangeKey]) || 0;
-          sBonus += Number(att.modifiers.snipingBonus) || 0;
-          sPenalty += Number(att.modifiers.snipingPenalty) || 0;
+          // ★ 수정: 다이스 굴림 시에도 실시간 원본 데이터를 가져와 적용합니다.
+          let liveItem = this.item.actor ? this.item.actor.items.get(att.id) : game.items.get(att.id);
+          let mods = liveItem ? liveItem.system.modifiers : att.modifiers;
+
+          if (!mods) continue;
+          wBuff += Number(mods.rangeBuffs?.[rangeKey]) || 0;
+          wPenalty += Number(mods.rangePenalties?.[rangeKey]) || 0;
+          sBonus += Number(mods.snipingBonus) || 0;
+          sPenalty += Number(mods.snipingPenalty) || 0;
           
-          if (att.modifiers.damageNonPen) dmgNonPenArr.push(att.modifiers.damageNonPen);
-          if (att.modifiers.damagePen) dmgPenArr.push(att.modifiers.damagePen);
+          if (mods.damageNonPen) dmgNonPenArr.push(mods.damageNonPen);
+          if (mods.damagePen) dmgPenArr.push(mods.damagePen);
         }
       }
     }

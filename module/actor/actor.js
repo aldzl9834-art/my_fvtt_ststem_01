@@ -165,8 +165,26 @@ export class GundogActor extends Actor {
     // TODO: 추후 Item 시스템이 연동되면 생활 랭크, 주거, 차량, 차고, 커넥션 등의 아이템을 필터링하여 합산합니다.
     let baseMaintenance = 0; // 기타 기본 유지비
     let itemMaintenance = 0; // 아이템에 의한 유지비 합산액
-    
+
     // 최종 유지비 계산
     system.profile.maintenanceCost = baseMaintenance + itemMaintenance;
+
+    // ==========================================
+    // ★ 6. 이니셔티브(선공) 기본 스탯 연산 ★
+    // ==========================================
+    let tacticsVal = Number(system.skills?.generalEducation?.tactics?.targetValue) || 0;
+    let awarenessVal = Number(system.skills?.perception?.situationalAwareness?.targetValue) || 0;
+
+    // '컴뱃 센스' 클래스 아츠 보유 여부 체크 (띄어쓰기 무시)
+    const hasCombatSense = this.items.some(i => i.type === "classarts" && i.name.replace(/\s/g, '').includes("컴뱃센스"));
+
+    // 컴뱃 센스가 있으면 둘 중 높은 값, 없으면 전술(tactics) 값 사용
+    let initBase = tacticsVal;
+    if (hasCombatSense && awarenessVal > tacticsVal) {
+      initBase = awarenessVal;
+    }
+
+    // 연산된 값을 시스템 데이터에 저장 (이 값이 @initiativeBase가 됩니다)
+    system.initiativeBase = initBase;
   }
 }
