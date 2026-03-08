@@ -203,6 +203,7 @@ class GundogActorSheet extends ActorSheet {
     context.inventoryWeapons = [];
     context.headArmors = [];
     context.bodyArmors = [];
+    context.inventoryArmors = [];
 
     // ==========================================
     // ★ 2. 아이템(CP 관리표) 탭 분류용 배열
@@ -262,7 +263,9 @@ class GundogActorSheet extends ActorSheet {
           }
         }
         item.computedAmmoMax = computedAmmoMax;
-        // ★ 수정: 장착 상태에 따라 각기 다른 배열로 보냅니다.
+        item.finalMaxAmmo = (Number(item.system.ammo?.max) || 0) + computedAmmoMax;
+        
+        // ★ 수정: 장착 상태에 따라 각기 다른 배열로 보냅니다.        
         if (item.system.equippedSlot === "main") {
           context.mainWeapons.push(item);
         } else if (item.system.equippedSlot === "sub") {
@@ -273,8 +276,12 @@ class GundogActorSheet extends ActorSheet {
       }
 
       else if (item.type === "armor") {
-        if (item.system.armorType === "head") context.headArmors.push(item);
-        else context.bodyArmors.push(item);
+        if (item.system.equipped) {
+          if (item.system.armorType === "head") context.headArmors.push(item);
+          else context.bodyArmors.push(item);
+        } else {
+          context.inventoryArmors.push(item);
+        }
       }
 
       // --- [유지비 및 커넥션 분류] ---
@@ -736,12 +743,21 @@ class GundogActorSheet extends ActorSheet {
     // ==========================================
     // ★ 무기 드래그 앤 드롭 장착 로직
     // ==========================================
-    // ★ 필수 추가: 브라우저의 드롭 차단 기본 동작을 해제하여 드롭존으로 만듭니다.
+    // ★ 1. [핵심 추가] 무기를 마우스로 끌기 시작할 때 아이템 정보를 쥐어주는 코드
+    html.find('.item[draggable="true"]').on('dragstart', ev => {
+      ev.originalEvent.dataTransfer.setData("text/plain", JSON.stringify({
+        type: "CPGridItem", // CP 관리표와 동일한 데이터 형식을 사용하여 인벤토리 연동
+        actorId: this.actor.id, 
+        itemId: ev.currentTarget.dataset.itemId
+      }));
+    });
+
+    // 2. 브라우저의 드롭 차단 기본 동작을 해제하여 드롭존으로 만듭니다.
     html.find('.weapon-equip-slot').on('dragover', (ev) => {
       ev.preventDefault();
     });
 
-    // 실제 드롭 동작 처리
+    // 3. 실제 드롭 동작 처리
     html.find('.weapon-equip-slot').on('drop', async (ev) => {
       ev.preventDefault();
       ev.stopPropagation(); // 아이템이 인벤토리에 중복 복사되는 버그 차단
@@ -783,7 +799,7 @@ class GundogActorSheet extends ActorSheet {
       // 드래그한 무기를 해당 슬롯(main 또는 sub)으로 장착 처리
       await actualItem.update({ "system.equippedSlot": targetSlot });
     });
-
+    
     // ==========================================
     // ★ 장착 해제 버튼 로직
     // ==========================================
@@ -796,7 +812,85 @@ class GundogActorSheet extends ActorSheet {
         await item.update({ "system.equippedSlot": "" });
       }
     });
+
+    // ==========================================
+    // ★ 무기 더블클릭 시 상세 시트 열기
+    // ==========================================
+    html.find('.weapon-equip-slot .item, .armor-equip-slot .item, .item[draggable="true"]').dblclick(ev => {
+      ev.preventDefault();
+      const itemId = ev.currentTarget.dataset.itemId;
+      const item = this.actor.items.get(itemId);
+      if (item) item.sheet.render(true);
+    });
+
+    // ==========================================
+    // ★ 방어구 드래그 앤 드롭 장착 로직
+    // ==========================================
     
+    // 브라우저의 드롭 차단 해제
+    html.find('.armor-equip-slot').on('dragover', (ev) => {
+      ev.preventDefault();
+    });
+
+    html.find('.armor-equip-slot').on('drop', async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      const targetSlot = ev.currentTarget.dataset.slot; // "head" 또는 "body"
+
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch (err) { return; }
+
+      let dropItem = null;
+      if (data.type === "Item") {
+        dropItem = await Item.implementation.fromDropData(data);
+      } else if (data.type === "CPGridItem") {
+        const dragActor = game.actors.get(data.actorId);
+        if (dragActor) dropItem = dragActor.items.get(data.itemId);
+      }
+
+      if (!dropItem) return;
+
+      if (dropItem.type !== "armor") {
+        ui.notifications.warn("이 슬롯에는 '방어구'만 장착할 수 있습니다.");
+        return;
+      }
+
+      const actualItem = this.actor.items.get(dropItem.id);
+      if (!actualItem) {
+        ui.notifications.warn("현재 캐릭터가 소지한 방어구만 장착할 수 있습니다.");
+        return;
+      }
+
+      // 방어구 부위(머리/몸통)가 슬롯과 일치하는지 검사
+      if (actualItem.system.armorType !== targetSlot) {
+        const slotName = targetSlot === "head" ? "머리" : "몸통";
+        ui.notifications.warn(`이 방어구는 [${slotName}] 전용 방어구가 아닙니다.`);
+        return;
+      }
+
+      // 이미 장착된 같은 부위의 방어구가 있다면 먼저 해제(false) 처리
+      const currentEquipped = this.actor.items.find(i => i.type === "armor" && i.system.armorType === targetSlot && i.system.equipped);
+      if (currentEquipped && currentEquipped.id !== actualItem.id) {
+        await currentEquipped.update({ "system.equipped": false });
+      }
+
+      // 드래그한 방어구를 장착(true) 처리
+      await actualItem.update({ "system.equipped": true });
+    });
+
+    // ==========================================
+    // ★ 방어구 장착 해제 버튼 로직
+    // ==========================================
+    html.find('.unequip-armor-btn').click(async (ev) => {
+      ev.preventDefault();
+      const itemId = ev.currentTarget.dataset.itemId;
+      const item = this.actor.items.get(itemId);
+      if (item) {
+        // 장착 해제 시 자동으로 소지 방어구 목록으로 돌아갑니다.
+        await item.update({ "system.equipped": false });
+      }
+    });    
   }
 
   // ★ 초기화 기능 함수들 추가 ★
