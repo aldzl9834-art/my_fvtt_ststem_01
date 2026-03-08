@@ -112,6 +112,9 @@
   <section class="sheet-body">
     
     <div class="tab profile" data-group="primary" data-tab="profile">
+
+      <div style="grid-column: span 4; margin-top: 10px; display: grid; grid-template-columns: 6fr 4fr; gap: 15px;">
+
       <div class="profile-details-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; border:1px solid #ccc; padding:12px; background:#fff; border-radius:4px;">
         
         <div><label style="font-size:11px; color:#666; font-weight:bold;">국적</label><input type="text" name="system.profile.nationality" value="{{system.profile.nationality}}" style="height:24px; font-size:12px;"/></div>
@@ -129,27 +132,27 @@
         <div><label style="font-size:11px; color:#666; font-weight:bold;">피부색</label><input type="text" name="system.profile.skinColor" value="{{system.profile.skinColor}}" style="height:24px; font-size:12px;"/></div>
         
         <div>
-          <label style="font-size:11px; color:#dc3545; font-weight:bold;">유지비 (Maintenance)</label>
+          <label style="font-size:11px; color:#dc3545; font-weight:bold;">유지비</label>
           <input type="text" value="{{totalMaintenanceCost}}" style="height:24px; font-size:12px; border-color:#dc3545; background-color:#f4f4f4; text-align:center; font-weight:bold;" readonly title="생활 랭크, 주거, 차량, 커넥션 등의 유지비 합산 (자동 계산)"/>
         </div>
-        
-        <div style="grid-column: span 4; margin-top: 10px; display: grid; grid-template-columns: 6fr 4fr; gap: 15px;">
-          
-          <div style="display:flex; flex-direction:column; gap:10px;">
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
             
             <div>
               <label style="font-size:11px; color:#666; font-weight:bold;">경력 (최대 5개 / 클릭하여 선택)</label>
-              <div style="display:flex; gap:5px; margin-top:4px;">
+              <div style="display:flex; flex-direction:column; gap:5px; margin-top:4px;">
                 {{#each system.profile.careers as |career slotId|}}
-                  <div class="career-slot" data-slot="{{slotId}}" style="flex:1; height:45px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; background:#f9f9f9; position:relative;">
+                  <div class="career-slot" data-slot="{{slotId}}" style="flex:1; min-height:30px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:row; justify-content:space-between; align-items:center; cursor:pointer; background:#f9f9f9; position:relative; padding:0 10px;">
                     {{#if career.name}}
-                      <div style="font-weight:bold; font-size:11px; color:#222; text-align:center; margin-bottom:2px;">{{lookup (lookup @root.careerDisplay slotId) 'label'}}</div>
-                      <div style="font-size:9px; color:#0056b3; line-height:1.1; text-align:center;">
-                        {{lookup (lookup @root.careerDisplay slotId) 'skill1'}}<br>{{lookup (lookup @root.careerDisplay slotId) 'skill2'}}
+                      <div style="font-weight:bold; font-size:11px; color:#222; text-align:left;">
+                        {{lookup (lookup @root.careerDisplay slotId) 'label'}}
                       </div>
-                      <a class="reset-career" data-slot="{{slotId}}" style="position:absolute; top:2px; right:4px; font-size:10px; color:#dc3545; z-index:10;" title="경력 초기화"><i class="fas fa-trash"></i></a>
+                      <div style="font-size:10px; color:#0056b3; line-height:1.2; text-align:right; margin-right:15px;">
+                        {{lookup (lookup @root.careerDisplay slotId) 'skill1'}} / {{lookup (lookup @root.careerDisplay slotId) 'skill2'}}
+                      </div>
+                      <a class="reset-career" data-slot="{{slotId}}" style="position:absolute; top:50%; right:8px; transform:translateY(-50%); font-size:11px; color:#dc3545; z-index:10;" title="경력 초기화"><i class="fas fa-trash"></i></a>
                     {{else}}
-                      <div style="font-size:11px; color:#999;"><i class="fas fa-plus"></i> 추가</div>
+                      <div style="font-size:11px; color:#999; width:100%; text-align:center;"><i class="fas fa-plus"></i> 추가</div>
                     {{/if}}
                   </div>
                 {{/each}}
@@ -173,7 +176,48 @@
             </div>
 
           </div>
+        </div>
+                
+        <div style="grid-column: span 4; margin-top: 10px; display: grid; grid-template-columns: 7fr 3fr; gap: 15px;">
+          
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            
+            <div style="margin-top:15px; margin-bottom:15px;">
+        <label style="font-size:12px; font-weight:bold; color:#17a2b8; display:block; margin-bottom:8px; border-bottom:1px solid #ccc; padding-bottom:3px;">
+          <i class="fas fa-coffee"></i> 여가 행동 (Leisure Actions) 장착 슬롯
+        </label>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+          {{#each system.profile.leisures as |leisure slotId|}}
+            <div class="leisure-slot" data-slot="{{slotId}}" style="min-height:60px; border:1px dashed #17a2b8; border-radius:4px; display:flex; flex-direction:column; padding:6px 10px; cursor:pointer; background:#f4fbfc; position:relative;">
+              
+              {{#if leisure.name}}
+                <div style="font-weight:bold; font-size:13px; color:#0056b3; text-align:center; margin-bottom:4px; border-bottom:1px solid #cce5ff; padding-bottom:4px;">
+                  {{leisure.name}}
+                </div>
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; text-align:center; font-size:11px; font-weight:bold; color:#dc3545; margin-bottom:4px;">
+                  <div>유지비: {{leisure.maintenanceCost}}G</div>
+                  <div style="border-left:1px solid #cce5ff;">여가 슬롯: {{leisure.leisureSlot}}</div>
+                </div>
+                
+                <div style="font-size:10px; color:#555; line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;" title="{{leisure.effect}}">
+                  {{leisure.effect}}
+                </div>
+                
+                <a class="remove-leisure" data-slot="{{slotId}}" style="position:absolute; top:6px; right:6px; font-size:11px; color:#dc3545; z-index:10; background:#f4fbfc;" title="여가 행동 해제"><i class="fas fa-times-circle"></i></a>
+              
+              {{else}}
+                <div style="font-size:11px; color:#17a2b8; width:100%; height:100%; display:flex; justify-content:center; align-items:center;">
+                  <span><i class="fas fa-plus"></i> 여가 슬롯 {{slotId}}</span>
+                </div>
+              {{/if}}
 
+            </div>
+          {{/each}}
+        </div>
+      </div>
+      </div>
           <div style="display:flex; flex-direction:column; gap:10px;">
             
             <div style="flex:1; display:flex; flex-direction:column;">
@@ -284,37 +328,61 @@
     </div>
 
     <div class="tab equipment" data-group="primary" data-tab="equipment">
-      <div style="display:flex; gap:10px;">
-        
-        <div style="flex:1; border:1px solid #ccc; padding:5px; background:#fff; border-radius:4px;">
-          <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">무기 (Weapons)</h3>
+      <div style="display:flex; gap:15px; margin-top:10px;">
+
+        <div style="flex:1; display:flex; flex-direction:column; gap:15px;">
           
-          <div style="display:flex; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:4px;">
-            <div style="flex:0 0 25px; text-align:center;">장착</div>
-            <div style="flex:2;">무기명</div>
-            <div style="flex:1; text-align:center;">무기타입</div>
-            <div style="flex:0 0 45px; text-align:center;">신뢰도</div>
-            <div style="flex:1; text-align:center;">탄약</div>
-            <div style="flex:0 0 40px; text-align:center;">관리</div>
+          <div class="weapon-equip-slot" data-slot="main" style="min-height:70px; border:2px dashed #dc3545; border-radius:4px; padding:5px; background:#fffafb;">
+            <h3 style="background:#dc3545; color:white; padding:4px 8px; font-size:12px; margin:-5px -5px 5px -5px; border-radius:3px 3px 0 0;">
+              <i class="fas fa-crosshairs"></i> 메인 무기 (Main Weapon)
+            </h3>
+            {{#each mainWeapons as |item id|}}
+              <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:3px 0;">
+                <div class="item-name" style="font-weight:bold;">
+                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24" style="vertical-align:middle; border:none; margin-right:5px;"/>
+                  {{item.name}}
+                </div>
+                <a class="unequip-btn" data-item-id="{{item._id}}" style="color:#dc3545; font-size:11px; margin-right:5px; border:1px solid #dc3545; padding:2px 6px; border-radius:3px; background:#fff;" title="장착 해제"><i class="fas fa-times"></i> 해제</a>
+              </div>
+            {{else}}
+              <div style="text-align:center; color:#dc3545; font-size:11px; padding-top:12px; opacity:0.6;"><i class="fas fa-arrow-down"></i> 소지 무기를 이곳으로 드래그</div>
+            {{/each}}
           </div>
 
-          {{#each weapons as |item|}}
-          <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; font-size:11px; align-items:center; border-bottom:1px solid #eee; padding:4px 0;">
-            <div style="flex:0 0 25px; text-align:center;">
-              <a class="item-equip" style="color:{{#if item.system.equipped}}#28a745{{else}}#ccc{{/if}};">
-                <i class="{{#if item.system.equipped}}fas fa-check-square{{else}}far fa-square{{/if}}"></i>
-              </a>
-            </div>
-            <div class="item-name item-edit" style="flex:2; font-weight:bold; cursor:pointer; color:#0056b3;">{{item.name}}</div>
-            <div style="flex:1; text-align:center;">{{item.system.weaponType}}</div>
-            <div style="flex:0 0 45px; text-align:center; font-weight:bold; color:#d9534f;">{{item.system.reliability}}</div>
-            <div style="flex:1; text-align:center;">{{item.system.ammo.value}} / {{item.computedAmmoMax}}</div>
-            <div style="flex:0 0 40px; text-align:center;">
-              <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
-              <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+          <div class="weapon-equip-slot" data-slot="sub" style="min-height:70px; border:2px dashed #0056b3; border-radius:4px; padding:5px; background:#f4f8ff;">
+            <h3 style="background:#0056b3; color:white; padding:4px 8px; font-size:12px; margin:-5px -5px 5px -5px; border-radius:3px 3px 0 0;">
+              <i class="fas fa-crosshairs"></i> 서브 무기 (Sub Weapon)
+            </h3>
+            {{#each subWeapons as |item id|}}
+              <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:3px 0;">
+                <div class="item-name" style="font-weight:bold;">
+                  <img src="{{item.img}}" title="{{item.name}}" width="24" height="24" style="vertical-align:middle; border:none; margin-right:5px;"/>
+                  {{item.name}}
+                </div>
+                <a class="unequip-btn" data-item-id="{{item._id}}" style="color:#0056b3; font-size:11px; margin-right:5px; border:1px solid #0056b3; padding:2px 6px; border-radius:3px; background:#fff;" title="장착 해제"><i class="fas fa-times"></i> 해제</a>
+              </div>
+            {{else}}
+              <div style="text-align:center; color:#0056b3; font-size:11px; padding-top:12px; opacity:0.6;"><i class="fas fa-arrow-down"></i> 소지 무기를 이곳으로 드래그</div>
+            {{/each}}
+          </div>
+
+          <div>
+            <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 5px 0;">
+              <i class="fas fa-toolbox"></i> 소지 무기 목록
+            </h3>
+            <div style="border:1px solid #ccc; border-radius:3px; padding:5px; background:#fff; min-height:100px;">
+              {{#each inventoryWeapons as |item id|}}
+                <div class="item flexrow" data-item-id="{{item._id}}" draggable="true" style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding:3px 0; cursor:grab;">
+                  <div class="item-name item-edit" style="font-weight:bold;">
+                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24" style="vertical-align:middle; border:none; margin-right:5px; pointer-events:none;"/>
+                    {{item.name}}
+                  </div>
+                  <a class="item-control item-delete" title="삭제" style="color:#999;"><i class="fas fa-trash"></i></a>
+                </div>
+              {{/each}}
             </div>
           </div>
-          {{/each}}
+
         </div>
 
         <div style="flex:1; display:flex; flex-direction:column; gap:10px;">

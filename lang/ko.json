@@ -36,7 +36,8 @@
       "classarts" : "클래스 아츠",
       "belief" : "신념",
       "trait" : "특징",
-      "vehicleAttachment" : "차량 아이템"
+      "vehicleAttachment" : "차량 아이템",
+      "leisure": "여가행동"      
     },
     "Actor" :{
     "character": "캐릭터",

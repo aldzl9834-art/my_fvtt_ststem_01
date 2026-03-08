@@ -30,7 +30,7 @@ Hooks.once("init", () => {
   // 아이템 시트 등록
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("gundog", GundogItemSheet, { 
-    types: ["weapon", "armor", "attachment", "item", "upkeepitem", "connection", "classarts", "belief", "trait", "vehicleAttachment"], // ★ 추가
+    types: ["weapon", "armor", "attachment", "item", "upkeepitem", "connection", "classarts", "belief", "trait", "vehicleAttachment", "leisure"], // ★ 추가
     makeDefault: true 
   });
 });
@@ -100,12 +100,9 @@ Hooks.on("updateCombat", async (combat, updateData, options, userId) => {
 Hooks.on("preCreateCombatant", (combatant, data, options, userId) => {
   if (combatant.actor) {
     const initBase = combatant.actor.system.initiativeBase || 0;
-    
-    // 전투원에 추가되자마자 주사위 굴림 없이 즉시 값을 설정합니다.
-    combatant.update({ initiative: initBase });
+    combatant.updateSource({ initiative: initBase });
   }
 });
-
 // ==========================================
 // ★ 2. 라운드 변경 시 이니셔티브를 빈칸이 아닌 '기본 스탯'으로 원상복구
 // ==========================================
@@ -201,7 +198,9 @@ class GundogActorSheet extends ActorSheet {
     // ==========================================
     // ★ 1. 장비(Equipment) 탭 분류용 배열 
     // ==========================================
-    context.weapons = [];
+    context.mainWeapons = [];
+    context.subWeapons = [];
+    context.inventoryWeapons = [];
     context.headArmors = [];
     context.bodyArmors = [];
 
@@ -263,8 +262,16 @@ class GundogActorSheet extends ActorSheet {
           }
         }
         item.computedAmmoMax = computedAmmoMax;
-        context.weapons.push(item);
-      } 
+        // ★ 수정: 장착 상태에 따라 각기 다른 배열로 보냅니다.
+        if (item.system.equippedSlot === "main") {
+          context.mainWeapons.push(item);
+        } else if (item.system.equippedSlot === "sub") {
+          context.subWeapons.push(item);
+        } else {
+          context.inventoryWeapons.push(item);
+        }
+      }
+
       else if (item.type === "armor") {
         if (item.system.armorType === "head") context.headArmors.push(item);
         else context.bodyArmors.push(item);
@@ -282,11 +289,11 @@ class GundogActorSheet extends ActorSheet {
       } else if (item.type === "belief") {
         context.beliefs.push(item);
       } else if (item.type === "trait") {
-        context.traits.push(item);
-      } else if (item.type === "trait") {  
         totalMaintenance += Number(item.system.maintenanceCost) || 0;
         context.traits.push(item);
       }
+    
+    // ==========================================
 
       // --- [CP 관리표(인벤토리) 분류] ---
       if (["weapon", "armor", "item", "attachment"].includes(item.type)) {
@@ -333,6 +340,16 @@ class GundogActorSheet extends ActorSheet {
           }
         } else {
           itemData.isPlaced = false;
+        }
+      }
+    }
+
+      const leisures = this.actor.system.profile?.leisures;
+    if (leisures) {
+      for (let i = 1; i <= 6; i++) {
+        const slot = leisures[i];
+        if (slot && slot.name) {
+          totalMaintenance += Number(slot.maintenanceCost) || 0;
         }
       }
     }
@@ -664,6 +681,121 @@ class GundogActorSheet extends ActorSheet {
         if (item) await item.update({"system.grid.x": -1, "system.grid.y": -1});
       }
     });
+
+    // ==========================================
+    // ★ 여가 행동 (Leisure) 장착 및 해제 로직
+    // ==========================================
+    
+    // 1. 여가 행동 해제 (휴지통 아이콘 클릭 시)
+    html.find('.remove-leisure').click(async (ev) => {
+      ev.preventDefault();
+      const slotId = ev.currentTarget.dataset.slot;
+      // 해당 슬롯의 데이터를 초기화합니다.
+      await this.actor.update({
+        [`system.profile.leisures.${slotId}`]: { name: "", leisureSlot: 0, maintenanceCost: 0, effect: "" }
+      });
+    });
+
+    // 2. 여가 행동 드래그 앤 드롭 장착
+    html.find('.leisure-slot').on('drop', async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const slotId = ev.currentTarget.dataset.slot;
+      
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch (err) { return; }
+      
+      let dropItem = null;
+      // 기본 아이템 드래그 또는 CP 관리표 드래그 모두 지원
+      if (data.type === "Item") {
+        dropItem = await Item.implementation.fromDropData(data);
+      } else if (data.type === "CPGridItem") {
+        const dragActor = game.actors.get(data.actorId);
+        if (dragActor) dropItem = dragActor.items.get(data.itemId);
+      }
+
+      if (!dropItem) return;
+
+      // 여가 행동 타입인지 검사
+      if (dropItem.type !== "leisure") {
+        ui.notifications.warn("이 슬롯에는 '여가 행동' 아이템만 장착할 수 있습니다.");
+        return;
+      }
+
+      // 아이템의 데이터를 슬롯에 복사하여 저장 (효과는 description에서 가져옴)
+      await this.actor.update({
+        [`system.profile.leisures.${slotId}`]: {
+          name: dropItem.name,
+          leisureSlot: dropItem.system.leisureSlot || 0,
+          maintenanceCost: dropItem.system.maintenanceCost || 0,
+          effect: dropItem.system.description || ""
+        }
+      });
+    });
+    
+    // ==========================================
+    // ★ 무기 드래그 앤 드롭 장착 로직
+    // ==========================================
+    // ★ 필수 추가: 브라우저의 드롭 차단 기본 동작을 해제하여 드롭존으로 만듭니다.
+    html.find('.weapon-equip-slot').on('dragover', (ev) => {
+      ev.preventDefault();
+    });
+
+    // 실제 드롭 동작 처리
+    html.find('.weapon-equip-slot').on('drop', async (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation(); // 아이템이 인벤토리에 중복 복사되는 버그 차단
+
+      const targetSlot = ev.currentTarget.dataset.slot; // "main" 또는 "sub"
+
+      let data;
+      try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch (err) { return; }
+
+      let dropItem = null;
+      if (data.type === "Item") {
+        dropItem = await Item.implementation.fromDropData(data);
+      } else if (data.type === "CPGridItem") {
+        const dragActor = game.actors.get(data.actorId);
+        if (dragActor) dropItem = dragActor.items.get(data.itemId);
+      }
+
+      if (!dropItem) return;
+
+      // 무기인지 검사
+      if (dropItem.type !== "weapon") {
+        ui.notifications.warn("이 슬롯에는 '무기'만 장착할 수 있습니다.");
+        return;
+      }
+
+      // 내 인벤토리에 있는 무기가 맞는지 확인
+      const actualItem = this.actor.items.get(dropItem.id);
+      if (!actualItem) {
+        ui.notifications.warn("현재 캐릭터가 소지한 무기만 장착할 수 있습니다.");
+        return;
+      }
+
+      // 이미 해당 슬롯에 장착된 다른 무기가 있다면, 기존 무기부터 해제("")
+      const currentEquipped = this.actor.items.find(i => i.type === "weapon" && i.system.equippedSlot === targetSlot);
+      if (currentEquipped && currentEquipped.id !== actualItem.id) {
+        await currentEquipped.update({ "system.equippedSlot": "" });
+      }
+
+      // 드래그한 무기를 해당 슬롯(main 또는 sub)으로 장착 처리
+      await actualItem.update({ "system.equippedSlot": targetSlot });
+    });
+
+    // ==========================================
+    // ★ 장착 해제 버튼 로직
+    // ==========================================
+    html.find('.unequip-btn').click(async (ev) => {
+      ev.preventDefault();
+      const itemId = ev.currentTarget.dataset.itemId;
+      const item = this.actor.items.get(itemId);
+      if (item) {
+        // 장착 슬롯을 비워주면 소지 무기 목록으로 다시 내려갑니다.
+        await item.update({ "system.equippedSlot": "" });
+      }
+    });
     
   }
 
@@ -732,7 +864,7 @@ class GundogActorSheet extends ActorSheet {
 
     const content = `
       <form style="padding:10px;">
-        <p style="font-size:12px; color:#666;">경력과 습득할 스킬 2개를 선택하세요. (한 번 저장하면 취소 불가)</p>
+        <p style="font-size:12px; color:#666;">경력과 습득할 스킬 2개를 선택하세요.</p>
         <div class="form-group">
           <label><strong>경력 목록</strong></label>
           <select id="career-select" style="width:100%; height:28px;">${careerOptions}</select>
@@ -971,6 +1103,7 @@ class GundogItemSheet extends ItemSheet {
     context.isClassArts = (this.item.type === "classarts");
     context.isBelief = (this.item.type === "belief");
     context.isTrait = (this.item.type === "trait");
+    context.isLeisure = (this.item.type === "leisure");
     context.isVehicleAttachment = (this.item.type === "vehicleAttachment");
     context.gundogClasses = GUNDOG.classes;
 
@@ -1098,6 +1231,18 @@ class GundogItemSheet extends ItemSheet {
       let currentArr = Array.isArray(currentData) ? duplicate(currentData) : [];
       
       if (currentArr.length > index) {
+        
+        // ★ 추가: 해제하는 부착물이 '탄창'일 경우, 무기에 남은 탄알을 탄창 아이템에 백업
+        if (slot === "magazine" && this.item.actor) {
+          const magId = currentArr[index].id;
+          const magItem = this.item.actor.items.get(magId);
+          if (magItem) {
+            magItem.update({ "system.ammo.value": this.item.system.ammo?.value || 0 });
+          }
+          // 무기 안에 들어있는 총알은 0으로 비움 (탄창을 뺐으므로)
+          this.item.update({ "system.ammo.value": 0 });
+        }
+
         currentArr.splice(index, 1);
         this.item.update({ [`system.attachments.${slot}`]: currentArr });
       }
@@ -1136,9 +1281,18 @@ class GundogItemSheet extends ItemSheet {
 
     let data;
     try { data = JSON.parse(event.dataTransfer.getData('text/plain')); } catch (err) { return; }
-    if (data.type !== "Item") return;
+    
+    let dropItem = null;
 
-    const dropItem = await Item.implementation.fromDropData(data);
+    // ★ 수정: 기본 Item 드래그와 CP 관리표(CPGridItem) 드래그 모두 지원
+    if (data.type === "Item") {
+      dropItem = await Item.implementation.fromDropData(data);
+    } else if (data.type === "CPGridItem") {
+      // CP 그리드에서 드래그한 아이템인 경우, 해당 캐릭터의 인벤토리에서 아이템을 찾아옵니다.
+      const dragActor = game.actors.get(data.actorId);
+      if (dragActor) dropItem = dragActor.items.get(data.itemId);
+    }
+
     if (!dropItem) return;
 
     if (dropItem.type !== "attachment") {
@@ -1161,6 +1315,22 @@ class GundogItemSheet extends ItemSheet {
     let currentData = this.item.system.attachments[slot];
     let currentArr = Array.isArray(currentData) ? duplicate(currentData) : [];
     
+    // ★ 추가: 탄창(magazine)을 무기에 장착하는 경우
+    if (slot === "magazine" && this.item.actor) {
+      // 기존에 꽂혀있던 탄창이 있다면, 빼기 전에 무기의 현재 탄알을 예전 탄창에 백업
+      if (currentArr.length > 0) {
+        const oldMagItem = this.item.actor.items.get(currentArr[0].id);
+        if (oldMagItem) {
+          oldMagItem.update({ "system.ammo.value": this.item.system.ammo?.value || 0 });
+        }
+        // 새 탄창으로 교체하는 것이므로 기존 탄창 목록을 비워줍니다.
+        currentArr = []; 
+      }
+      
+      // 새 탄창이 가지고 있는 탄알 수를 무기에 장전합니다.
+      this.item.update({ "system.ammo.value": dropItem.system.ammo?.value || 0 });
+    }
+
     currentArr.push(newAttachment);
     this.item.update({ [`system.attachments.${slot}`]: currentArr });
   }
@@ -1201,9 +1371,10 @@ class GundogItemSheet extends ItemSheet {
       return;
     }
 
-    let wBuff = Number(this.item.system.rangeModifiers.buffs[rangeKey]) || 0;
+   let wBuff = Number(this.item.system.rangeModifiers.buffs[rangeKey]) || 0;
     let wPenalty = Number(this.item.system.rangeModifiers.penalties[rangeKey]) || 0;
     let sBonus = 0; let sPenalty = 0;
+    let ammoMaxBonus = 0; // ★ 추가: 탄약 최대치 보너스 
     
     // 데미지를 문자열 배열로 모으기
     let dmgNonPenArr = [];
@@ -1213,7 +1384,7 @@ class GundogItemSheet extends ItemSheet {
       const arr = this.item.system.attachments[slot];
       if (Array.isArray(arr)) {
         for (let att of arr) {
-          // ★ 수정: 다이스 굴림 시에도 실시간 원본 데이터를 가져와 적용합니다.
+          // 실시간 부착물 추적 안전장치
           let liveItem = this.item.actor ? this.item.actor.items.get(att.id) : game.items.get(att.id);
           let mods = liveItem ? liveItem.system.modifiers : att.modifiers;
 
@@ -1222,6 +1393,7 @@ class GundogItemSheet extends ItemSheet {
           wPenalty += Number(mods.rangePenalties?.[rangeKey]) || 0;
           sBonus += Number(mods.snipingBonus) || 0;
           sPenalty += Number(mods.snipingPenalty) || 0;
+          ammoMaxBonus += Number(mods.ammoMax) || 0; // ★ 최대 탄약 합산
           
           if (mods.damageNonPen) dmgNonPenArr.push(mods.damageNonPen);
           if (mods.damagePen) dmgPenArr.push(mods.damagePen);
@@ -1234,7 +1406,7 @@ class GundogItemSheet extends ItemSheet {
 
     let baseTarget = Number(actorSkill.targetValue) || 0;
     let sniperText = "";
-    // ★ 수정: 사거리가 '저격'일 때만 부착물의 저격 전용 보너스/페널티를 합산합니다.
+    
     if (rangeKey === "sniping" && (sBonus > 0 || sPenalty > 0)) {
       baseTarget = baseTarget + sBonus - sPenalty;
       sniperText = `<br><span style="color:#17a2b8; font-size:11px;">(부착물 저격 보정: +${sBonus} / -${sPenalty} 적용됨)</span>`;
@@ -1243,6 +1415,10 @@ class GundogItemSheet extends ItemSheet {
     const initialTarget = baseTarget + wBuff - wPenalty;
     const dmgNonPen = this.item.system.damageNonPenetrating || "0";
     const dmgPen = this.item.system.damagePenetrating || "0";
+    
+    // ★ 탄약 데이터 추출
+    const currentAmmo = this.item.system.ammo?.value || 0;
+    const maxAmmo = (Number(this.item.system.ammo?.max) || 0) + ammoMaxBonus;
 
     const content = `
       <form style="padding:10px;">
@@ -1251,8 +1427,16 @@ class GundogItemSheet extends ItemSheet {
           <div style="font-size:12px; color:#666; font-weight:normal;">
             <i class="fas fa-user" style="color:#0056b3;"></i> ${this.item.actor.name}
           </div>
-          <div style="font-size:16px;">
-            <i class="fas fa-crosshairs"></i> ${this.item.name} <span style="color:#d9534f; font-size:14px;">(${rangeLabel})</span>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div style="font-size:16px;">
+              <i class="fas fa-crosshairs"></i> ${this.item.name} <span style="color:#d9534f; font-size:14px;">(${rangeLabel})</span>
+            </div>
+            
+            <div style="font-size:12px; font-weight:normal; display:flex; align-items:center; gap:5px; background:#f4f4f4; padding:3px 6px; border-radius:4px; border:1px solid #ccc;">
+              <i class="fas fa-cubes" style="color:#666;"></i> 탄약:
+              <input type="number" id="dialog-ammo-value" value="${currentAmmo}" style="width:35px; text-align:center; height:20px; font-weight:bold; border:1px solid #aaa; border-radius:3px; background:#fff; color:#333;" />
+              <span style="font-weight:bold; color:#666;">/ ${maxAmmo}</span>
+            </div>
           </div>
         </h3>
         
@@ -1369,6 +1553,32 @@ class GundogItemSheet extends ItemSheet {
 
         bInput.on('input', updateTarget);
         pInput.on('input', updateTarget);
+
+        // ==========================================
+        // ★ 1. 다이얼로그에서 숫자를 바꾸면 무기 아이템에 즉시 저장
+        // ==========================================
+        const ammoInput = html.find('#dialog-ammo-value');
+        const weaponItem = this.item;
+
+        ammoInput.on('change', async (ev) => {
+          const newAmmo = Number(ev.currentTarget.value) || 0;
+          await weaponItem.update({ "system.ammo.value": newAmmo });
+        });
+
+        // ==========================================
+        // ★ 2. 캐릭터 시트에서 무기 탄약을 바꾸면 다이얼로그 창의 숫자도 즉시 변경
+        // ==========================================
+        const hookId = Hooks.on("updateItem", (item, updateData) => {
+          if (item.id === weaponItem.id && updateData.system?.ammo?.value !== undefined) {
+            // 사용자가 다이얼로그 입력칸을 타이핑하고 있지 않을 때만 숫자를 갱신합니다
+            if (!ammoInput.is(':focus')) {
+              ammoInput.val(updateData.system.ammo.value);
+            }
+          }
+        });
+        
+        // 창이 닫힐 때 이 훅(Hook)을 제거하기 위해 다이얼로그 요소에 임시 저장
+        html.data("ammoHookId", hookId);
 
         html.find('#custom-roll-btn').click(async (ev) => {
           ev.preventDefault();
@@ -1653,6 +1863,12 @@ class GundogItemSheet extends ItemSheet {
             rolls: rollsToSync 
           });
         });
+
+        // ★ 추가: 다이얼로그 창이 닫힐 때 실시간 동기화 연결고리를 끊어줍니다
+      close: (html) => {
+        const hookId = html.data("ammoHookId");
+        if (hookId) Hooks.off("updateItem", hookId);
+      }
 
         html.find('#custom-close-btn').click(ev => { ev.preventDefault(); rollDialog.close(); });
       }

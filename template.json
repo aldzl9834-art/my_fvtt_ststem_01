@@ -102,6 +102,15 @@
             "slot4": { "name": "", "skill1": "", "skill2": "" },
             "slot5": { "name": "", "skill1": "", "skill2": "" }
           },
+
+          "leisures": {
+            "1": { "name": "", "leisureSlot": 0, "maintenanceCost": 0, "effect": "" },
+            "2": { "name": "", "leisureSlot": 0, "maintenanceCost": 0, "effect": "" },
+            "3": { "name": "", "leisureSlot": 0, "maintenanceCost": 0, "effect": "" },
+            "4": { "name": "", "leisureSlot": 0, "maintenanceCost": 0, "effect": "" },
+            "5": { "name": "", "leisureSlot": 0, "maintenanceCost": 0, "effect": "" },
+            "6": { "name": "", "leisureSlot": 0, "maintenanceCost": 0, "effect": "" }
+          },
           "bonusSkills": {
             "skill1": "",
             "skill2": "",
@@ -136,7 +145,7 @@
     }
   },
   "Item": {
-    "types": ["weapon", "armor", "attachment", "item", "upkeepitem", "connection", "classarts", "belief", "trait", "vehicleAttachment"],
+    "types": ["weapon", "armor", "attachment", "item", "upkeepitem", "connection", "classarts", "belief", "trait", "vehicleAttachment", "leisure"],
     "weapon": {
       "locked": false,
       "availability": "",
@@ -154,6 +163,7 @@
       "portability": { "x": 0, "y": 0 },
       "grid": { "x": -1, "y": -1, "type": "none" },
       "isWearable": false,
+      "equippedSlot": "",
       "rangeModifiers": {
         "buffs": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 },
         "penalties": { "pointBlank": 0, "short": 0, "medium": 0, "long": 0, "sniping": 0 }
@@ -229,6 +239,14 @@
         "ammoMultiplier": 1
       }
     },
+
+    "leisure": {
+        "maintenanceCost": 0,
+        "leisureSlot": 0,
+        "description": "",
+        "effect": ""
+      },
+
     "item": {
       "locked": false,
       "availability": "",

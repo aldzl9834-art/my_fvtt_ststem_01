@@ -31,6 +31,8 @@
         {{#unless isClassArts}}
         {{#unless isBelief}}
         {{#unless isTrait}}
+        {{#unless isLeisure}}
+        
         <div class="grid-label">가격</div>
         <div class="grid-input">
           <input type="number" name="system.price" value="{{system.price}}" />
@@ -40,6 +42,7 @@
         <div class="grid-input">
           <input type="text" name="system.availability" value="{{system.availability}}" />
         </div>
+        {{/unless}}
         {{/unless}}
         {{/unless}}
         {{/unless}}
@@ -80,6 +83,8 @@
             <option value="sniping" {{#if (eq system.skill "sniping")}}selected{{/if}}>저격</option>
             <option value="meleeCombat" {{#if (eq system.skill "meleeCombat")}}selected{{/if}}>무기전투</option>
             <option value="throwing" {{#if (eq system.skill "throwing")}}selected{{/if}}>투척</option>
+            <option value="mechanics" {{#if (eq system.skill "mechanics")}}selected{{/if}}>메카닉</option>
+            <option value="explosives" {{#if (eq system.skill "explosives")}}selected{{/if}}>폭발물</option>
         </select>
       </div>
 
@@ -320,47 +325,67 @@
     {{#if isAttachment}}
       <h3 style="background:#28a745; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">부착물 효과 (Modifier) 설정</h3>
       
-      <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
-        <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
-        <div style="display:flex; align-items:center; gap:5px;">
-          <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
-          <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
-          <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
-          
-          <label style="margin-left:10px; display:flex; align-items:center; gap:4px; font-size:11px; color:#17a2b8; cursor:pointer; font-weight:bold;">
-            <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:14px; height:14px;"/> 무기에 부착됨
-          </label>
-        </div>
-      </div>
-
-      <div style="margin-bottom: 15px; display: flex; align-items: center; gap: 10px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
-        <label style="font-weight:bold; font-size:12px; color:#333;">장착 부위 (타입)</label>
-        <select name="system.attachType" style="height:26px;">
-          <option value="sight" {{#if (eq system.attachType "sight")}}selected{{/if}}>조준경 (상부)</option>
-          <option value="common" {{#if (eq system.attachType "common")}}selected{{/if}}>총기 악세서리 (공통)</option>
-          <option value="underbarrel" {{#if (eq system.attachType "underbarrel")}}selected{{/if}}>총기 악세서리 (하부)</option>
-          <option value="muzzle" {{#if (eq system.attachType "muzzle")}}selected{{/if}}>총구 부착물 (오른쪽)</option>
-          <option value="magazine" {{#if (eq system.attachType "magazine")}}selected{{/if}}>탄창</option>
-        </select>
-      </div>
-
-      <h4 style="margin:15px 0 5px 0; font-size:12px; color:#0056b3; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-crosshairs"></i> 사거리별 명중 수정치</h4>
-      <div style="display:grid; grid-template-columns: 65px repeat(5, 1fr); gap:2px; text-align:center; font-size:11px; margin-bottom:15px; align-items:center;">
+      <div style="display:grid; grid-template-columns: 4fr 3fr 3fr; gap:10px; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc; text-align:center;">
         
-        <div></div> <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">지근거리</div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <label style="font-weight:bold; font-size:12px; color:#333;">장착 부위 (타입)</label>
+          <select name="system.attachType" style="height:26px; border:1px solid #ccc; border-radius:3px; width:100%; text-align:center; text-align-last:center;">
+            <option value="sight" {{#if (eq system.attachType "sight")}}selected{{/if}}>조준경 (상부)</option>
+            <option value="common" {{#if (eq system.attachType "common")}}selected{{/if}}>총기 악세서리 (공통)</option>
+            <option value="underbarrel" {{#if (eq system.attachType "underbarrel")}}selected{{/if}}>총기 악세서리 (하부)</option>
+            <option value="muzzle" {{#if (eq system.attachType "muzzle")}}selected{{/if}}>총구 부착물 (오른쪽)</option>
+            <option value="magazine" {{#if (eq system.attachType "magazine")}}selected{{/if}}>탄창</option>
+          </select>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
+          <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
+          <div style="display:flex; align-items:center; gap:4px; height:26px;">
+            <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+            <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
+            <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:40px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
+          <label style="font-weight:bold; font-size:12px; color:#333;">장착</label>
+          <div style="display:flex; align-items:center; height:26px;">
+            <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:#17a2b8; cursor:pointer; font-weight:bold;">
+              <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:16px; height:16px;"/>
+            </label>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:flex-end; margin:15px 0 5px 0; border-bottom:1px solid #ccc; padding-bottom:3px;">
+        
+        <h4 style="margin:0; font-size:12px; color:#0056b3; border:none; padding:0;">
+          <i class="fas fa-crosshairs"></i> 사거리별 명중 수정치
+        </h4>
+        
+        {{#if (eq system.attachType "magazine")}}
+        <div style="display:flex; align-items:center; gap:5px;">
+          <label style="color:#28a745; font-size:11px; font-weight:bold;"><i class="fas fa-cubes"></i> 남은 탄알</label>
+          <input type="number" name="system.ammo.value" value="{{system.ammo.value}}" style="width:45px; height:20px; text-align:center; font-size:12px; font-weight:bold; border:2px solid #28a745; border-radius:3px; background:#f0fdf4;"/>
+        </div>
+        {{/if}}
+
+      </div>
+      <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap:2px; text-align:center; font-size:12px; margin-bottom:15px;">
+        
+        <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">지근거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">근거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">중거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">장거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0; color:#17a2b8;">저격</div>
 
-        <div style="font-weight:bold; color:blue;">버프 (+)</div>
         <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.pointBlank" value="{{system.modifiers.rangeBuffs.pointBlank}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.short" value="{{system.modifiers.rangeBuffs.short}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.medium" value="{{system.modifiers.rangeBuffs.medium}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.long" value="{{system.modifiers.rangeBuffs.long}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="number" name="system.modifiers.rangeBuffs.sniping" value="{{system.modifiers.rangeBuffs.sniping}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
 
-        <div style="font-weight:bold; color:red;">페널티 (-)</div>
         <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="number" name="system.modifiers.rangePenalties.pointBlank" value="{{system.modifiers.rangePenalties.pointBlank}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="number" name="system.modifiers.rangePenalties.short" value="{{system.modifiers.rangePenalties.short}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
         <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="number" name="system.modifiers.rangePenalties.medium" value="{{system.modifiers.rangePenalties.medium}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
@@ -369,6 +394,13 @@
       </div>
 
       <hr style="margin:15px 0;">
+
+      <div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px dashed #ccc;">
+        <label style="font-weight:bold; font-size:12px; color:#333; display:block; margin-bottom:5px;">
+          <i class="fas fa-align-left"></i> 부착물 효과 (설명)
+        </label>
+        <textarea name="system.description" style="width:100%; height:90px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;" placeholder="이 부착물의 특수 효과나 룰을 적어주세요.">{{system.description}}</textarea>
+      </div>
 
       <div style="display:grid; grid-template-columns: 120px 1fr 120px 1fr; gap:8px; align-items:center;">
         <label>신뢰성 보너스</label><input type="number" name="system.modifiers.reliability" value="{{system.modifiers.reliability}}" style="width:50px; text-align:center;"/>
@@ -460,7 +492,7 @@
       </div>
 
       <div style="display:flex; flex-direction:column; gap:4px;">
-        <label style="font-weight:bold; font-size:12px; color:#333;">효과</label>
+        <label style="font-weight:bold; font-size:12px; color:#333;">아츠 설명</label>
         <textarea name="system.effect" ...>{{system.effect}}</textarea>
       </div>
       {{/if}}
@@ -490,15 +522,47 @@
       </div>
     {{/if}}
 
+    {{#if isLeisure}}
+      <h3 style="background:#17a2b8; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">
+        <i class="fas fa-coffee"></i> 여가 행동 (유지 아이템) 프로필
+      </h3>
+      
+      <div style="display:flex; align-items:center; gap:20px; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
+        
+        <div style="display:flex; align-items:center; gap:6px;">
+          <label style="font-weight:bold; font-size:12px; color:#333;">유지비 (Maintenance)</label>
+          <div style="display:flex; align-items:center;">
+            <input type="number" name="system.maintenanceCost" value="{{system.maintenanceCost}}" style="width:60px; text-align:center; height:24px; border:2px solid #17a2b8; border-radius:3px; font-weight:bold;"/>
+            <span style="font-size:12px; font-weight:bold; color:#666; margin-left:4px;">G</span>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:6px;">
+          <label style="font-weight:bold; font-size:12px; color:#333;">여가 슬롯</label>
+          <input type="number" name="system.leisureSlot" value="{{system.leisureSlot}}" style="width:50px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px; font-weight:bold;"/>
+        </div>
+
+        <div style="flex:1; font-size:11px; color:#999; text-align:right;">
+          ※ 캐릭터 시트 프로필에 장착하여 사용합니다.
+        </div>
+
+      </div>
+    {{/if}}
+      
+      {{#unless isAttachment}}
     <div style="margin-top:15px;">
-      <label style="font-weight:bold; font-size:12px; display:block; border-bottom:1px solid #ddd; padding-bottom:3px; margin-bottom:5px;">효과</label>
       
       {{#if isClassArts}}
-        <textarea name="system.effect" style="width:100%; height:120px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.effect}}</textarea>
+        <label style="font-weight:bold; font-size:12px; display:block; border-bottom:1px solid #ddd; padding-bottom:3px; margin-bottom:5px;">설명 (연출 및 상세 설정)</label>
+        <textarea name="system.description" style="width:100%; height:120px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.description}}</textarea>
+      
       {{else}}
+        <label style="font-weight:bold; font-size:12px; display:block; border-bottom:1px solid #ddd; padding-bottom:3px; margin-bottom:5px;">효과</label>
         <textarea name="system.description" style="width:100%; height:80px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.description}}</textarea>
       {{/if}}
+      
     </div>
+    {{/unless}}
 
     {{#if isVehicleAttachment}}
       <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;"><i class="fas fa-tools"></i> 차량 부착물 프로필</h3>
