@@ -303,3 +303,21 @@
 .gundog-item-sheet .sheet-header {
     overflow: hidden; /* 헤더 밖으로 삐져나간 배경 이미지를 잘라내어 스크롤 방지 */
 }
+
+/* 1. 이동 액션(Movement Actions) 팔레트 버튼 완벽 숨김 */
+#token-hud .control-icon[data-palette="movementActions"] {
+    display: none !important;
+    pointer-events: none !important;
+}
+
+/* 2. (선택사항) 고도(Elevation) 버튼 숨김 - 필요 없으시면 지우셔도 됩니다 */
+#token-hud .control-icon[data-action="elevation"],
+#token-hud .elevation {
+    display: none !important;
+}
+
+/* 3. 토큰 정렬(위로/아래로) 버튼 완벽 숨김 */
+#token-hud .control-icon[data-action="sort"] {
+    display: none !important;
+    pointer-events: none !important;
+}
