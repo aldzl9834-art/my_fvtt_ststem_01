@@ -35,7 +35,7 @@
         
         <div class="grid-label">가격</div>
         <div class="grid-input">
-          <input type="number" name="system.price" value="{{system.price}}" />
+          <input type="text" class="comma-input" data-field="system.price" value="{{formattedPrice}}" style="width:100%; text-align:center;" />
         </div>
         
         <div class="grid-label">입수치</div>
@@ -81,6 +81,7 @@
             <option value="rifle" {{#if (eq system.skill "rifle")}}selected{{/if}}>라이플</option>
             <option value="heavyWeaponry" {{#if (eq system.skill "heavyWeaponry")}}selected{{/if}}>중화기</option>
             <option value="sniping" {{#if (eq system.skill "sniping")}}selected{{/if}}>저격</option>
+            <option value="fighting" {{#if (eq system.skill "fighting")}}selected{{/if}}>격투</option>
             <option value="meleeCombat" {{#if (eq system.skill "meleeCombat")}}selected{{/if}}>무기전투</option>
             <option value="throwing" {{#if (eq system.skill "throwing")}}selected{{/if}}>투척</option>
             <option value="mechanics" {{#if (eq system.skill "mechanics")}}selected{{/if}}>메카닉</option>
@@ -136,17 +137,47 @@
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0;">장거리</div>
         <div style="background:#eee; font-weight:bold; border:1px solid #ccc; padding:4px 0; color:#17a2b8;">저격</div>
 
-        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="text" name="system.rangeModifiers.buffs.pointBlank" value="{{computed.rangeBuffs.pointBlank}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
-        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="text" name="system.rangeModifiers.buffs.short" value="{{computed.rangeBuffs.short}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
-        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="text" name="system.rangeModifiers.buffs.medium" value="{{computed.rangeBuffs.medium}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
-        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="text" name="system.rangeModifiers.buffs.long" value="{{computed.rangeBuffs.long}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
-        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px;"><input type="text" name="system.rangeModifiers.buffs.sniping" value="{{computed.rangeBuffs.sniping}}" style="width:100%; height:20px; text-align:center; color:blue; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:blue; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangeBuffs.pointBlank}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.buffs.pointBlank" value="{{system.rangeModifiers.buffs.pointBlank}}" style="display:none; width:100%; height:100%; text-align:center; color:blue; font-weight:bold; border:1px solid #b8daff; outline:none;"/>
+        </div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:blue; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangeBuffs.short}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.buffs.short" value="{{system.rangeModifiers.buffs.short}}" style="display:none; width:100%; height:100%; text-align:center; color:blue; font-weight:bold; border:1px solid #b8daff; outline:none;"/>
+        </div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:blue; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangeBuffs.medium}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.buffs.medium" value="{{system.rangeModifiers.buffs.medium}}" style="display:none; width:100%; height:100%; text-align:center; color:blue; font-weight:bold; border:1px solid #b8daff; outline:none;"/>
+        </div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:blue; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangeBuffs.long}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.buffs.long" value="{{system.rangeModifiers.buffs.long}}" style="display:none; width:100%; height:100%; text-align:center; color:blue; font-weight:bold; border:1px solid #b8daff; outline:none;"/>
+        </div>
+        <div style="border:1px solid #ccc; background:#f4f8ff; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:blue; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangeBuffs.sniping}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.buffs.sniping" value="{{system.rangeModifiers.buffs.sniping}}" style="display:none; width:100%; height:100%; text-align:center; color:blue; font-weight:bold; border:1px solid #b8daff; outline:none;"/>
+        </div>
 
-        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.pointBlank" value="{{computed.rangePenalties.pointBlank}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
-        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.short" value="{{computed.rangePenalties.short}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
-        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.medium" value="{{computed.rangePenalties.medium}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
-        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.long" value="{{computed.rangePenalties.long}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
-        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px;"><input type="text" name="system.rangeModifiers.penalties.sniping" value="{{computed.rangePenalties.sniping}}" style="width:100%; height:20px; text-align:center; color:red; font-weight:bold; border:none; background:transparent;"/></div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:red; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangePenalties.pointBlank}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.penalties.pointBlank" value="{{system.rangeModifiers.penalties.pointBlank}}" style="display:none; width:100%; height:100%; text-align:center; color:red; font-weight:bold; border:1px solid #f5c6cb; outline:none;"/>
+        </div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:red; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangePenalties.short}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.penalties.short" value="{{system.rangeModifiers.penalties.short}}" style="display:none; width:100%; height:100%; text-align:center; color:red; font-weight:bold; border:1px solid #f5c6cb; outline:none;"/>
+        </div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:red; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangePenalties.medium}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.penalties.medium" value="{{system.rangeModifiers.penalties.medium}}" style="display:none; width:100%; height:100%; text-align:center; color:red; font-weight:bold; border:1px solid #f5c6cb; outline:none;"/>
+        </div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:red; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangePenalties.long}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.penalties.long" value="{{system.rangeModifiers.penalties.long}}" style="display:none; width:100%; height:100%; text-align:center; color:red; font-weight:bold; border:1px solid #f5c6cb; outline:none;"/>
+        </div>
+        <div style="border:1px solid #ccc; background:#fff4f4; padding:2px; height:24px; display:flex; align-items:center; justify-content:center;">
+          <span class="mod-display" title="클릭하여 기본값 수정" style="color:red; font-weight:bold; cursor:pointer; width:100%; text-align:center;">{{computed.rangePenalties.sniping}}</span>
+          <input type="text" class="mod-input comma-input" data-field="system.rangeModifiers.penalties.sniping" value="{{system.rangeModifiers.penalties.sniping}}" style="display:none; width:100%; height:100%; text-align:center; color:red; font-weight:bold; border:1px solid #f5c6cb; outline:none;"/>
+        </div>
         <a class="roll-weapon" data-range="pointBlank" style="background:#222; color:white; padding:4px 0; border-radius:2px; cursor:pointer;"><i class="fas fa-dice"></i> 판정</a>
         <a class="roll-weapon" data-range="short" style="background:#222; color:white; padding:4px 0; border-radius:2px; cursor:pointer;"><i class="fas fa-dice"></i> 판정</a>
         <a class="roll-weapon" data-range="medium" style="background:#222; color:white; padding:4px 0; border-radius:2px; cursor:pointer;"><i class="fas fa-dice"></i> 판정</a>
@@ -298,6 +329,7 @@
           
           <div>
             <div style="font-size:11px; font-weight:bold; color:#17a2b8; margin-bottom:5px; border-bottom:1px dashed #bee5eb; padding-bottom:2px;">[ 개별 스킬 ]</div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>운동</span> <input type="number" name="system.modifiers.skills.athletics" value="{{system.modifiers.skills.athletics}}" style="width:45px; text-align:center;"/></div>
             <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>시가지 행동</span> <input type="number" name="system.modifiers.skills.urbanAction" value="{{system.modifiers.skills.urbanAction}}" style="width:45px; text-align:center;"/></div>
             <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>국지 행동</span> <input type="number" name="system.modifiers.skills.fieldcraft" value="{{system.modifiers.skills.fieldcraft}}" style="width:45px; text-align:center;"/></div>
             <div style="display:flex; justify-content:space-between; margin-bottom:3px;"><span>감지</span> <input type="number" name="system.modifiers.skills.detection" value="{{system.modifiers.skills.detection}}" style="width:45px; text-align:center;"/></div>
@@ -397,7 +429,7 @@
 
       <div style="margin-bottom:15px; padding-bottom:15px; border-bottom:1px dashed #ccc;">
         <label style="font-weight:bold; font-size:12px; color:#333; display:block; margin-bottom:5px;">
-          <i class="fas fa-align-left"></i> 부착물 효과 (설명)
+          <i class="fas fa-align-left"></i> 설명
         </label>
         <textarea name="system.description" style="width:100%; height:90px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;" placeholder="이 부착물의 특수 효과나 룰을 적어주세요.">{{system.description}}</textarea>
       </div>
@@ -417,7 +449,14 @@
         
         <label style="color:#d9534f; font-weight:bold;">탄약 가격 배수(x)</label>
         <input type="number" name="system.modifiers.ammoMultiplier" value="{{system.modifiers.ammoMultiplier}}" placeholder="기본 1" style="width:50px; text-align:center; border:2px solid #d9534f;"/>
-        <div></div> </div>
+        <div></div></div>
+
+      <div style="margin-top:15px; margin-bottom:15px; padding-bottom:15px; border-bottom:1px dashed #ccc;">
+          <label style="font-weight:bold; font-size:12px; display:block; border-bottom:1px solid #ddd; padding-bottom:3px; margin-bottom:5px;">
+            <i class="fas fa-align-left"></i> 부착물 효과
+          </label>
+          <textarea name="system.details" style="width:100%; height:130px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.details}}</textarea>
+        </div>
     {{/if}}
 
     {{#if isItem}}
@@ -433,8 +472,10 @@
             <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:14px; height:14px;"/> 착용 아이템
           </label>
         </div>
+        <!-- 수량 부분 제거
         <label style="font-weight:bold; font-size:12px; color:#333;">수량</label>
         <input type="number" name="system.quantity" value="{{system.quantity}}" style="text-align:center; height:24px; border:1px solid #ccc; border-radius:3px; width:60px;"/>
+        -->
       </div>
     {{/if}}
 
@@ -442,7 +483,7 @@
       <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;">유지비 프로필</h3>
       <div style="display:grid; grid-template-columns: 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
         <label style="font-weight:bold; font-size:12px; color:#dc3545;">유지 코스트</label>
-        <input type="number" name="system.maintenanceCost" value="{{system.maintenanceCost}}" style="text-align:center; height:24px; border:1px solid #dc3545; border-radius:3px; width:60px; color:#dc3545; font-weight:bold;"/>
+        <input type="text" class="comma-input" data-field="system.maintenanceCost" value="{{formattedMaintenanceCost}}" style="text-align:center; height:24px; border:1px solid #dc3545; border-radius:3px; color:#dc3545; font-weight:bold;" />
         
         <label style="font-weight:bold; font-size:12px; color:#333;">위치 (속성)</label>
         <input type="text" name="system.location" value="{{system.location}}" style="height:24px; border:1px solid #ccc; border-radius:3px; width:100%; padding-left:5px;" placeholder="예: 서울시 강남구, 개인 차고 등"/>
@@ -493,7 +534,7 @@
 
       <div style="display:flex; flex-direction:column; gap:4px;">
         <label style="font-weight:bold; font-size:12px; color:#333;">아츠 설명</label>
-        <textarea name="system.effect" ...>{{system.effect}}</textarea>
+        <textarea name="system.effect" style="width:100%; height:120px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.effect}}</textarea>
       </div>
       {{/if}}
 
@@ -554,11 +595,11 @@
       
       {{#if isClassArts}}
         <label style="font-weight:bold; font-size:12px; display:block; border-bottom:1px solid #ddd; padding-bottom:3px; margin-bottom:5px;">설명 (연출 및 상세 설정)</label>
-        <textarea name="system.description" style="width:100%; height:120px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.description}}</textarea>
+        <textarea name="system.description" style="width:100%; height:60px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.description}}</textarea>
       
       {{else}}
         <label style="font-weight:bold; font-size:12px; display:block; border-bottom:1px solid #ddd; padding-bottom:3px; margin-bottom:5px;">효과</label>
-        <textarea name="system.description" style="width:100%; height:80px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.description}}</textarea>
+        <textarea name="system.description" style="width:100%; height:130px; padding:5px; border:1px solid #ccc; border-radius:3px; resize:none; font-family:inherit; font-size:12px;">{{system.description}}</textarea>
       {{/if}}
       
     </div>
@@ -567,20 +608,42 @@
     {{#if isVehicleAttachment}}
       <h3 style="background:#222; color:white; padding:4px 8px; font-size:12px; margin:0 0 10px 0;"><i class="fas fa-tools"></i> 차량 부착물 프로필</h3>
       
-      <div style="display:grid; grid-template-columns: 80px 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc;">
-        <label style="font-weight:bold; font-size:12px; color:#333;">장착 부위</label>
-        <select name="system.attachmentType" style="height:24px; border:1px solid #ccc; border-radius:3px; width:100%; font-weight:bold; color:#0056b3;">
-          <option value="top" {{#if (eq system.attachmentType "top")}}selected{{/if}}>상단 (Top)</option>
-          <option value="under" {{#if (eq system.attachmentType "under")}}selected{{/if}}>하단 (Under)</option>
-          <option value="side" {{#if (eq system.attachmentType "side")}}selected{{/if}}>사이드 (Side)</option>
-          <option value="tire" {{#if (eq system.attachmentType "tire")}}selected{{/if}}>타이어 (Tire)</option>
-          <option value="weapon" {{#if (eq system.attachmentType "weapon")}}selected{{/if}}>무장 (Weapon)</option>
-          <option value="body" {{#if (eq system.attachmentType "body")}}selected{{/if}}>보디 (Body)</option>
-          <option value="glass" {{#if (eq system.attachmentType "glass")}}selected{{/if}}>유리 (Glass)</option>
-        </select>
+      <div style="display:grid; grid-template-columns: 2.5fr 2fr 1.5fr 1fr; gap:8px; align-items:center; margin-bottom:15px; padding-bottom:10px; border-bottom:1px dashed #ccc; text-align:center;">
+        
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <label style="font-weight:bold; font-size:12px; color:#333;">장착 부위</label>
+          <select name="system.attachmentType" style="height:26px; border:1px solid #ccc; border-radius:3px; width:100%; font-weight:bold; color:#0056b3; text-align:center; text-align-last:center;">
+            <option value="top" {{#if (eq system.attachmentType "top")}}selected{{/if}}>상단 (Top)</option>
+            <option value="under" {{#if (eq system.attachmentType "under")}}selected{{/if}}>하단 (Under)</option>
+            <option value="side" {{#if (eq system.attachmentType "side")}}selected{{/if}}>사이드 (Side)</option>
+            <option value="tire" {{#if (eq system.attachmentType "tire")}}selected{{/if}}>타이어 (Tire)</option>
+            <option value="weapon" {{#if (eq system.attachmentType "weapon")}}selected{{/if}}>무장 (Weapon)</option>
+            <option value="body" {{#if (eq system.attachmentType "body")}}selected{{/if}}>보디 (Body)</option>
+            <option value="glass" {{#if (eq system.attachmentType "glass")}}selected{{/if}}>유리 (Glass)</option>
+          </select>
+        </div>
 
-        <label style="font-weight:bold; font-size:12px; color:#dc3545;">유지 코스트</label>
-        <input type="number" name="system.maintenanceCost" value="{{system.maintenanceCost}}" style="text-align:center; height:24px; border:1px solid #dc3545; border-radius:3px; color:#dc3545; font-weight:bold;"/>
+        <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
+          <label style="font-weight:bold; font-size:12px; color:#dc3545;">유지 코스트</label>
+          <input type="number" name="system.maintenanceCost" value="{{system.maintenanceCost}}" style="text-align:center; height:26px; border:1px solid #dc3545; border-radius:3px; width:100%; color:#dc3545; font-weight:bold;"/>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
+          <label style="font-weight:bold; font-size:12px; color:#333;">휴대치</label>
+          <div style="display:flex; align-items:center; gap:4px; height:26px;">
+            <input type="number" name="system.portability.x" value="{{system.portability.x}}" style="width:35px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+            <span style="font-weight:bold; font-size:12px; color:#555;">X</span>
+            <input type="number" name="system.portability.y" value="{{system.portability.y}}" style="width:35px; text-align:center; height:24px; border:1px solid #ccc; border-radius:3px;"/>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:5px; align-items:center;">
+          <label style="font-weight:bold; font-size:12px; color:#17a2b8;">장착</label>
+          <div style="display:flex; align-items:center; height:26px;">
+            <input type="checkbox" name="system.isWearable" {{checked system.isWearable}} style="margin:0; width:18px; height:18px; cursor:pointer;" title="차량에 장착 (체크 시 CP표에서 제외)"/>
+          </div>
+        </div>
+
       </div>
 
       <h4 style="margin:10px 0 5px 0; font-size:12px; color:#17a2b8; border-bottom:1px solid #ccc; padding-bottom:3px;"><i class="fas fa-plus-circle"></i> 차량 성능 수정치 (장착 시 자동 합산)</h4>

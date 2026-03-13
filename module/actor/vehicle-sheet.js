@@ -52,25 +52,32 @@ export class GundogVehicleSheet extends ActorSheet {
 
     for (let item of allSortedItems) {
       if (item.type === "vehicleAttachment") {
-        let type = item.system.attachmentType || "top";
-        if (context.attachments[type]) context.attachments[type].push(item);
-        
-        let m = item.system.modifiers || {};
-        mods.hp += Number(m.hp) || 0;
-        mods.armor += Number(m.armor) || 0;
-        mods.defense += Number(m.defense) || 0;
-        mods.speedNormal += Number(m.speedNormal) || 0;
-        mods.speedLimit += Number(m.speedLimit) || 0;
-        mods.handling += Number(m.handling) || 0;
-        mods.maintenanceCost += Number(item.system.maintenanceCost) || 0;
+        // ★ 수정: "장착(isWearable)" 체크박스가 켜져 있을 때만 차량 능력치에 반영하고 그리드를 건너뜁니다.
+        if (item.system.isWearable) {
+          let type = item.system.attachmentType || "top";
+          if (context.attachments[type]) context.attachments[type].push(item);
+          
+          let m = item.system.modifiers || {};
+          mods.hp += Number(m.hp) || 0;
+          mods.armor += Number(m.armor) || 0;
+          mods.defense += Number(m.defense) || 0;
+          mods.speedNormal += Number(m.speedNormal) || 0;
+          mods.speedLimit += Number(m.speedLimit) || 0;
+          mods.handling += Number(m.handling) || 0;
+          mods.maintenanceCost += Number(item.system.maintenanceCost) || 0;
+          
+          continue; // ★ 장착 중이므로 아래의 CP 관리표(화물) 목록으로 내려가지 않고 바로 다음 아이템으로 넘어감
+        }
       }
 
       // --- [차량 적재량(CP 인벤토리) 분류] ---
-      if (["weapon", "armor", "item", "attachment"].includes(item.type)) {
-        let portX = Math.max(1, Number(item.system.portability?.x) || 1); 
-        let portY = Math.max(1, Number(item.system.portability?.y) || 1);
+      if (["weapon", "armor", "item", "attachment", "vehicleAttachment"].includes(item.type)) {
+        let pxVal = item.system.portability?.x;
+        let pyVal = item.system.portability?.y;
+        let portX = (pxVal !== undefined && pxVal !== "") ? Number(pxVal) : 1; 
+        let portY = (pyVal !== undefined && pyVal !== "") ? Number(pyVal) : 1;
         
-        // ★ 추가: 화물의 가로 x 세로 칸수를 모두 더해줍니다.
+        // 화물의 가로 x 세로 칸수를 모두 더해줍니다.
         totalCargoCells += (portX * portY);
 
         let gx = Number(item.system.grid?.x);
@@ -78,7 +85,9 @@ export class GundogVehicleSheet extends ActorSheet {
 
         let itemData = {
           id: item.id, name: item.name, type: item.type,
-          portX: portX, portY: portY, w: portX * 40, h: portY * 40,
+          portX: portX, portY: portY, 
+          w: portX === 0 ? 40 : portX * 40, 
+          h: portY === 0 ? 40 : portY * 40,
           isWearable: item.system.isWearable
         };
 
@@ -162,7 +171,7 @@ export class GundogVehicleSheet extends ActorSheet {
         const itemUpdates = [];
         
         for (let item of this.actor.items) {
-          if (["weapon", "armor", "item", "attachment"].includes(item.type)) {
+          if (["weapon", "armor", "item", "attachment", "vehicleAttachment"].includes(item.type)) {
             let gx = Number(item.system.grid?.x);
             // 그리드에 배치된(좌표가 0 이상인) 아이템인지 확인
             if (!isNaN(gx) && gx >= 0) {
@@ -187,10 +196,12 @@ export class GundogVehicleSheet extends ActorSheet {
     // 한계치 싱크 업데이트
     html.find('.sync-input').change(async ev => {
       const field = ev.currentTarget.dataset.field;
-      let val = Number(ev.currentTarget.value) || 0;
+      // ★ 콤마 제거 로직 추가
+      let rawVal = String(ev.currentTarget.value).replace(/,/g, '');
+      let val = Number(rawVal) || 0;
+      
       if (val < 1) val = 1;
       
-      // ★ 수정: X축(가로)은 최대 10, Y축(세로)은 최대 30으로 각각 한계를 다르게 설정합니다.
       if (field === "system.inventoryMax.x" && val > 10) val = 10;
       if (field === "system.inventoryMax.y" && val > 30) val = 30;
       
@@ -211,57 +222,103 @@ export class GundogVehicleSheet extends ActorSheet {
     });
     html.find('.cp-grid-item, .unplaced-item').on('dragend', ev => $(ev.currentTarget).css("opacity", "1.0"));
 
-    // CP 그리드로 드롭
+   // CP 그리드로 드롭 (캐릭터 -> 차량 연동)
     html.find('.cp-grid-wrapper').on('dragover', ev => ev.preventDefault());
     html.find('.cp-grid-wrapper').on('drop', async ev => {
-      // ★ 추가: 간이 중량 규칙이 켜져있으면 그리드에 직접 드롭하는 것을 차단
       if (this.actor.system.simplifiedWeightRule) {
         return ui.notifications.warn("간이 중량 규칙이 적용 중이므로 그리드에 화물을 직접 배치할 수 없습니다.");
       }
 
       let data; try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch(err) { return; }
-      if (data && data.type === "CPGridItem" && data.actorId === this.actor.id) {
+      
+      // ★ 수정: 내 아이디인지 검사하는 조건을 빼서 외부(캐릭터) 드래그 허용
+      if (data && data.type === "CPGridItem") {
         ev.preventDefault(); ev.stopPropagation(); 
         const wrapper = $(ev.currentTarget);
         const offset = wrapper.offset();
         const dropX = Math.floor((ev.originalEvent.pageX - offset.left) / 40);
         const dropY = Math.floor((ev.originalEvent.pageY - offset.top) / 40);
         
-        const item = this.actor.items.get(data.itemId);
+        // 원본 캐릭터(출처)와 아이템 정보를 가져옵니다.
+        const sourceActor = game.actors.get(data.actorId);
+        if (!sourceActor) return;
+        const item = sourceActor.items.get(data.itemId);
+        
         if (item) {
-          let pX = Math.max(1, Number(item.system.portability?.x) || 1);
-          let pY = Math.max(1, Number(item.system.portability?.y) || 1);
+          let pxVal = item.system.portability?.x;
+          let pyVal = item.system.portability?.y;
+          let pX = (pxVal !== undefined && pxVal !== "") ? Number(pxVal) : 1;
+          let pY = (pyVal !== undefined && pyVal !== "") ? Number(pyVal) : 1;
           
-          // ★ 수정: Y축 한계를 30으로 늘려줍니다.
           if (dropX + pX > 10 || dropY + pY > 30) return ui.notifications.warn("차량 CP 관리표의 영역을 벗어납니다!");
 
           let isColliding = false;
-          for (let other of this.actor.items) {
-            if (other.id === item.id) continue;
-            if (["weapon", "armor", "item", "attachment"].includes(other.type)) {
-              let oX = Number(other.system.grid?.x), oY = Number(other.system.grid?.y);
-              if (oX >= 0 && oY >= 0) {
-                let opX = Math.max(1, Number(other.system.portability?.x) || 1), opY = Math.max(1, Number(other.system.portability?.y) || 1);
-                if (dropX < oX + opX && dropX + pX > oX && dropY < oY + opY && dropY + pY > oY) { isColliding = true; break; }
+          // ★ 0x0 아이템 충돌 무시
+          if (pX > 0 && pY > 0) {
+            for (let other of this.actor.items) {
+              if (sourceActor.id === this.actor.id && other.id === item.id) continue;
+              if (["weapon", "armor", "item", "attachment", "vehicleAttachment"].includes(other.type)) {
+                let oX = Number(other.system.grid?.x), oY = Number(other.system.grid?.y);
+                if (oX >= 0 && oY >= 0) {
+                  let opxVal = other.system.portability?.x;
+                  let opyVal = other.system.portability?.y;
+                  let opX = (opxVal !== undefined && opxVal !== "") ? Number(opxVal) : 1;
+                  let opY = (opyVal !== undefined && opyVal !== "") ? Number(opyVal) : 1;
+                  
+                  if (opX > 0 && opY > 0) {
+                    if (dropX < oX + opX && dropX + pX > oX && dropY < oY + opY && dropY + pY > oY) { isColliding = true; break; }
+                  }
+                }
               }
             }
           }
           if (isColliding) return ui.notifications.warn("다른 아이템과 위치가 겹칩니다! 빈 공간을 찾으세요.");
-          await item.update({"system.grid.x": dropX, "system.grid.y": dropY, "system.grid.type": "cp"});
+          
+          // 내부 이동
+          if (sourceActor.id === this.actor.id) {
+            await item.update({"system.grid.x": dropX, "system.grid.y": dropY, "system.grid.type": "cp"});
+          } else {
+            // 외부 이동
+            let newItemData = item.toObject(); 
+            newItemData.system.grid = { x: dropX, y: dropY, type: "cp" };
+            if (newItemData.system.equipped !== undefined) newItemData.system.equipped = false;
+            if (newItemData.system.equippedSlot !== undefined) newItemData.system.equippedSlot = "";
+            
+            await this.actor.createEmbeddedDocuments("Item", [newItemData]);
+            await sourceActor.deleteEmbeddedDocuments("Item", [item.id]);
+            ui.notifications.info(`[${sourceActor.name}]의 <${item.name}>을(를) 차량 화물칸으로 옮겼습니다.`);
+          }
         }
       }
     });
 
-    // 미배치 목록으로 빼기
+    // 미배치 목록으로 빼기 (캐릭터 -> 차량 연동)
     html.find('.unplaced-item-list').on('dragover', ev => { ev.preventDefault(); $(ev.currentTarget).css("background", "#f0f0f0"); });
     html.find('.unplaced-item-list').on('dragleave', ev => { $(ev.currentTarget).css("background", "#fafafa"); });
     html.find('.unplaced-item-list').on('drop', async ev => {
       $(ev.currentTarget).css("background", "#fafafa");
       let data; try { data = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain')); } catch(err) { return; }
-      if (data && data.type === "CPGridItem" && data.actorId === this.actor.id) {
+      
+      if (data && data.type === "CPGridItem") {
         ev.preventDefault(); ev.stopPropagation();
-        const item = this.actor.items.get(data.itemId);
-        if (item) await item.update({"system.grid.x": -1, "system.grid.y": -1, "system.grid.type": "none"});
+        const sourceActor = game.actors.get(data.actorId);
+        if (!sourceActor) return;
+        const item = sourceActor.items.get(data.itemId);
+        
+        if (item) {
+          if (sourceActor.id === this.actor.id) {
+            await item.update({"system.grid.x": -1, "system.grid.y": -1, "system.grid.type": "none"});
+          } else {
+            let newItemData = item.toObject();
+            newItemData.system.grid = { x: -1, y: -1, type: "none" };
+            if (newItemData.system.equipped !== undefined) newItemData.system.equipped = false;
+            if (newItemData.system.equippedSlot !== undefined) newItemData.system.equippedSlot = "";
+            
+            await this.actor.createEmbeddedDocuments("Item", [newItemData]);
+            await sourceActor.deleteEmbeddedDocuments("Item", [item.id]);
+            ui.notifications.info(`[${sourceActor.name}]의 <${item.name}>을(를) 차량 미배치 목록으로 옮겼습니다.`);
+          }
+        }
       }
     });
 

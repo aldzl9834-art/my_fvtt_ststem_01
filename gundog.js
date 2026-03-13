@@ -149,6 +149,20 @@ class GundogActorSheet extends ActorSheet {
     context.formattedBank = Number(context.system.profile?.wealth?.bank || 0).toLocaleString();
     context.formattedCash = Number(context.system.profile?.wealth?.cash || 0).toLocaleString();
 
+    // ==========================================
+    // ★ 추가: 특징(Trait)의 RP 상한 수정치 자동 합산
+    // ==========================================
+    let totalRpMod = 0;
+    // 캐릭터가 가진 모든 아이템을 검사해서 '특징(trait)'이면 rpModifier 값을 더합니다.
+    for (let item of this.actor.items) {
+      if (item.type === "trait") {
+        totalRpMod += (Number(item.system.rpModifier) || 0);
+      }
+    }
+    
+    // 기본 RP 최대치 + 특징 수정치 합산 = 최종 RP 최대치 (HTML로 전달)
+    context.computedRpMax = (Number(context.system.profile?.rewardPoints?.total) || 0) + totalRpMod;
+
     // 에디터 활성화를 위한 필수 권한 데이터 명시
     context.editable = this.isEditable;
     context.owner = this.actor.isOwner;
@@ -438,6 +452,64 @@ class GundogActorSheet extends ActorSheet {
         val = Number(rawVal) || 0;
       }
       await this.actor.update({ [field]: val });
+    });
+
+    // ==========================================
+    // ★ 추가: 콤마(,) 자동 포맷 및 저장 에러 방지
+    // ==========================================
+    // 1. 시트가 열릴 때: DB에 저장된 숫자(50000)를 가져와서 콤마(50,000)를 찍어 보여줍니다.
+    html.find('.comma-input').each(function() {
+      let val = Number($(this).val()) || 0;
+      if ($(this).val() !== "") {
+        $(this).val(val.toLocaleString('en-US'));
+      }
+    });
+
+    // 2. 사용자가 클릭(포커스)할 때: 수정하기 편하도록 콤마를 임시로 싹 지워줍니다.
+    html.find('.comma-input').focus(function() {
+      let rawVal = String($(this).val()).replace(/,/g, '');
+      if (rawVal === "0") $(this).val(""); // 0일 때는 빈칸으로 만들어 바로 타이핑하기 좋게 만듬
+      else $(this).val(rawVal);
+    });
+
+    // 3. 입력 완료(엔터 or 다른 곳 클릭) 시: 다시 콤마를 찍고 DB에 확실하게 저장합니다.
+    html.find('.comma-input').change(async (ev) => {
+      ev.preventDefault();
+      const field = ev.currentTarget.dataset.field; // data-field 값(경로)을 가져옴
+      
+      // 콤마를 지우고 순수한 숫자로 변환
+      let rawVal = String(ev.currentTarget.value).replace(/,/g, '');
+      let val = Number(rawVal) || 0;
+      
+      // 화면에는 즉시 콤마가 찍힌 형태로 변환해서 띄워줌
+      $(ev.currentTarget).val(val.toLocaleString('en-US'));
+      
+      // FVTT 엔진 대신 우리가 직접 DB에 안전하게 저장!
+      await this.actor.update({ [field]: val });
+    });
+
+    // ==========================================
+    // ★ 추가: 읽기 전용 자동 계산 항목 콤마 표시 (.readonly-comma)
+    // ==========================================
+    html.find('.readonly-comma').each(function() {
+      let rawVal = String($(this).val()).replace(/,/g, '');
+      let val = Number(rawVal) || 0;
+      // 화면을 열 때 콤마만 쓱 찍어주고 어떠한 추가 이벤트도 발생시키지 않습니다.
+      $(this).val(val.toLocaleString('en-US'));
+    });
+
+    // ==========================================
+    // ★ 추가: RP 최대치 클릭 시 텍스트 <-> 입력칸 스위칭
+    // ==========================================
+    html.find('.rp-display').click(function() {
+      $(this).hide();
+      $(this).siblings('.rp-input').show().focus();
+    });
+
+    html.find('.rp-input').blur(function() {
+      // 포커스를 잃으면 다시 텍스트로 전환 (값이 바뀌면 FVTT가 알아서 저장하고 새로고침함)
+      $(this).hide();
+      $(this).siblings('.rp-display').show();
     });
 
     // 1. 아이템 수정 (연필 아이콘 클릭 시 아이템 시트 열기)
@@ -1400,14 +1472,19 @@ class GundogItemSheet extends ItemSheet {
       await this.item.update({ [field]: val });
     });
 
-    html.find('.comma-input').change(async (ev) => {
-      ev.preventDefault();
-      const field = ev.currentTarget.dataset.field; // 저장할 DB 경로
-      
-      const rawVal = String(ev.currentTarget.value).replace(/,/g, '');
-      const val = Number(rawVal) || 0;
-      
-      await this.actor.update({ [field]: val });
+    // ==========================================
+    // ★ 사거리 수정치: 텍스트 <-> 입력칸 스위칭 로직 (아이템 시트 전용)
+    // ==========================================
+    html.find('.mod-display').on('click', function(ev) {
+      ev.preventDefault(); // 다른 클릭 이벤트와 꼬이는 것을 방지
+      $(this).hide(); // 텍스트 숨김
+      $(this).siblings('.mod-input').show().focus(); // 숨겨진 입력칸 등장
+    });
+
+    html.find('.mod-input').on('blur', function() {
+      // 포커스를 잃으면 다시 텍스트로 전환
+      $(this).hide();
+      $(this).siblings('.mod-display').show();
     });
 
     // ★ 자물쇠 토글 버튼 클릭 이벤트

@@ -49,7 +49,7 @@ export class GundogActor extends Actor {
     // ==========================================
     let armorMods = {
       groups: { shooting: 0, fighting: 0, expertise: 0 },
-      skills: { urbanAction: 0, fieldcraft: 0, detection: 0, situationalAwareness: 0 },
+      skills: { urbanAction: 0, fieldcraft: 0, detection: 0, situationalAwareness: 0, athletics: 0 },
       movement: { base: 0, cautious: 0, normal: 0, sprint: 0 }
     };
 
@@ -68,6 +68,7 @@ export class GundogActor extends Actor {
           armorMods.skills.fieldcraft += Number(mods.skills.fieldcraft) || 0;
           armorMods.skills.detection += Number(mods.skills.detection) || 0;
           armorMods.skills.situationalAwareness += Number(mods.skills.situationalAwareness) || 0;
+          armorMods.skills.athletics += Number(mods.skills.athletics) || 0;
         }
         if (mods.movement) {
           armorMods.movement.base += Number(mods.movement.base) || 0;
@@ -104,9 +105,17 @@ export class GundogActor extends Actor {
         // ==========================================
         let skillBonus = Number(skill.bonus) || 0;
         let skillPenalty = Number(skill.penalty) || 0; // 양수로 입력해도 빼기로 계산됨
+
+        // 방어구의 스킬 그룹 보정치를 가져옵니다.
+        let groupMod = armorMods.groups[groupKey] || 0;
         
-        // 장착된 방어구의 스킬 그룹 보정치와 개별 스킬 보정치를 합산합니다.
-        let itemMod = (armorMods.groups[groupKey] || 0) + (armorMods.skills[skillKey] || 0);
+        // ★ 핵심: 현재 계산 중인 스킬이 '강인함(toughness)'이라면 그룹 보정치를 적용하지 않습니다(0으로 처리).
+        if (skillKey === "toughness") {
+          groupMod = 0;
+        }
+        
+       // 그룹 보정치(강인함 제외됨)와 개별 스킬 보정치를 합산합니다.
+        let itemMod = groupMod + (armorMods.skills[skillKey] || 0);
         
         // 시트에 표시하기 위해 임시 저장
         skill.itemMod = itemMod;

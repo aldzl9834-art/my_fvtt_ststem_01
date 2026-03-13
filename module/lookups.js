@@ -82,7 +82,7 @@ GUNDOG.classes = {
     specialties: [] 
   },
   npc: { 
-    label: "NPC", 
+    label: "공용", 
     mainBonuses: {}, 
     subBonuses: {}, 
     specialties: [] 

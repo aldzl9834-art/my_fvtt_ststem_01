@@ -39,7 +39,10 @@
           <div style="display:flex; align-items:center; justify-content:center; gap:5px; margin-top:2px;">
             <input type="text" name="system.profile.rewardPoints.current" value="{{system.profile.rewardPoints.current}}" data-dtype="Number" style="width:35px; height:24px; text-align:center; font-weight:bold;"/>
             <span style="font-size:12px; color:#555;">/</span>
-            <input type="text" name="system.profile.rewardPoints.total" value="{{system.profile.rewardPoints.total}}" data-dtype="Number" style="width:35px; height:24px; text-align:center;"/>
+            <div style="display:inline-block; position:relative; width:35px; height:24px; vertical-align:middle;">
+  <span class="rp-display" title="특징이 적용된 최종 최대치 (클릭하여 기본값 수정)" style="display:inline-block; width:100%; height:100%; line-height:24px; text-align:center; font-weight:bold; color:#17a2b8; cursor:pointer; font-size:12px;">{{computedRpMax}}</span>
+  <input type="text" class="rp-input" name="system.profile.rewardPoints.total" value="{{system.profile.rewardPoints.total}}" data-dtype="Number" style="display:none; width:100%; height:100%; text-align:center; font-size:12px; border:1px solid #ccc; border-radius:2px;"/>
+</div>
           </div>
         </div>
       </div>
@@ -55,7 +58,7 @@
 
         <div style="flex:0.8;">
           <label style="font-weight:bold; color:#333;">현금 (Cash)</label>
-          <input type="text" name="system.profile.wealth.cash" value="{{system.profile.wealth.cash}}" data-dtype="Number" style="width:100%; height:20px; text-align:center; margin-top:2px;"/>
+          <input type="text" class="comma-input" data-field="system.profile.wealth.cash" value="{{system.profile.wealth.cash}}" style="width:100%; height:20px; text-align:center; margin-top:2px;"/>
         </div>
 
         <div style="flex:1;">
@@ -125,7 +128,8 @@
         <div><label style="font-size:11px; color:#666; font-weight:bold;">나이</label><input type="text" name="system.profile.age" value="{{system.profile.age}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">신장 (cm)</label><input type="text" name="system.profile.height" value="{{system.profile.height}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">체중 (kg)</label><input type="text" name="system.profile.weight" value="{{system.profile.weight}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
-        <div><label style="font-size:11px; color:#0056b3; font-weight:bold;">예금 (Bank)</label><input type="text" name="system.profile.wealth.bank" value="{{system.profile.wealth.bank}}" data-dtype="Number" style="height:24px; font-size:12px; border-color:#0056b3;"/></div>
+        <div><label style="font-size:11px; color:#0056b3; font-weight:bold;">예금 (Bank)</label>
+        <input type="text" class="comma-input" data-field="system.profile.wealth.bank" value="{{system.profile.wealth.bank}}" style="height:24px; font-size:12px; border-color:#0056b3; text-align:right; padding-right:5px;"/></div>
 
         <div><label style="font-size:11px; color:#666; font-weight:bold;">머리색</label><input type="text" name="system.profile.hairColor" value="{{system.profile.hairColor}}" style="height:24px; font-size:12px;"/></div>
         <div><label style="font-size:11px; color:#666; font-weight:bold;">눈색</label><input type="text" name="system.profile.eyeColor" value="{{system.profile.eyeColor}}" style="height:24px; font-size:12px;"/></div>
@@ -133,7 +137,7 @@
         
         <div>
           <label style="font-size:11px; color:#dc3545; font-weight:bold;">유지비</label>
-          <input type="text" value="{{totalMaintenanceCost}}" style="height:24px; font-size:12px; border-color:#dc3545; background-color:#f4f4f4; text-align:center; font-weight:bold;" readonly title="생활 랭크, 주거, 차량, 커넥션 등의 유지비 합산 (자동 계산)"/>
+<input type="text" class="readonly-comma" value="{{totalMaintenanceCost}}" style="height:24px; font-size:12px; border:1px solid #dc3545; background-color:#f4f4f4; text-align:center; font-weight:bold; pointer-events:none;" readonly title="생활 랭크, 주거, 차량, 커넥션 등의 유지비 합산 (자동 계산)"/>
         </div>
         </div>
         <div style="display:flex; flex-direction:column; gap:10px;">
