@@ -738,7 +738,7 @@ form.gundog-sheet {
 /* ========================================== */
 .gundog-sheet .profile-bottom-layout {
     display: grid;
-    grid-template-columns: 7fr 3fr;
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 

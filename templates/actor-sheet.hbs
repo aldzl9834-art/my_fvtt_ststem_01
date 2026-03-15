@@ -292,37 +292,7 @@
 
           </div>
         </div>
-        <div style="flex:1; display:flex; flex-direction:column;">
-              <label style="font-size:11px; color:#666; font-weight:bold;">특징 (Traits)</label>
-              <div style="flex:1; display:flex; flex-direction:column; gap:4px; margin-top:4px; min-height:20px; overflow-y:auto; border:1px dashed #999; border-radius:4px; background:#f9f9f9; padding:4px;">
-                {{#each traits as |item|}}
-                <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; flex-direction:column; gap:2px; padding:4px 6px; border-bottom:1px solid #ddd; background:#fff; border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
-                  
-                  <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="item-name item-edit" style="font-weight:bold; font-size:15px; cursor:pointer; color:#0056b3; line-height:1;" title="[상세 설정] {{item.system.details}}">{{item.name}}</span>
-                    <div style="display:flex; gap:5px; flex-shrink:0;">
-                      <a class="item-edit" style="color:#666; cursor:pointer;" title="수정"><i class="fas fa-edit"></i></a>
-                      <a class="item-delete" style="color:#dc3545; cursor:pointer;" title="삭제"><i class="fas fa-trash"></i></a>
-                    </div>
-                  </div>
-                  
-                  <div style="display:flex; gap:8px; font-size:11px; color:#555; line-height:1;">
-                    <div><span style="font-weight:bold; color:#17a2b8;">RP 수정:</span> {{item.system.rpModifier}}</div>
-                    <div><span style="font-weight:bold; color:#dc3545;">유지 코스트:</span> {{item.system.maintenanceCost}}</div>
-                  </div>
-                  
-                  {{#if item.system.description}}
-                  <div style="margin-top:1px; font-size:12px; color:#333; line-height:1.3; background:#f4f4f4; padding:4px; border-radius:2px; word-break:keep-all; white-space:pre-wrap; border-left:2px solid #17a2b8; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">{{item.system.description}}</div>
-                  {{/if}}
 
-                </div>
-                {{/each}}
-                {{#unless traits}}
-                  <div style="text-align:center; color:#aaa; font-size:10px; margin-top:10px;">드래그하여 추가</div>
-                {{/unless}}
-              </div>
-            </div>
-            
             <div style="grid-column: span 4; margin-top:10px;">
           <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">백 스토리 (Backstory)</label>
           <textarea name="system.profile.backstory" style="width:100%; height:120px; padding:8px; border:1px solid #ddd; border-radius:4px; background:#fafafa; resize:none; font-family:inherit; font-size:12px;">{{system.profile.backstory}}</textarea>
