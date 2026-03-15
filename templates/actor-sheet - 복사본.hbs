@@ -2,297 +2,251 @@
 
   <div class="sheet-main-content">
   
-  <header class="sheet-header">
+  <header class="sheet-header" style="display:flex; gap: 15px; margin-bottom: 10px;">
+    <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="140" width="140" style="border: 2px solid #000; object-fit: cover;"/>
     
-    <div class="portrait-container">
-      <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}"/>
-      <div class="name-class-overlay">
-        <input class="charname-input" name="name" type="text" value="{{actor.name}}" placeholder="캐릭터 이름"/>
-        <div class="class-selects">
-          <select name="system.profile.mainClass" title="Main Class">
-            <option value="">-- Main --</option>
-            {{#each gundogClasses as |classData key|}}<option value="{{key}}" {{#if (eq ../system.profile.mainClass key)}}selected{{/if}}>{{classData.label}}</option>{{/each}}
-          </select>
-          <select name="system.profile.subClass" title="Sub Class">
-            <option value="">-- Sub --</option>
-            {{#each gundogClasses as |classData key|}}<option value="{{key}}" {{#if (eq ../system.profile.subClass key)}}selected{{/if}}>{{classData.label}}</option>{{/each}}
-          </select>
+    <div class="header-fields" style="flex: 1; display:flex; flex-direction:column; gap:8px;">
+      
+      <div style="display:flex; gap:10px; align-items:flex-end;">
+        <h1 class="charname" style="flex:1; margin:0; border-bottom:2px solid #222;">
+          <input name="name" type="text" value="{{actor.name}}" placeholder="캐릭터 이름" style="font-weight:bold;"/>
+        </h1>
+        <div style="flex:1; display:flex; gap:10px;">
+          <div style="flex:1;"><label style="font-size:11px; color:#666; font-weight:bold;">Main Class</label><select name="system.profile.mainClass" style="width:100%;"><option value="">-- 선택 --</option>{{#each gundogClasses as |classData key|}}<option value="{{key}}" {{#if (eq ../system.profile.mainClass key)}}selected{{/if}}>{{classData.label}}</option>{{/each}}</select></div>
+          <div style="flex:1;"><label style="font-size:11px; color:#666; font-weight:bold;">Sub Class</label><select name="system.profile.subClass" style="width:100%;"><option value="">-- 선택 --</option>{{#each gundogClasses as |classData key|}}<option value="{{key}}" {{#if (eq ../system.profile.subClass key)}}selected{{/if}}>{{classData.label}}</option>{{/each}}</select></div>
         </div>
       </div>
-    </div>
-    
-    <div class="header-fields">
-      
-      <div class="header-stats">
 
-                <div class="cap-title-bar">
-          
-          <h2 class="cap-main-title">기본 정보</h2>
-          
-          <div class="cap-right-info">
-            <div class="info-group">
-              <span class="info-label">소속</span>
-              <select name="system.profile.affiliation" class="affiliation-select" disabled>
-                <option value="">-- 선택 --</option>
-                {{#each gundogAffiliations as |label key|}}
-                  <option value="{{key}}" {{#if (eq ../system.profile.affiliation key)}}selected{{/if}}>{{label}}</option>
-                {{/each}}
-              </select>
-              <a class="toggle-affiliation" title="수정하려면 클릭하세요"><i class="fas fa-lock"></i></a>
-            </div>
-            
-            <div class="info-group">
-              <span class="info-label">EXP</span>
-              <input type="text" class="exp-input" name="system.profile.exp.current" value="{{system.profile.exp.current}}" data-dtype="Number"/>
-              <span class="exp-slash">/</span>
-              <input type="text" class="exp-input" name="system.profile.exp.total" value="{{system.profile.exp.total}}" data-dtype="Number"/>
-            </div>
+      <div style="display:flex; gap:10px; background:#f4f4f4; padding:8px 10px; border-radius:4px; border:1px solid #ddd;">
+        <div style="flex:1;">
+          <label style="font-weight:bold; color:#d9534f; font-size:13px;"><i class="fas fa-heart"></i> 내구력 (HP)</label>
+          <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
+            <input type="text" name="system.profile.hp.value" value="{{system.profile.hp.value}}" data-dtype="Number" style="width:40px; height:24px; text-align:center; font-size:14px; font-weight:bold;"/>
+            <span style="font-size:14px; color:#555;">/</span>
+            <span style="font-size:16px; font-weight:bold; color:#d9534f; padding:0 5px;">{{system.profile.hp.max}}</span>
           </div>
-
         </div>
         
-        <div class="header-row header-row-2">
-          
-          <div class="stat-box hp-box">
-            <label><i class="fas fa-heart"></i> 내구력</label>
-            <div class="stat-inputs">
-              <input type="text" name="system.profile.hp.value" value="{{system.profile.hp.value}}" data-dtype="Number"/>
-              <span class="slash">/</span>
-              <span class="max-val">{{system.profile.hp.max}}</span>
-            </div>
+        <div style="flex:1.5;">
+          <label style="font-weight:bold; color:#0056b3; font-size:13px;"><i class="fas fa-running"></i> 이동력</label>
+          <div style="display:flex; justify-content:space-around; margin-top:2px; text-align:center;">
+            <div><span style="font-size:10px; color:#666;">신중</span><br><span style="font-size:14px; font-weight:bold;">{{system.profile.movement.careful}}</span></div>
+            <div><span style="font-size:10px; color:#666;">일반</span><br><span style="font-size:14px; font-weight:bold; color:#0056b3;">{{system.profile.movement.normal}}</span></div>
+            <div><span style="font-size:10px; color:#666;">전력질주</span><br><span style="font-size:14px; font-weight:bold;">{{system.profile.movement.sprint}}</span></div>
           </div>
-          
-          <div class="stat-box movement-box">
-            <label><i class="fas fa-running"></i> 이동력</label>
-            <div class="movement-grid">
-              <div class="move-item"><span class="move-label">신중</span><br><span class="move-val">{{system.profile.movement.careful}}</span></div>
-              <div class="move-item center"><span class="move-label">일반</span><br><span class="move-val highlight">{{system.profile.movement.normal}}</span></div>
-              <div class="move-item"><span class="move-label">전력질주</span><br><span class="move-val">{{system.profile.movement.sprint}}</span></div>
-            </div>
-          </div>
-
-          <div class="stat-box rp-box">
-            <label><i class="fas fa-star"></i> 리워드 포인트</label>
-            <div class="stat-inputs">
-              <input type="text" name="system.profile.rewardPoints.current" value="{{system.profile.rewardPoints.current}}" data-dtype="Number"/>
-              <span class="slash">/</span>
-              <div class="rp-max-container">
-                <span class="rp-display" title="특징이 적용된 최종 최대치 (클릭하여 기본값 수정)">{{computedRpMax}}</span>
-                <input type="text" class="rp-input" name="system.profile.rewardPoints.total" value="{{system.profile.rewardPoints.total}}" data-dtype="Number" style="display:none;"/>
-              </div>
-            </div>
-          </div>
-          
         </div>
 
-        <div class="header-row header-row-3">
-          
-          <div class="money-container">
-            <label style="font-size: 12px;">자산</label>
-            
-            <div style="display: flex; flex-direction: column; gap: 4px; margin-top: 4px;">
-              <div class="money-row">
-                <label><i class="fas fa-money-bill"></i> 현금 (Cash)</label>
-                <input type="text" class="comma-input cash-input" data-field="system.profile.wealth.cash" value="{{system.profile.wealth.cash}}"/>
-              </div>
-              <div class="money-row">
-                <label><i class="fas fa-bank"></i> 예금 (Bank)</label>
-                <input type="text" class="comma-input bank-input" data-field="system.profile.wealth.bank" value="{{system.profile.wealth.bank}}"/>
-              </div>
-            </div>
+        <div style="flex:0.8;">
+          <label style="font-weight:bold; color:#17a2b8; font-size:13px;"><i class="fas fa-star"></i> 리워드 포인트</label>
+          <div style="display:flex; align-items:center; justify-content:center; gap:5px; margin-top:2px;">
+            <input type="text" name="system.profile.rewardPoints.current" value="{{system.profile.rewardPoints.current}}" data-dtype="Number" style="width:35px; height:24px; text-align:center; font-weight:bold;"/>
+            <span style="font-size:12px; color:#555;">/</span>
+            <div style="display:inline-block; position:relative; width:35px; height:24px; vertical-align:middle;">
+  <span class="rp-display" title="특징이 적용된 최종 최대치 (클릭하여 기본값 수정)" style="display:inline-block; width:100%; height:100%; line-height:24px; text-align:center; font-weight:bold; color:#17a2b8; cursor:pointer; font-size:12px;">{{computedRpMax}}</span>
+  <input type="text" class="rp-input" name="system.profile.rewardPoints.total" value="{{system.profile.rewardPoints.total}}" data-dtype="Number" style="display:none; width:100%; height:100%; text-align:center; font-size:12px; border:1px solid #ccc; border-radius:2px;"/>
+</div>
           </div>
-
-          <div class="stat-box language-box" style="flex: 1.5;">
-            <label>사용 언어 (최대 6개)</label>
-            <div class="lang-grid">
-              <input type="text" name="system.profile.languages.lang1" value="{{system.profile.languages.lang1}}"/>
-              <input type="text" name="system.profile.languages.lang2" value="{{system.profile.languages.lang2}}"/>
-              <input type="text" name="system.profile.languages.lang3" value="{{system.profile.languages.lang3}}"/>
-              <input type="text" name="system.profile.languages.lang4" value="{{system.profile.languages.lang4}}"/>
-              <input type="text" name="system.profile.languages.lang5" value="{{system.profile.languages.lang5}}"/>
-              <input type="text" name="system.profile.languages.lang6" value="{{system.profile.languages.lang6}}"/>
-            </div>
-          </div>
-          
         </div>
-
       </div>
 
-      <div class="header-capabilities">
+      <div style="display:flex; gap:10px; background:#e9ecef; padding:6px 10px; border-radius:4px; border:1px solid #ccc; font-size:11px;">
+        <div style="flex:1;">
+          <label style="font-weight:bold; color:#333;">EXP (현재/누적)</label>
+          <div style="display:flex; gap:2px; align-items:center; margin-top:2px;">
+            <input type="text" name="system.profile.exp.current" value="{{system.profile.exp.current}}" data-dtype="Number" style="width:35px; height:20px; text-align:center;"/> /
+            <input type="text" name="system.profile.exp.total" value="{{system.profile.exp.total}}" data-dtype="Number" style="width:35px; height:20px; text-align:center;"/>
+          </div>
+        </div>
 
-        <div class="capabilities-grid">
-          {{#each system.capabilities as |cap key|}}
-            <div class="capability-box">
-              <div class="cap-name">{{lookup ../capabilityLabels key}}</div>
-              <input class="cap-val-input" type="text" name="system.capabilities.{{key}}.value" value="{{cap.value}}" data-dtype="Number"/>
-            </div>
-          {{/each}}
+        <div style="flex:0.8;">
+          <label style="font-weight:bold; color:#333;">현금 (Cash)</label>
+          <input type="text" class="comma-input" data-field="system.profile.wealth.cash" value="{{system.profile.wealth.cash}}" style="width:100%; height:20px; text-align:center; margin-top:2px;"/>
+        </div>
+
+        <div style="flex:1;">
+          <label style="font-weight:bold; color:#333;">소속</label>
+          <div style="display:flex; gap:4px; align-items:center; margin-top:2px;">
+            <select name="system.profile.affiliation" class="affiliation-select" disabled style="flex:1; height:20px; font-size:11px; background:#f0f0f0; cursor:not-allowed;">
+              <option value="">-- 선택 --</option>
+              {{#each gundogAffiliations as |label key|}}
+                <option value="{{key}}" {{#if (eq ../system.profile.affiliation key)}}selected{{/if}}>{{label}}</option>
+              {{/each}}
+            </select>
+            <a class="toggle-affiliation" style="font-size:11px; color:#dc3545; cursor:pointer;" title="수정하려면 클릭하세요"><i class="fas fa-lock"></i></a>
+          </div>
+        </div>
+
+        <div style="flex:1.5;">
+          <label style="font-weight:bold; color:#333;">사용 언어 (최대 6개)</label>
+          <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:2px; margin-top:2px;">
+            <input type="text" name="system.profile.languages.lang1" value="{{system.profile.languages.lang1}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang2" value="{{system.profile.languages.lang2}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang3" value="{{system.profile.languages.lang3}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang4" value="{{system.profile.languages.lang4}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang5" value="{{system.profile.languages.lang5}}" style="height:18px; text-align:center; font-size:10px;"/>
+            <input type="text" name="system.profile.languages.lang6" value="{{system.profile.languages.lang6}}" style="height:18px; text-align:center; font-size:10px;"/>
+          </div>
         </div>
       </div>
 
     </div>
   </header>
-     
-      <nav class="sheet-tabs tabs" data-group="primary">
-    <a class="item" data-tab="profile" title="프로필"><i class="fas fa-id-card"></i></a>
-    <a class="item" data-tab="skills" title="스킬"><i class="fas fa-brain"></i></a>
-    <a class="item" data-tab="equipment" title="장비"><i class="fas fa-shield-alt"></i></a>
-    <a class="item" data-tab="items" title="아이템(가방)"><i class="fas fa-box-open"></i></a>
-    <a class="item" data-tab="class-arts" title="클래스 아츠"><i class="fas fa-star"></i></a>
-  </nav>
 
-      <section class="sheet-body">
+  <div class="capabilities-container" style="margin-bottom: 15px;">
+    <h2 style="background:#222; color:white; padding:4px 8px; margin:0 0 8px 0; font-size: 13px;">능력치 (Capabilities)</h2>
+    <div class="capabilities-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px;">
+      {{#each system.capabilities as |cap key|}}
+        <div class="capability-row" style="border: 1px solid #ccc; padding: 4px; border-radius: 4px; display: flex; flex-direction: column; align-items: center; background: #f9f9f9;">
+          <div style="font-weight:bold; font-size: 11px; margin-bottom: 4px;">{{lookup ../capabilityLabels key}}</div>
+          <div style="display: flex; gap: 3px; width: 100%; text-align: center;">
+            <div style="flex:1;"><label style="font-size:9px; color:#666;">Val</label><input type="text" name="system.capabilities.{{key}}.value" value="{{cap.value}}" data-dtype="Number" style="height:20px; text-align:center; font-size:11px;"/></div>
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+
+  <div style="display: flex; flex-direction: row; flex: 1; overflow: hidden;">
+      
+      <section class="sheet-body" style="flex: 1; overflow-y: auto; padding-right: 10px;">
 
     <div class="tab profile" data-group="primary" data-tab="profile">
+
+      <div style="grid-column: span 4; margin-top: 10px; display: grid; grid-template-columns: 6fr 4fr; gap: 15px;">
+
+      <div class="profile-details-grid" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; border:1px solid #ccc; padding:12px; background:#fff; border-radius:4px;">
         
-        <div class="profile-top-layout">
-          
-          <div class="profile-section">
-            <h2 class="section-title">프로필</h2>
-          
-          <div class="profile-grid-2col">
-            <div class="profile-field"><label>국적</label><input type="text" name="system.profile.nationality" value="{{system.profile.nationality}}"/></div>
-            <div class="profile-field"><label>직업</label><input type="text" name="system.profile.occupation" value="{{system.profile.occupation}}"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">국적</label><input type="text" name="system.profile.nationality" value="{{system.profile.nationality}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">직업</label><input type="text" name="system.profile.occupation" value="{{system.profile.occupation}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">성별</label><input type="text" name="system.profile.gender" value="{{system.profile.gender}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">혈액형</label><input type="text" name="system.profile.bloodType" value="{{system.profile.bloodType}}" style="height:24px; font-size:12px;"/></div>
+
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">나이</label><input type="text" name="system.profile.age" value="{{system.profile.age}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">신장 (cm)</label><input type="text" name="system.profile.height" value="{{system.profile.height}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">체중 (kg)</label><input type="text" name="system.profile.weight" value="{{system.profile.weight}}" data-dtype="Number" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#0056b3; font-weight:bold;">예금 (Bank)</label>
+        <input type="text" class="comma-input" data-field="system.profile.wealth.bank" value="{{system.profile.wealth.bank}}" style="height:24px; font-size:12px; border-color:#0056b3; text-align:right; padding-right:5px;"/></div>
+
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">머리색</label><input type="text" name="system.profile.hairColor" value="{{system.profile.hairColor}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">눈색</label><input type="text" name="system.profile.eyeColor" value="{{system.profile.eyeColor}}" style="height:24px; font-size:12px;"/></div>
+        <div><label style="font-size:11px; color:#666; font-weight:bold;">피부색</label><input type="text" name="system.profile.skinColor" value="{{system.profile.skinColor}}" style="height:24px; font-size:12px;"/></div>
+        
+        <div>
+          <label style="font-size:11px; color:#dc3545; font-weight:bold;">유지비</label>
+<input type="text" class="readonly-comma" value="{{totalMaintenanceCost}}" style="height:24px; font-size:12px; border:1px solid #dc3545; background-color:#f4f4f4; text-align:center; font-weight:bold; pointer-events:none;" readonly title="생활 랭크, 주거, 차량, 커넥션 등의 유지비 합산 (자동 계산)"/>
+        </div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
             
-            <div class="profile-field"><label>성별</label><input type="text" name="system.profile.gender" value="{{system.profile.gender}}"/></div>
-            <div class="profile-field"><label>혈액형</label><input type="text" name="system.profile.bloodType" value="{{system.profile.bloodType}}"/></div>
-            
-            <div class="profile-field"><label>나이</label><input type="text" name="system.profile.age" value="{{system.profile.age}}"/></div>
-            <div class="profile-field"><label>눈색</label><input type="text" name="system.profile.eyeColor" value="{{system.profile.eyeColor}}"/></div>
-            
-            <div class="profile-field"><label>체중</label><input type="text" name="system.profile.weight" value="{{system.profile.weight}}"/></div>
-            <div class="profile-field"><label>머리색</label><input type="text" name="system.profile.hairColor" value="{{system.profile.hairColor}}"/></div>
-            
-            <div class="profile-field"><label>신장</label><input type="text" name="system.profile.height" value="{{system.profile.height}}"/></div>
-            <div class="profile-field"><label>피부색</label><input type="text" name="system.profile.skinColor" value="{{system.profile.skinColor}}"/></div>
-            
-            <div class="profile-field"><label>유지비</label><input type="text" class="readonly-comma" value="{{totalMaintenanceCost}}" style="font-size:12px; color:#dc3545; border:1px solid #a5a5a5; border-radius: 4px; background-color:#ffffff00; text-align:center; font-weight:bold; pointer-events:none;"/></div>
+            <div>
+              <label style="font-size:11px; color:#666; font-weight:bold;">경력 (최대 5개 / 클릭하여 선택)</label>
+              <div style="display:flex; flex-direction:column; gap:5px; margin-top:4px;">
+                {{#each system.profile.careers as |career slotId|}}
+                  <div class="career-slot" data-slot="{{slotId}}" style="flex:1; min-height:30px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:row; justify-content:space-between; align-items:center; cursor:pointer; background:#f9f9f9; position:relative; padding:0 10px;">
+                    {{#if career.name}}
+                      <div style="font-weight:bold; font-size:11px; color:#222; text-align:left;">
+                        {{lookup (lookup @root.careerDisplay slotId) 'label'}}
+                      </div>
+                      <div style="font-size:10px; color:#0056b3; line-height:1.2; text-align:right; margin-right:15px;">
+                        {{lookup (lookup @root.careerDisplay slotId) 'skill1'}} / {{lookup (lookup @root.careerDisplay slotId) 'skill2'}}
+                      </div>
+                      <a class="reset-career" data-slot="{{slotId}}" style="position:absolute; top:50%; right:8px; transform:translateY(-50%); font-size:11px; color:#dc3545; z-index:10;" title="경력 초기화"><i class="fas fa-trash"></i></a>
+                    {{else}}
+                      <div style="font-size:11px; color:#999; width:100%; text-align:center;"><i class="fas fa-plus"></i> 추가</div>
+                    {{/if}}
+                  </div>
+                {{/each}}
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:11px; color:#666; font-weight:bold;">보너스 스킬 (3개 선택 / 클릭하여 추가)</label>
+              <div class="bonus-skill-slot" style="margin-top:4px; height:40px; border:1px dashed #999; border-radius:4px; display:flex; flex-direction:column; justify-content:center; align-items:center; cursor:pointer; background:#f9f9f9; position:relative;">
+                {{#if system.profile.bonusSkills.skill1}}
+                  <div style="font-weight:bold; font-size:11px; color:#0056b3; text-align:center;">
+                    {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill1}}, 
+                    {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill2}}, 
+                    {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill3}}
+                  </div>
+                  <a class="reset-bonus-skills" style="position:absolute; top:2px; right:4px; font-size:10px; color:#dc3545; z-index:10;" title="보너스 스킬 초기화"><i class="fas fa-trash"></i></a>
+                {{else}}
+                  <div style="font-size:11px; color:#999;"><i class="fas fa-plus"></i> 보너스 스킬 선택</div>
+                {{/if}}
+              </div>
+            </div>
+
           </div>
         </div>
-
-        <div class="profile-section profile-right-section">
+                
+        <div style="grid-column: span 4; margin-top: 10px; display: grid; grid-template-columns: 7fr 3fr; gap: 15px;">
+          
+          <div style="display:flex; flex-direction:column; gap:10px;">
             
-            <h2 class="section-title">경력 및 스킬</h2>
-            
-            <div class="career-bonus-container">
+            <div style="margin-top:15px; margin-bottom:15px;">
+        <label style="font-size:12px; font-weight:bold; color:#17a2b8; display:block; margin-bottom:8px; border-bottom:1px solid #ccc; padding-bottom:3px;">
+          <i class="fas fa-coffee"></i> 여가 행동 (Leisure Actions) 장착 슬롯
+        </label>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+          {{#each system.profile.leisures as |leisure slotId|}}
+            <div class="leisure-slot" data-slot="{{slotId}}" style="min-height:60px; border:1px dashed #17a2b8; border-radius:4px; display:flex; flex-direction:column; padding:6px 10px; cursor:pointer; background:#f4fbfc; position:relative;">
               
-              <div class="career-group">
-                <label class="group-label">경력 (최대 5개 / 클릭하여 선택)</label>
-                <div class="career-list">
-                  {{#each system.profile.careers as |career slotId|}}
-                    <div class="career-slot" data-slot="{{slotId}}">
-                      {{#if career.name}}
-                        <div class="career-name">
-                          {{lookup (lookup @root.careerDisplay slotId) 'label'}}
-                        </div>
-                        <div class="career-skills">
-                          {{lookup (lookup @root.careerDisplay slotId) 'skill1'}} / {{lookup (lookup @root.careerDisplay slotId) 'skill2'}}
-                        </div>
-                        <a class="reset-career" data-slot="{{slotId}}" title="경력 초기화"><i class="fas fa-trash"></i></a>
-                      {{else}}
-                        <div class="career-empty"><i class="fas fa-plus"></i> 추가</div>
-                      {{/if}}
-                    </div>
-                  {{/each}}
+              {{#if leisure.name}}
+                <div style="font-weight:bold; font-size:13px; color:#0056b3; text-align:center; margin-bottom:4px; border-bottom:1px solid #cce5ff; padding-bottom:4px;">
+                  {{leisure.name}}
                 </div>
-              </div>
-
-              <div class="bonus-group">
-                <label class="group-label">보너스 스킬 (3개 선택 / 클릭하여 추가)</label>
-                <div class="bonus-skill-slot">
-                  {{#if system.profile.bonusSkills.skill1}}
-                    <div class="bonus-skills-text">
-                      {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill1}}, 
-                      {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill2}}, 
-                      {{lookup @root.gundogSkillNames system.profile.bonusSkills.skill3}}
-                    </div>
-                    <a class="reset-bonus-skills" title="보너스 스킬 초기화"><i class="fas fa-trash"></i></a>
-                  {{else}}
-                    <div class="bonus-empty"><i class="fas fa-plus"></i> 보너스 스킬 선택</div>
-                  {{/if}}
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; text-align:center; font-size:11px; font-weight:bold; color:#dc3545; margin-bottom:4px;">
+                  <div>유지비: {{leisure.maintenanceCost}}G</div>
+                  <div style="border-left:1px solid #cce5ff;">여가 슬롯: {{leisure.leisureSlot}}</div>
                 </div>
-              </div>
+                
+                <div style="font-size:10px; color:#555; line-height:1.2; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;" title="{{leisure.effect}}">
+                  {{leisure.effect}}
+                </div>
+                
+                <a class="remove-leisure" data-slot="{{slotId}}" style="position:absolute; top:6px; right:6px; font-size:11px; color:#dc3545; z-index:10; background:#f4fbfc;" title="여가 행동 해제"><i class="fas fa-times-circle"></i></a>
+              
+              {{else}}
+                <div style="font-size:11px; color:#17a2b8; width:100%; height:100%; display:flex; justify-content:center; align-items:center;">
+                  <span><i class="fas fa-plus"></i> 여가 슬롯 {{slotId}}</span>
+                </div>
+              {{/if}}
 
             </div>
-          </div>
-                </div>
-        <hr class="section-divider">
-
-        <div class="profile-bottom-layout">
-          
-          <div class="profile-section" style="padding: 15px;">
-            <h2 class="section-title"><i class="fas fa-coffee" style="color:#17a2b8;"></i> 여가 행동</h2>
-            
-            <div class="leisure-grid">
-              {{#each system.profile.leisures as |leisure slotId|}}
-                <div class="leisure-slot" data-slot="{{slotId}}">
-                  {{#if leisure.name}}
-                    <div class="leisure-name">{{leisure.name}}</div>
-                    <div class="leisure-stats">
-                      <div>유지비: {{leisure.maintenanceCost}}G</div>
-                      <div>여가 슬롯: {{leisure.leisureSlot}}</div>
-                    </div>
-                    <div class="leisure-effect" title="{{leisure.effect}}">{{leisure.effect}}</div>
-                    <a class="remove-leisure" data-slot="{{slotId}}" title="여가 행동 해제"><i class="fas fa-times-circle"></i></a>
-                  {{else}}
-                    <div class="leisure-empty"><i class="fas fa-plus"></i>&nbsp;여가 슬롯 {{slotId}}</div>
-                  {{/if}}
-                </div>
-              {{/each}}
-            </div>
-          </div>
-
-          <div class="bt-container">
-            
-            <div class="profile-section" style="padding: 10px 15px; display: flex; flex-direction: column; flex: 1;">
-              <h2 class="section-title" style="margin-bottom: 8px;">신념</h2>
-              <div class="bt-list">
-                {{#each beliefs as |item|}}
-                <div class="item flexrow bt-item" data-item-id="{{item._id}}">
-                  <div class="bt-header">
-                    <span class="item-name item-edit bt-name" title="[상세 설정] {{item.system.details}}">{{item.name}}</span>
-                    <div class="bt-controls">
-                      <a class="item-edit" title="수정"><i class="fas fa-edit"></i></a>
-                      <a class="item-delete" title="삭제"><i class="fas fa-trash"></i></a>
-                    </div>
-                  </div>
-                  {{#if item.system.description}}
-                  <div class="bt-desc">{{item.system.description}}</div>
-                  {{/if}}
-                </div>
-                {{/each}}
-                {{#unless beliefs}}<div class="bt-empty">드래그하여 추가</div>{{/unless}}
-              </div>
-            </div>
-
-            <div class="profile-section" style="padding: 10px 15px; display: flex; flex-direction: column; flex: 1;">
-              <h2 class="section-title" style="margin-bottom: 8px;">특징</h2>
-              <div class="bt-list">
-                {{#each traits as |item|}}
-                <div class="item flexrow bt-item" data-item-id="{{item._id}}">
-                  <div class="bt-header">
-                    <span class="item-name item-edit bt-name" title="[상세 설정] {{item.system.details}}">{{item.name}}</span>
-                    <div class="bt-controls">
-                      <a class="item-edit" title="수정"><i class="fas fa-edit"></i></a>
-                      <a class="item-delete" title="삭제"><i class="fas fa-trash"></i></a>
-                    </div>
-                  </div>
-                  <div class="trait-stats">
-                    <div><span style="font-weight:bold; color:#17a2b8;">RP 수정:</span> {{item.system.rpModifier}}</div>
-                    <div><span style="font-weight:bold; color:#dc3545;">유지 코스트:</span> {{item.system.maintenanceCost}}</div>
-                  </div>
-                  {{#if item.system.description}}
-                  <div class="bt-desc trait">{{item.system.description}}</div>
-                  {{/if}}
-                </div>
-                {{/each}}
-                {{#unless traits}}<div class="bt-empty">드래그하여 추가</div>{{/unless}}
-              </div>
-            </div>
-
-          </div>
+          {{/each}}
         </div>
-        <div style="flex:1; display:flex; flex-direction:column;">
+      </div>
+      </div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            
+            <div style="flex:1; display:flex; flex-direction:column;">
+              <label style="font-size:11px; color:#666; font-weight:bold;">신념 (Beliefs)</label>
+              <div style="flex:1; display:flex; flex-direction:column; gap:4px; margin-top:4px; min-height:45px; overflow-y:auto; border:1px dashed #999; border-radius:4px; background:#f9f9f9; padding:4px;">
+                {{#each beliefs as |item|}}
+                <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; flex-direction:column; gap:2px; padding:4px 6px; border-bottom:1px solid #ddd; background:#fff; border-radius:3px; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+                  
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span class="item-name item-edit" style="font-weight:bold; font-size:15px; cursor:pointer; color:#0056b3; line-height:1;" title="[상세 설정] {{item.system.details}}">{{item.name}}</span>
+                    <div style="display:flex; gap:5px; flex-shrink:0;">
+                      <a class="item-edit" style="color:#666; cursor:pointer;" title="수정"><i class="fas fa-edit"></i></a>
+                      <a class="item-delete" style="color:#dc3545; cursor:pointer;" title="삭제"><i class="fas fa-trash"></i></a>
+                    </div>
+                  </div>
+
+                  {{#if item.system.description}}
+                  <div style="margin-top:2px; font-size:12px; color:#333; line-height:1.3; background:#f4f4f4; padding:4px; border-radius:2px; word-break:keep-all; white-space:pre-wrap; border-left:2px solid #0056b3; display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">{{item.system.description}}</div>
+                  {{/if}}
+
+                </div>
+                {{/each}}
+                {{#unless beliefs}}
+                  <div style="text-align:center; color:#aaa; font-size:10px; margin-top:10px;">드래그하여 추가</div>
+                {{/unless}}
+              </div>
+            </div>
+
+            <div style="flex:1; display:flex; flex-direction:column;">
               <label style="font-size:11px; color:#666; font-weight:bold;">특징 (Traits)</label>
               <div style="flex:1; display:flex; flex-direction:column; gap:4px; margin-top:4px; min-height:20px; overflow-y:auto; border:1px dashed #999; border-radius:4px; background:#f9f9f9; padding:4px;">
                 {{#each traits as |item|}}
@@ -322,8 +276,12 @@
                 {{/unless}}
               </div>
             </div>
-            
-            <div style="grid-column: span 4; margin-top:10px;">
+
+          </div>
+
+        </div>
+
+        <div style="grid-column: span 4; margin-top:10px;">
           <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">백 스토리 (Backstory)</label>
           <textarea name="system.profile.backstory" style="width:100%; height:120px; padding:8px; border:1px solid #ddd; border-radius:4px; background:#fafafa; resize:none; font-family:inherit; font-size:12px;">{{system.profile.backstory}}</textarea>
         </div>
@@ -332,8 +290,8 @@
           <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">기타 특이 사항 (Notes)</label>
           <textarea name="system.profile.notes" style="width:100%; height:80px; padding:8px; border:1px solid #ddd; border-radius:4px; background:#fafafa; resize:none; font-family:inherit; font-size:12px;">{{system.profile.notes}}</textarea>
         </div>
+
       </div>
-      </section>
 
     <div class="tab skills" data-group="primary" data-tab="skills">
       <div class="skills-container">
@@ -782,5 +740,12 @@
     </div>
   </section>
 
+  <nav class="sheet-tabs tabs" data-group="primary" style="flex: 0 0 28px; background: #2b2b2b; border: 1px solid #000; border-radius: 4px; display: flex; flex-direction: column; align-items: center; padding: 5px 0; height: fit-content; gap: 4px; margin-left: 10px;">
+    <a class="item" data-tab="profile" title="프로필"><i class="fas fa-id-card"></i></a>
+    <a class="item" data-tab="skills" title="스킬"><i class="fas fa-brain"></i></a>
+    <a class="item" data-tab="equipment" title="장비"><i class="fas fa-shield-alt"></i></a>
+    <a class="item" data-tab="items" title="아이템(가방)"><i class="fas fa-box-open"></i></a>
+    <a class="item" data-tab="class-arts" title="클래스 아츠"><i class="fas fa-star"></i></a>
+  </nav>
   </div>
 </form>

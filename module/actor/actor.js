@@ -154,7 +154,9 @@ export class GundogActor extends Actor {
     // [내구력 계산] (근력 + 체격) * 3 + (터프니스 갯수 * 5)
     let physicalTotal = system.capabilities.physical?.total || 0;
     let constitutionTotal = system.capabilities.constitution?.total || 0;
-    let toughnessArtsCount = 0; // TODO: 추후 클래스 아츠 구현 시 연동할 변수 공간
+    
+    // ★ 수정: 액터가 가진 아이템 중 타입이 'classarts'이고 이름에 '터프니스'가 포함된 아이템의 개수를 실시간으로 셉니다.
+    let toughnessArtsCount = this.items.filter(item => item.type === "classarts" && item.name.includes("터프니스")).length;
     
     system.profile.hp.max = ((physicalTotal + constitutionTotal) * 3) + (toughnessArtsCount * 5);
 
