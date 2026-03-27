@@ -139,6 +139,10 @@
     <a class="item" data-tab="equipment" title="장비"><i class="fas fa-shield-alt"></i></a>
     <a class="item" data-tab="items" title="아이템(가방)"><i class="fas fa-box-open"></i></a>
     <a class="item" data-tab="class-arts" title="클래스 아츠"><i class="fas fa-star"></i></a>
+
+    <a class="btn-open-smartphone" title="스마트폰 열기" style="margin-left: auto; padding: 0 15px; cursor: pointer; font-size: 20px; color: #3498db; transition: 0.2s;">
+          <i class="fas fa-mobile-alt"></i>
+        </a>
   </nav>
 
       <section class="sheet-body">
@@ -293,140 +297,116 @@
           </div>
         </div>
 
-            <div style="grid-column: span 4; margin-top:10px;">
-          <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">백 스토리 (Backstory)</label>
-          <textarea name="system.profile.backstory" style="width:100%; height:120px; padding:8px; border:1px solid #ddd; border-radius:4px; background:#fafafa; resize:none; font-family:inherit; font-size:12px;">{{system.profile.backstory}}</textarea>
+        <hr class="section-divider">
+
+            <div class="profile-text-group">
+          <label class="profile-text-label">백 스토리 (Backstory)</label>
+          <textarea class="profile-textarea backstory-input" name="system.profile.backstory">{{system.profile.backstory}}</textarea>
         </div>
 
-        <div style="grid-column: span 4; margin-top:5px;">
-          <label style="font-size:12px; color:#222; font-weight:bold; display:block; border-bottom:1px solid #ccc; padding-bottom:4px; margin-bottom:8px;">기타 특이 사항 (Notes)</label>
-          <textarea name="system.profile.notes" style="width:100%; height:80px; padding:8px; border:1px solid #ddd; border-radius:4px; background:#fafafa; resize:none; font-family:inherit; font-size:12px;">{{system.profile.notes}}</textarea>
+        <div class="profile-text-group notes-group">
+          <label class="profile-text-label">기타 특이 사항 (Notes)</label>
+          <textarea class="profile-textarea notes-input" name="system.profile.notes">{{system.profile.notes}}</textarea>
         </div>
       </div>
-      </section>
 
-    <div class="tab skills" data-group="primary" data-tab="skills">
+      <div class="tab skills" data-group="primary" data-tab="skills">
       <div class="skills-container">
         {{#each system.skills as |group groupKey|}}
-          <div class="skill-group" style="border:1px solid #ccc; margin-bottom: 10px; padding: 5px; background: #fff;">
+          <div class="skill-group">
             
-            <h3 style="background:#222; color:white; padding:3px 8px; margin: 0 0 8px 0; text-transform:uppercase; font-size:13px;">
-              {{lookup @root.gundogGroupNames groupKey}}
-            </h3>
+            <h3 class="skill-group-title">{{lookup @root.gundogGroupNames groupKey}}</h3>
             
-            <div class="skill-list" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+            <div class="skill-list">
               {{#each group as |skill skillKey|}}
-                <div class="skill-row" style="display:flex; gap: 4px; align-items: center; font-size: 11px; border: 1px solid #e0e0e0; padding: 2px 4px; border-radius: 3px;">
+                <div class="skill-row">
                   
-                  <div class="skill-name" style="flex:0 0 70px; font-weight:bold; overflow:hidden; text-overflow:ellipsis;" title="{{lookup @root.gundogSkillNames skillKey}}">
-                    {{lookup @root.gundogSkillNames skillKey}}
+                  <a class="skill-name roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}" title="클릭하여 판정 굴림">
+                    <span class="skill-bullet">•</span> <span class="s-name">{{lookup @root.gundogSkillNames skillKey}}</span>
+                  </a>
+                  
+                  <div class="skill-lv">
+                    <label>Lv</label>
+                    <input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.lv" value="{{skill.lv}}" data-dtype="Number" />
                   </div>
                   
-                  <div class="skill-lv" style="flex:1; text-align:center;"><label style="font-size:9px; color:#666; display:block;">Lv</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.lv" value="{{skill.lv}}" data-dtype="Number" style="height:20px; text-align:center;"/></div>
-                  <div class="skill-bonus" style="flex:1; text-align:center;"><label style="font-size:9px; color:#28a745; display:block;">(+)</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.bonus" value="{{skill.bonus}}" data-dtype="Number" style="height:20px; text-align:center; border: 1px solid #28a745;"/></div>
-                  <div class="skill-penalty" style="flex:1; text-align:center;"><label style="font-size:9px; color:#dc3545; display:block;">(-)</label><input type="text" name="system.skills.{{groupKey}}.{{skillKey}}.penalty" value="{{skill.penalty}}" data-dtype="Number" style="height:20px; text-align:center; border: 1px solid #dc3545;"/></div>
-                  <div class="skill-item-mod" style="flex:1; text-align:center;"><label style="font-size:9px; color:#17a2b8; display:block;">item</label><div style="font-weight:bold; color:#17a2b8; line-height:20px;">{{skill.itemMod}}</div></div>
-                  <div class="skill-target-value" style="flex:0 0 35px; text-align:center;"><label style="font-size:9px; display:block;">성공률</label><strong style="color:blue; font-size:13px;">{{skill.targetValue}}</strong></div>
+                  <div class="skill-item-mod" title="장비/아이템 수정치">
+                    <label>Item</label>
+                    <div class="mod-val">{{skill.itemMod}}</div>
+                  </div>
                   
-                  <button type="button" class="roll-skill" data-group="{{groupKey}}" data-skill="{{skillKey}}" style="flex:0 0 30px; height:24px; padding:0; cursor:pointer; font-size:10px;" title="판정"><i class="fas fa-dice-d10"></i></button>
-                
+                  <div class="skill-target-value">
+                    <label>성공률</label>
+                    <strong>{{skill.targetValue}}</strong>
+                  </div>
+                  
                 </div>
               {{/each}}
-            </div>
+              </div>
           </div>
         {{/each}}
       </div>
     </div>
 
-    <div class="tab equipment" data-group="primary" data-tab="equipment">
-      <div style="display:flex; gap:15px; margin-top:10px;">
 
-        <div style="flex:1; display:flex; flex-direction:column; gap:15px;">
+  <div class="tab equipment" data-group="primary" data-tab="equipment">
+      <div class="equip-layout">
+
+        <div class="equip-col">
           
-          <div class="weapon-equip-slot" data-slot="main" style="border:2px dashed #dc3545; padding:5px; background:#fffafb; border-radius:4px; min-height:80px;">
-            <h3 style="background:#dc3545; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">
-              <i class="fas fa-crosshairs"></i> 메인 무기 (Main Weapon)
-            </h3>
+          <div class="equip-slot equip-main weapon-equip-slot" data-slot="main">
+            <h3 class="equip-header"><i class="fas fa-crosshairs"></i> 메인 무기 (Main Weapon)</h3>
             
-            <div style="display:flex; align-items:center; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #dc3545; padding-bottom:6px; margin-bottom:2px;">
-              <div style="flex:2; padding-left:5px;">무기명</div>
-              <div style="flex:1; text-align:center;">신뢰성</div>
-              <div style="flex:1.5; text-align:center;">탄약</div>
-              <div style="flex:0 0 40px; text-align:center;">해제</div>
+            <div class="equip-table-header">
+              <div class="w-name">무기명</div><div class="w-stat">신뢰성</div><div class="w-ammo">탄약</div><div class="w-action">해제</div>
             </div>
 
             {{#each mainWeapons as |item|}}
-            <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; align-items:center; font-size:11px; border-bottom:1px solid #eee; padding:6px 0; min-height:28px; cursor:pointer;" title="더블클릭하여 상세 보기">
-              <div class="item-name" style="flex:2; padding-left:5px; font-weight:bold; color:#dc3545; line-height:1.2;">
-                {{item.name}}
-              </div>
-              <div style="flex:1; text-align:center; font-size:12px; font-weight:bold;">{{item.system.reliability}}</div>
-              <div style="flex:1.5; text-align:center; font-size:12px; font-weight:bold; color:#dc3545;">
-                {{item.system.ammo.value}} <span style="color:#666; font-size:10px;">/ {{item.finalMaxAmmo}}</span>
-              </div>
-              <div style="flex:0 0 40px; text-align:center;">
-                <a class="unequip-btn" data-item-id="{{item._id}}" title="해제" style="color:#dc3545;"><i class="fas fa-times-circle"></i></a>
-              </div>
+            <div class="item flexrow equip-item" data-item-id="{{item._id}}" title="더블클릭하여 상세 보기">
+              <div class="item-name w-name">{{item.name}}</div>
+              <div class="w-stat">{{item.system.reliability}}</div>
+              <div class="w-ammo">{{item.system.ammo.value}} <span>/ {{item.finalMaxAmmo}}</span></div>
+              <div class="w-action"><a class="unequip-btn" data-item-id="{{item._id}}" title="해제"><i class="fas fa-times-circle"></i></a></div>
             </div>
             {{else}}
-            <div style="text-align:center; color:#dc3545; font-size:11px; padding-top:10px; opacity:0.6;"><i class="fas fa-arrow-down"></i> 소지 무기를 이곳으로 드래그</div>
+            <div class="equip-empty"><i class="fas fa-arrow-down"></i> 소지 무기를 이곳으로 드래그</div>
             {{/each}}
           </div>
 
-          <div class="weapon-equip-slot" data-slot="sub" style="border:2px dashed #0056b3; padding:5px; background:#f4f8ff; border-radius:4px; min-height:80px;">
-            <h3 style="background:#0056b3; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">
-              <i class="fas fa-crosshairs"></i> 서브 무기 (Sub Weapon)
-            </h3>
+          <div class="equip-slot equip-sub weapon-equip-slot" data-slot="sub">
+            <h3 class="equip-header"><i class="fas fa-crosshairs"></i> 서브 무기 (Sub Weapon)</h3>
             
-            <div style="display:flex; align-items:center; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #0056b3; padding-bottom:6px; margin-bottom:2px;">
-              <div style="flex:2; padding-left:5px;">무기명</div>
-              <div style="flex:1; text-align:center;">신뢰성</div>
-              <div style="flex:1.5; text-align:center;">탄약</div>
-              <div style="flex:0 0 40px; text-align:center;">해제</div>
+            <div class="equip-table-header">
+              <div class="w-name">무기명</div><div class="w-stat">신뢰성</div><div class="w-ammo">탄약</div><div class="w-action">해제</div>
             </div>
 
             {{#each subWeapons as |item|}}
-            <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; align-items:center; font-size:11px; border-bottom:1px solid #eee; padding:6px 0; min-height:28px; cursor:pointer;" title="더블클릭하여 상세 보기">
-              <div class="item-name" style="flex:2; padding-left:5px; font-weight:bold; color:#0056b3; line-height:1.2;">
-                {{item.name}}
-              </div>
-              <div style="flex:1; text-align:center; font-size:12px; font-weight:bold;">{{item.system.reliability}}</div>
-              <div style="flex:1.5; text-align:center; font-size:12px; font-weight:bold; color:#0056b3;">
-                {{item.system.ammo.value}} <span style="color:#666; font-size:10px;">/ {{item.finalMaxAmmo}}</span>
-              </div>
-              <div style="flex:0 0 40px; text-align:center;">
-                <a class="unequip-btn" data-item-id="{{item._id}}" title="해제" style="color:#0056b3;"><i class="fas fa-times-circle"></i></a>
-              </div>
+            <div class="item flexrow equip-item" data-item-id="{{item._id}}" title="더블클릭하여 상세 보기">
+              <div class="item-name w-name">{{item.name}}</div>
+              <div class="w-stat">{{item.system.reliability}}</div>
+              <div class="w-ammo">{{item.system.ammo.value}} <span>/ {{item.finalMaxAmmo}}</span></div>
+              <div class="w-action"><a class="unequip-btn" data-item-id="{{item._id}}" title="해제"><i class="fas fa-times-circle"></i></a></div>
             </div>
             {{else}}
-            <div style="text-align:center; color:#0056b3; font-size:11px; padding-top:10px; opacity:0.6;"><i class="fas fa-arrow-down"></i> 소지 무기를 이곳으로 드래그</div>
+            <div class="equip-empty"><i class="fas fa-arrow-down"></i> 소지 무기를 이곳으로 드래그</div>
             {{/each}}
           </div>
 
-          <div style="border:1px solid #ccc; padding:5px; background:#fff; border-radius:4px;">
-            <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">
-              <i class="fas fa-toolbox"></i> 소지 무기 목록 <span style="font-size:10px; font-weight:normal; color:#ccc;">(드래그하여 장착)</span>
-            </h3>
+          <div class="equip-slot equip-inv">
+            <h3 class="equip-header"><i class="fas fa-toolbox"></i> 소지 무기 목록 <span style="font-size:10px; font-weight:normal; color:#aaa;">(드래그하여 장착)</span></h3>
             
-            <div style="display:flex; align-items:center; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #ccc; padding-bottom:6px; margin-bottom:2px;">
-              <div style="flex:2; padding-left:5px;">무기명</div>
-              <div style="flex:1; text-align:center;">신뢰성</div>
-              <div style="flex:1.5; text-align:center;">탄약</div>
-              <div style="flex:0 0 40px; text-align:center;">관리</div>
+            <div class="equip-table-header">
+              <div class="w-name">무기명</div><div class="w-stat">신뢰성</div><div class="w-ammo">탄약</div><div class="w-action">관리</div>
             </div>
 
             {{#each inventoryWeapons as |item|}}
-            <div class="item flexrow" data-item-id="{{item._id}}" draggable="true" style="display:flex; align-items:center; font-size:11px; border-bottom:1px solid #eee; padding:6px 0; min-height:28px; cursor:grab;" title="더블클릭하여 상세 보기">
-              <div class="item-name" style="flex:2; padding-left:5px; font-weight:bold; color:#333; line-height:1.2;">
-                {{item.name}}
-              </div>
-              <div style="flex:1; text-align:center; font-size:12px; font-weight:bold; color:#555;">{{item.system.reliability}}</div>
-              <div style="flex:1.5; text-align:center; font-size:12px; font-weight:bold; color:#555;">
-                {{item.system.ammo.value}} <span style="font-size:10px;">/ {{item.finalMaxAmmo}}</span>
-              </div>
-              <div style="flex:0 0 40px; text-align:center;">
-                <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
-                <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+            <div class="item flexrow equip-item" data-item-id="{{item._id}}" draggable="true" title="더블클릭하여 상세 보기">
+              <div class="item-name w-name">{{item.name}}</div>
+              <div class="w-stat">{{item.system.reliability}}</div>
+              <div class="w-ammo">{{item.system.ammo.value}} <span>/ {{item.finalMaxAmmo}}</span></div>
+              <div class="w-action">
+                <a class="item-edit" title="수정"><i class="fas fa-edit"></i></a>
+                <a class="item-delete" title="삭제"><i class="fas fa-trash"></i></a>
               </div>
             </div>
             {{/each}}
@@ -434,147 +414,121 @@
 
         </div>
 
-        <div style="flex:1; display:flex; flex-direction:column; gap:15px;">
+        <div class="equip-col">
           
-          <div class="armor-equip-slot" data-slot="head" style="border:2px dashed #28a745; padding:5px; background:#f4fdf6; border-radius:4px; min-height:80px;">
-            <h3 style="background:#28a745; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">
-              <i class="fas fa-hard-hat"></i> 머리 방어구 (Head)
-            </h3>
+          <div class="equip-slot equip-head armor-equip-slot" data-slot="head">
+            <h3 class="equip-header"><i class="fas fa-hard-hat"></i> 머리 방어구 (Head)</h3>
             
-            <div style="display:flex; align-items:center; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #28a745; padding-bottom:6px; margin-bottom:2px;">
-              <div style="flex:0 0 30px; text-align:center;">장착</div>
-              <div style="flex:2; padding-left:5px;">방어구명</div>
-              <div style="flex:1; text-align:center;">장갑치</div>
-              <div style="flex:1; text-align:center;">방어치</div>
-              <div style="flex:0 0 40px; text-align:center;">해제</div>
+            <div class="equip-table-header">
+              <div class="w-equip">장착</div><div class="w-name" style="padding-left:0;">방어구명</div><div class="w-stat">장갑치</div><div class="w-stat">방어치</div><div class="w-action">해제</div>
             </div>
             
             {{#each headArmors as |item|}}
-            <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; align-items:center; font-size:11px; border-bottom:1px solid #eee; padding:6px 0; min-height:28px; cursor:pointer;" title="더블클릭하여 상세 보기">
-              <div style="flex:0 0 30px; text-align:center;">
-                <a class="item-equip" style="color:{{#if item.system.equipped}}#28a745{{else}}#ccc{{/if}}; font-size:13px;">
+            <div class="item flexrow equip-item" data-item-id="{{item._id}}" title="더블클릭하여 상세 보기">
+              <div class="w-equip">
+                <a class="item-equip {{#if item.system.equipped}}is-equipped{{/if}}">
                   <i class="{{#if item.system.equipped}}fas fa-check-square{{else}}far fa-square{{/if}}"></i>
                 </a>
               </div>
-              <div class="item-name" style="flex:2; padding-left:5px; font-weight:bold; color:#28a745; line-height:1.2;">
-                {{item.name}}
-              </div>
-              <div style="flex:1; text-align:center; font-size:12px; color:#d9534f; font-weight:bold;">{{item.system.armorValue}}</div>
-              <div style="flex:1; text-align:center; font-size:12px; color:#0056b3; font-weight:bold;">{{item.system.defense}}</div>
-              <div style="flex:0 0 40px; text-align:center;">
-                <a class="unequip-armor-btn" data-item-id="{{item._id}}" title="해제" style="color:#28a745;"><i class="fas fa-times-circle"></i></a>
-              </div>
+              <div class="item-name w-name" style="padding-left:0;">{{item.name}}</div>
+              <div class="w-stat stat-armor">{{item.system.armorValue}}</div>
+              <div class="w-stat stat-defense">{{item.system.defense}}</div>
+              <div class="w-action"><a class="unequip-armor-btn" data-item-id="{{item._id}}" title="해제"><i class="fas fa-times-circle"></i></a></div>
             </div>
             {{else}}
-            <div style="text-align:center; color:#28a745; font-size:11px; padding-top:10px; opacity:0.6;"><i class="fas fa-arrow-down"></i> 소지 방어구를 이곳으로 드래그</div>
+            <div class="equip-empty"><i class="fas fa-arrow-down"></i> 소지 방어구를 이곳으로 드래그</div>
             {{/each}}
           </div>
 
-          <div class="armor-equip-slot" data-slot="body" style="border:2px dashed #20c997; padding:5px; background:#f2fcf9; border-radius:4px; min-height:80px;">
-            <h3 style="background:#20c997; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">
-              <i class="fas fa-shield-alt"></i> 몸통 방어구 (Body)
-            </h3>
+          <div class="equip-slot equip-body armor-equip-slot" data-slot="body">
+            <h3 class="equip-header"><i class="fas fa-shield-alt"></i> 몸통 방어구 (Body)</h3>
             
-            <div style="display:flex; align-items:center; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #20c997; padding-bottom:6px; margin-bottom:2px;">
-              <div style="flex:0 0 30px; text-align:center;">장착</div>
-              <div style="flex:2; padding-left:5px;">방어구명</div>
-              <div style="flex:1; text-align:center;">장갑치</div>
-              <div style="flex:1; text-align:center;">방어치</div>
-              <div style="flex:0 0 40px; text-align:center;">해제</div>
+            <div class="equip-table-header">
+              <div class="w-equip">장착</div><div class="w-name" style="padding-left:0;">방어구명</div><div class="w-stat">장갑치</div><div class="w-stat">방어치</div><div class="w-action">해제</div>
             </div>
             
             {{#each bodyArmors as |item|}}
-            <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; align-items:center; font-size:11px; border-bottom:1px solid #eee; padding:6px 0; min-height:28px; cursor:pointer;" title="더블클릭하여 상세 보기">
-              <div style="flex:0 0 30px; text-align:center;">
-                <a class="item-equip" style="color:{{#if item.system.equipped}}#20c997{{else}}#ccc{{/if}}; font-size:13px;">
+            <div class="item flexrow equip-item" data-item-id="{{item._id}}" title="더블클릭하여 상세 보기">
+              <div class="w-equip">
+                <a class="item-equip {{#if item.system.equipped}}is-equipped{{/if}}">
                   <i class="{{#if item.system.equipped}}fas fa-check-square{{else}}far fa-square{{/if}}"></i>
                 </a>
               </div>
-              <div class="item-name" style="flex:2; padding-left:5px; font-weight:bold; color:#20c997; line-height:1.2;">
-                {{item.name}}
-              </div>
-              <div style="flex:1; text-align:center; font-size:12px; color:#d9534f; font-weight:bold;">{{item.system.armorValue}}</div>
-              <div style="flex:1; text-align:center; font-size:12px; color:#0056b3; font-weight:bold;">{{item.system.defense}}</div>
-              <div style="flex:0 0 40px; text-align:center;">
-                <a class="unequip-armor-btn" data-item-id="{{item._id}}" title="해제" style="color:#20c997;"><i class="fas fa-times-circle"></i></a>
-              </div>
+              <div class="item-name w-name" style="padding-left:0;">{{item.name}}</div>
+              <div class="w-stat stat-armor">{{item.system.armorValue}}</div>
+              <div class="w-stat stat-defense">{{item.system.defense}}</div>
+              <div class="w-action"><a class="unequip-armor-btn" data-item-id="{{item._id}}" title="해제"><i class="fas fa-times-circle"></i></a></div>
             </div>
             {{else}}
-            <div style="text-align:center; color:#20c997; font-size:11px; padding-top:10px; opacity:0.6;"><i class="fas fa-arrow-down"></i> 소지 방어구를 이곳으로 드래그</div>
+            <div class="equip-empty"><i class="fas fa-arrow-down"></i> 소지 방어구를 이곳으로 드래그</div>
             {{/each}}
           </div>
 
-          <div style="border:1px solid #ccc; padding:5px; background:#fff; border-radius:4px;">
-            <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 8px 0; font-size:12px;">
-              <i class="fas fa-toolbox"></i> 소지 방어구 목록 <span style="font-size:10px; font-weight:normal; color:#ccc;">(드래그하여 장착)</span>
-            </h3>
+          <div class="equip-slot equip-inv">
+            <h3 class="equip-header"><i class="fas fa-toolbox"></i> 소지 방어구 목록 <span style="font-size:10px; font-weight:normal; color:#aaa;">(드래그하여 장착)</span></h3>
             
-            <div style="display:flex; align-items:center; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #ccc; padding-bottom:6px; margin-bottom:2px;">
-              <div style="flex:2; padding-left:5px;">방어구명</div>
-              <div style="flex:1; text-align:center;">장갑치</div>
-              <div style="flex:1; text-align:center;">방어치</div>
-              <div style="flex:0 0 40px; text-align:center;">관리</div>
+            <div class="equip-table-header">
+              <div class="w-name">방어구명</div><div class="w-stat">장갑치</div><div class="w-stat">방어치</div><div class="w-action">관리</div>
             </div>
             
             {{#each inventoryArmors as |item|}}
-            <div class="item flexrow" data-item-id="{{item._id}}" draggable="true" style="display:flex; align-items:center; font-size:11px; border-bottom:1px solid #eee; padding:6px 0; min-height:28px; cursor:grab;" title="더블클릭하여 상세 보기">
-              <div class="item-name" style="flex:2; padding-left:5px; font-weight:bold; color:#333; line-height:1.2;">
-                {{item.name}}
-              </div>
-              <div style="flex:1; text-align:center; font-size:12px; color:#d9534f; font-weight:bold;">{{item.system.armorValue}}</div>
-              <div style="flex:1; text-align:center; font-size:12px; color:#0056b3; font-weight:bold;">{{item.system.defense}}</div>
-              <div style="flex:0 0 40px; text-align:center;">
-                <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
-                <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+            <div class="item flexrow equip-item" data-item-id="{{item._id}}" draggable="true" title="더블클릭하여 상세 보기">
+              <div class="item-name w-name">{{item.name}}</div>
+              <div class="w-stat stat-armor">{{item.system.armorValue}}</div>
+              <div class="w-stat stat-defense">{{item.system.defense}}</div>
+              <div class="w-action">
+                <a class="item-edit" title="수정"><i class="fas fa-edit"></i></a>
+                <a class="item-delete" title="삭제"><i class="fas fa-trash"></i></a>
               </div>
             </div>
             {{/each}}
           </div>
-        </div>
 
         </div>
+
       </div>
+    </div>
     
-    <div class="tab items" data-group="primary" data-tab="items" style="padding:10px;">
+    <div class="tab items" data-group="primary" data-tab="items">
       
-      <div style="display:flex; gap:15px; align-items:flex-start;">
+      <div class="item-top-layout">
         
-        <div style="flex: 0 0 440px; display:flex; flex-direction:column; gap:20px;">
+        <div class="item-grid-section">
           
           <div>
-            <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 10px 0; font-size:13px;">CP 관리표 (10 x 10)</h3>
+            <h3>CP 관리표 (10 x 10)</h3>
             
-            <div style="display:flex; margin-left:40px; margin-bottom:5px; align-items:center;">
-              <div style="font-size:12px; font-weight:bold; color:#0056b3; margin-right:5px;">→ 크기(체격) 한계:</div>
-              <input type="number" name="system.profile.inventoryMax.x" data-field="system.profile.inventoryMax.x" value="{{#if system.profile.inventoryMax.x}}{{system.profile.inventoryMax.x}}{{else}}10{{/if}}" data-dtype="Number" class="sync-input" style="width:40px; height:20px; text-align:center; font-weight:bold; border:1px solid #0056b3; border-radius:3px; background:#e8f4ff; color:#0056b3;"/>
+            <div class="cp-controls">
+              <label>→ 크기(체격) 한계:</label>
+              <input type="number" name="system.profile.inventoryMax.x" data-field="system.profile.inventoryMax.x" value="{{#if system.profile.inventoryMax.x}}{{system.profile.inventoryMax.x}}{{else}}10{{/if}}" data-dtype="Number" class="sync-input" />
             </div>
             
-            <div style="display:flex; margin-left:40px; height:15px; margin-bottom:2px;">
-              <div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">1</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">2</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">3</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">4</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">5</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">6</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">7</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">8</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">9</div><div style="width:40px; text-align:center; font-size:11px; color:#555; font-weight:bold;">10</div>
+            <div class="grid-ruler-x">
+              <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
             </div>
 
-            <div style="display:flex;">
-              <div style="width:40px; display:flex; position:relative;">
-                <div style="position:absolute; left:0; top:0; display:flex; flex-direction:column; align-items:center;">
-                  <div style="writing-mode: vertical-rl; font-size:12px; font-weight:bold; color:#d9534f; letter-spacing: 2px;">↓ 무게(근력)</div>
-                  <input type="number" name="system.profile.inventoryMax.y" data-field="system.profile.inventoryMax.y" value="{{#if system.profile.inventoryMax.y}}{{system.profile.inventoryMax.y}}{{else}}10{{/if}}" data-dtype="Number" class="sync-input" style="width:26px; height:20px; text-align:center; font-size:11px; font-weight:bold; border:1px solid #d9534f; border-radius:3px; margin-top:5px; margin-left:5px; padding:0; background:#fff4f4; color:#d9534f;"/>
+            <div class="grid-layout-main">
+              <div class="grid-ruler-y-container">
+                <div class="grid-ruler-y-label">
+                  <span>↓ 무게(근력)</span>
+                  <input type="number" name="system.profile.inventoryMax.y" data-field="system.profile.inventoryMax.y" value="{{#if system.profile.inventoryMax.y}}{{system.profile.inventoryMax.y}}{{else}}10{{/if}}" data-dtype="Number" class="sync-input" />
                 </div>
-                <div style="margin-left:20px; display:flex; flex-direction:column; width:20px;">
-                  <div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">1</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">2</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">3</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">4</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">5</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">6</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">7</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">8</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">9</div><div style="height:40px; display:flex; align-items:center; justify-content:center; font-size:11px; color:#555; font-weight:bold;">10</div>
+                <div class="grid-ruler-y-numbers">
+                  <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
                 </div>
               </div>
 
-              <div class="cp-grid-wrapper" style="position:relative; width:400px; height:400px; background:#e8e8e8; border:2px solid #555; box-shadow:inset 0 0 10px rgba(0,0,0,0.1); flex-shrink:0;">
-                <div style="display:grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); width:100%; height:100%; position:absolute; top:0; left:0; pointer-events:none;">
+              <div class="grid-wrapper cp-grid-wrapper">
+                <div class="grid-bg cp-grid-bg">
                   {{#each gridCells}}
-                    <div style="border-right:1px solid #ccc; border-bottom:1px solid #ccc; box-sizing:border-box; background:{{#if isActive}}transparent{{else}}rgba(0, 0, 0, 0.6){{/if}};"></div>
+                    <div class="grid-cell" style="background:{{#if isActive}}transparent{{else}}rgba(0, 0, 0, 0.6){{/if}};"></div>
                   {{/each}}
                 </div>
                 
                 {{#each gridItems}}
-                  <div class="cp-grid-item" data-item-id="{{id}}" draggable="true" style="position:absolute; left:{{left}}px; top:{{top}}px; width:{{w}}px; height:{{h}}px; background:rgba(0, 86, 179, 0.85); border:1px solid #002752; color:white; font-size:10px; font-weight:bold; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:grab; overflow:hidden; box-shadow:2px 2px 5px rgba(0,0,0,0.4); z-index:10; user-select:none;">
-                    {{#if isWearable}}{{#if (eq type "attachment")}}<div style="color:#a2f1ff; font-size:9px; margin-bottom:2px;"><i class="fas fa-link"></i> 부착됨</div>{{/if}}{{/if}}
-                    <div style="word-break:keep-all; font-size:16px;">{{gridLabel}}</div>
+                  <div class="cp-grid-item grid-item-block cp-item" data-item-id="{{id}}" draggable="true" style="left:{{left}}px; top:{{top}}px; width:{{w}}px; height:{{h}}px;">
+                    {{#if isWearable}}{{#if (eq type "attachment")}}<div class="grid-item-attach"><i class="fas fa-link"></i> 부착됨</div>{{/if}}{{/if}}
+                    <div class="grid-item-name">{{gridLabel}}</div>
                   </div>
                 {{/each}}
               </div>
@@ -582,122 +536,97 @@
           </div>
 
           <div>
-            <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 10px 0; font-size:13px;">가방 (Bag) 4 x 4</h3>
-            <div style="margin-left:60px; display:flex;">
-              <div class="bag-grid-wrapper" style="position:relative; width:160px; height:160px; background:#e8e8e8; border:2px solid #555; box-shadow:inset 0 0 10px rgba(0,0,0,0.1); flex-shrink:0;">
-                <div style="display:grid; grid-template-columns: repeat(4, 40px); grid-template-rows: repeat(4, 40px); width:100%; height:100%; position:absolute; top:0; left:0; pointer-events:none;">
-                  {{#each bagGridCells}}
-                    <div style="border-right:1px solid #ccc; border-bottom:1px solid #ccc; box-sizing:border-box; background:transparent;"></div>
-                  {{/each}}
-                </div>
-                
-                {{#each bagGridItems}}
-                  <div class="cp-grid-item" data-item-id="{{id}}" draggable="true" style="position:absolute; left:{{left}}px; top:{{top}}px; width:{{w}}px; height:{{h}}px; background:rgba(40, 167, 69, 0.85); border:1px solid #1e7e34; color:white; font-size:10px; font-weight:bold; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:grab; overflow:hidden; box-shadow:2px 2px 5px rgba(0,0,0,0.4); z-index:10; user-select:none;">
-                    {{#if isWearable}}{{#if (eq type "attachment")}}<div style="color:#a2f1ff; font-size:9px; margin-bottom:2px;"><i class="fas fa-link"></i> 부착됨</div>{{/if}}{{/if}}
-                    <div style="word-break:keep-all; font-size:16px;">{{gridLabel}}</div>
-                  </div>
+            <h3>가방 (Bag) 4 x 4</h3>
+            <div class="grid-wrapper bag-grid-wrapper">
+              <div class="grid-bg bag-grid-bg">
+                {{#each bagGridCells}}
+                  <div class="grid-cell" style="background:transparent;"></div>
                 {{/each}}
               </div>
+              
+              {{#each bagGridItems}}
+                <div class="cp-grid-item grid-item-block bag-item" data-item-id="{{id}}" draggable="true" style="left:{{left}}px; top:{{top}}px; width:{{w}}px; height:{{h}}px;">
+                  {{#if isWearable}}{{#if (eq type "attachment")}}<div class="grid-item-attach"><i class="fas fa-link"></i> 부착됨</div>{{/if}}{{/if}}
+                  <div class="grid-item-name">{{gridLabel}}</div>
+                </div>
+              {{/each}}
             </div>
           </div>
 
         </div>
 
-        <div style="flex:1; height:650px;">
-          
-          <div class="unplaced-item-list" style="height:100%; border:2px dashed #999; padding:10px; background:#fafafa; border-radius:4px; overflow-y:auto; position:relative; box-sizing:border-box;">
-            <h4 style="margin:0 0 10px 0; color:#0056b3; border-bottom:1px solid #0056b3; padding-bottom:5px;"><i class="fas fa-box-open"></i> 보유중인 아이템</h4>
-            {{#each unplacedItems}}
-              <div class="unplaced-item" data-item-id="{{id}}" draggable="true" style="border:1px solid #ccc; background:#fff; padding:6px; margin-bottom:6px; border-radius:3px; cursor:grab; display:flex; justify-content:space-between; align-items:center; box-shadow:1px 1px 3px rgba(0,0,0,0.1);">
-                
-                <div style="display:flex; align-items:center; gap:8px; overflow:hidden;">
-                  <span style="font-weight:bold; font-size:12px; color:#fff; background:#0056b3; width:20px; height:20px; display:flex; align-items:center; justify-content:center; border-radius:3px; flex-shrink:0;">{{gridLabel}}</span>
-                  
-                  <span style="font-weight:bold; color:#333; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{name}}">
-                    {{#if isWearable}}{{#if (eq type "attachment")}}<i class="fas fa-link" style="color:#17a2b8; margin-right:4px;" title="무기에 부착됨"></i>{{else}}<i class="fas fa-tshirt" style="color:#28a745; margin-right:4px;" title="착용 아이템"></i>{{/if}}{{/if}}
-                    {{name}}
-                  </span>
-                </div>
-                
-                <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
-                  <span style="font-size:11px; color:#fff; background:{{#if isWearable}}{{#if (eq type "attachment")}}#17a2b8{{else}}#28a745{{/if}}{{else}}{{#if isPlaced}}{{#if (eq gType "bag")}}#28a745{{else}}#0056b3{{/if}}{{else}}#555{{/if}}{{/if}}; padding:2px 6px; border-radius:10px;">
-                    {{#if isWearable}}
-                      {{#if (eq type "attachment")}}부착됨{{else}}착용중{{/if}}
-                    {{else}}
-                      {{#if isPlaced}}{{#if (eq gType "bag")}}가방{{else}}배치됨{{/if}}{{else}}{{portX}} x {{portY}}{{/if}}
-                    {{/if}}
-                  </span>
-                  <a class="unplaced-item-delete" style="color:#dc3545; cursor:pointer;" title="영구 삭제"><i class="fas fa-trash"></i></a>
-                </div>
-
+        <div class="unplaced-list-container">
+          <h4 class="unplaced-title"><i class="fas fa-box-open"></i> 보유중인 아이템</h4>
+          {{#each unplacedItems}}
+            <div class="unplaced-item" data-item-id="{{id}}" draggable="true">
+              
+              <div class="unplaced-item-left">
+                <span class="unplaced-size-badge">{{gridLabel}}</span>
+                <span class="unplaced-name" title="{{name}}">
+                  {{#if isWearable}}{{#if (eq type "attachment")}}<i class="fas fa-link" style="color:#17a2b8; margin-right:4px;" title="무기에 부착됨"></i>{{else}}<i class="fas fa-tshirt" style="color:#28a745; margin-right:4px;" title="착용 아이템"></i>{{/if}}{{/if}}
+                  {{name}}
+                </span>
               </div>
-            {{/each}}
-            {{#unless unplacedItems}}
-              <div style="text-align:center; color:#aaa; font-size:12px; margin-top:20px;">보유중인 아이템이 없습니다.</div>
-            {{/unless}}
-          </div>
-          
+              
+              <div class="unplaced-controls">
+                <span class="unplaced-status-badge" style="background:{{#if isWearable}}{{#if (eq type "attachment")}}#17a2b8{{else}}#28a745{{/if}}{{else}}{{#if isPlaced}}{{#if (eq gType "bag")}}#28a745{{else}}#0056b3{{/if}}{{else}}#555{{/if}}{{/if}};">
+                  {{#if isWearable}}
+                    {{#if (eq type "attachment")}}부착됨{{else}}착용중{{/if}}
+                  {{else}}
+                    {{#if isPlaced}}{{#if (eq gType "bag")}}가방{{else}}배치됨{{/if}}{{else}}{{portX}} x {{portY}}{{/if}}
+                  {{/if}}
+                </span>
+                <a class="unplaced-item-delete" title="영구 삭제"><i class="fas fa-trash"></i></a>
+              </div>
+
+            </div>
+          {{/each}}
+          {{#unless unplacedItems}}
+            <div class="b-empty">보유중인 아이템이 없습니다.</div>
+          {{/unless}}
         </div>
+
       </div>
 
-      <div style="display:flex; gap:15px; margin-top:15px;">
+      <div class="item-bottom-layout">
         
-        <div style="flex:1; border:1px solid #ccc; background:#fff; border-radius:4px; padding:10px;">
-          <h4 style="margin:0 0 10px 0; color:#dc3545; border-bottom:1px solid #dc3545; padding-bottom:5px;">
-            <i class="fas fa-home"></i> 유지비
-          </h4>
-          <div style="display:flex; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #eee; padding-bottom:4px; margin-bottom:4px;">
-            <div style="flex:2;">아이템명</div>
-            <div style="flex:1.5; text-align:center;">위치 (속성)</div>
-            <div style="flex:1; text-align:center;">유지비</div>
-            <div style="flex:0 0 40px; text-align:center;">관리</div>
+        <div class="bottom-box upkeep-box">
+          <h4><i class="fas fa-home"></i> 유지비</h4>
+          <div class="b-table-header">
+            <div style="flex:2;">아이템명</div><div style="flex:1.5; text-align:center;">위치 (속성)</div><div style="flex:1; text-align:center;">유지비</div><div style="flex:0 0 40px; text-align:center;">관리</div>
           </div>
           {{#each upkeepItems as |item|}}
-          <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; font-size:11px; align-items:center; border-bottom:1px solid #eee; padding:4px 0;">
-            <div class="item-name item-edit" style="flex:2; font-weight:bold; cursor:pointer; color:#0056b3;">{{item.name}}</div>
-            <div style="flex:1.5; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{item.system.location}}">{{item.system.location}}</div>
-            <div style="flex:1; text-align:center; color:#dc3545; font-weight:bold;">{{item.system.maintenanceCost}}</div>
-            <div style="flex:0 0 40px; text-align:center;">
-              <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
-              <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+          <div class="item flexrow b-table-row" data-item-id="{{item._id}}">
+            <div class="item-name item-edit b-name" style="flex:2;">{{item.name}}</div>
+            <div class="b-text" style="flex:1.5;" title="{{item.system.location}}">{{item.system.location}}</div>
+            <div class="b-cost" style="flex:1;">{{item.system.maintenanceCost}}</div>
+            <div class="b-action" style="flex:0 0 40px;">
+              <a class="item-edit" title="수정"><i class="fas fa-edit"></i></a>
+              <a class="item-delete" title="삭제"><i class="fas fa-trash"></i></a>
             </div>
           </div>
           {{/each}}
-          {{#unless upkeepItems}}
-            <div style="text-align:center; color:#aaa; font-size:11px; margin-top:10px;">등록된 유지비 항목이 없습니다.</div>
-          {{/unless}}
+          {{#unless upkeepItems}}<div class="b-empty">등록된 유지비 항목이 없습니다.</div>{{/unless}}
         </div>
 
-        <div style="flex:1; border:1px solid #ccc; background:#fff; border-radius:4px; padding:10px;">
-          <h4 style="margin:0 0 10px 0; color:#17a2b8; border-bottom:1px solid #17a2b8; padding-bottom:5px;">
-            <i class="fas fa-users"></i> 커넥션 (Connections)
-          </h4>
-          <div style="display:flex; font-weight:bold; font-size:10px; color:#666; border-bottom:1px solid #eee; padding-bottom:4px; margin-bottom:4px;">
-            <div style="flex:1.5;">커넥션명</div>
-            <div style="flex:1; text-align:center;">직업</div>
-            <div style="flex:1.5; text-align:center;">본거지</div>
-            <div style="flex:0.8; text-align:center;">유지비</div>
-            <div style="flex:0 0 40px; text-align:center;">관리</div>
+        <div class="bottom-box conn-box">
+          <h4><i class="fas fa-users"></i> 커넥션 (Connections)</h4>
+          <div class="b-table-header">
+            <div style="flex:1.5;">커넥션명</div><div style="flex:1; text-align:center;">직업</div><div style="flex:1.5; text-align:center;">본거지</div><div style="flex:0.8; text-align:center;">유지비</div><div style="flex:0 0 40px; text-align:center;">관리</div>
           </div>
           {{#each connections as |item|}}
-          <div class="item flexrow" data-item-id="{{item._id}}" style="display:flex; font-size:11px; align-items:center; border-bottom:1px solid #eee; padding:4px 0;">
-            <div class="item-name item-edit" style="flex:1.5; font-weight:bold; cursor:pointer; color:#0056b3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="{{item.name}}">{{item.name}}</div>
-            
-            <div style="flex:1; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#444;" title="{{item.system.job}}">{{item.system.job}}</div>
-            
-            <div style="flex:1.5; text-align:center; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#666;" title="{{item.system.base}}">{{item.system.base}}</div>
-            
-            <div style="flex:0.8; text-align:center; color:#dc3545; font-weight:bold;">{{item.system.maintenanceCost}}</div>
-            
-            <div style="flex:0 0 40px; text-align:center;">
-              <a class="item-edit" title="수정" style="color:#666; margin-right:4px;"><i class="fas fa-edit"></i></a>
-              <a class="item-delete" title="삭제" style="color:#dc3545;"><i class="fas fa-trash"></i></a>
+          <div class="item flexrow b-table-row" data-item-id="{{item._id}}">
+            <div class="item-name item-edit b-name" style="flex:1.5;" title="{{item.name}}">{{item.name}}</div>
+            <div class="b-text" style="flex:1;" title="{{item.system.job}}">{{item.system.job}}</div>
+            <div class="b-text" style="flex:1.5;" title="{{item.system.base}}">{{item.system.base}}</div>
+            <div class="b-cost" style="flex:0.8;">{{item.system.maintenanceCost}}</div>
+            <div class="b-action" style="flex:0 0 40px;">
+              <a class="item-edit" title="수정"><i class="fas fa-edit"></i></a>
+              <a class="item-delete" title="삭제"><i class="fas fa-trash"></i></a>
             </div>
           </div>
           {{/each}}
-          {{#unless connections}}
-            <div style="text-align:center; color:#aaa; font-size:11px; margin-top:10px;">등록된 커넥션이 없습니다.</div>
-          {{/unless}}
+          {{#unless connections}}<div class="b-empty">등록된 커넥션이 없습니다.</div>{{/unless}}
         </div>
 
       </div>
@@ -705,45 +634,59 @@
     </div>
 
     <div class="tab class-arts" data-group="primary" data-tab="class-arts">
-      <div style="padding:10px;">
-        <h3 style="background:#222; color:white; padding:4px 8px; margin:0 0 10px 0; font-size:13px; display:flex; justify-content:space-between; align-items:center;">
-          <span><i class="fas fa-bolt"></i> 클래스 아츠 (Class Arts)</span>
-          <span style="font-size:11px; font-weight:normal; color:#aaa;">※ 최대 8개 ※</span>
+      <div class="arts-container">
+        
+        <h3 class="arts-header">
+          <span><i class="fas fa-star" style="color:#fff; margin-right:5px;"></i> 클래스 아츠 (Class Arts)</span>
+          <span class="arts-header-limit">※ 최대 8개 ※</span>
         </h3>
         
-        <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="arts-list">
           {{#each classArts as |art|}}
-          <div class="item" data-item-id="{{art._id}}" style="border:1px solid #ccc; background:#fff; border-radius:4px; padding:10px; position:relative; box-shadow:1px 1px 3px rgba(0,0,0,0.1);">
+          <div class="item art-card" data-item-id="{{art._id}}">
             
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #eee; padding-bottom:5px; margin-bottom:5px;">
-              <div style="display:flex; align-items:center; gap:10px;">
-                <a class="item-use-toggle" style="font-size:18px; color:{{#if art.system.used}}#dc3545{{else}}#ccc{{/if}}; cursor:pointer;" title="사용 여부 토글 (클릭)">
+            <div class="art-card-header">
+              <div class="art-card-title-group">
+                <a class="item-use-toggle art-use-toggle {{#if art.system.used}}is-used{{else}}not-used{{/if}}" title="사용 여부 토글 (클릭)">
                   <i class="fas {{#if art.system.used}}fa-check-square{{else}}fa-square{{/if}}"></i>
                 </a>
-                <div class="item-name item-edit" style="font-weight:bold; font-size:14px; color:#0056b3; cursor:pointer;" title="클릭하여 상세 정보 수정">{{art.name}}</div>
+                
+                <div class="item-name item-edit art-name" title="클릭하여 상세 정보 수정">{{art.name}}</div>
+                
                 {{#if art.system.artsGroup}}
-                  <div style="font-size:10px; color:#fff; background:#555; padding:2px 6px; border-radius:10px;">{{lookup (lookup @root.gundogClasses art.system.artsGroup) 'label'}}</div>
+                  <div class="art-group-tag">{{lookup (lookup @root.gundogClasses art.system.artsGroup) 'label'}}</div>
                 {{/if}}
               </div>
-              <div style="display:flex; gap:10px;">
-                <a class="item-edit" title="수정" style="color:#666; cursor:pointer;"><i class="fas fa-edit"></i></a>
-                <a class="item-delete" title="삭제" style="color:#dc3545; cursor:pointer;"><i class="fas fa-trash"></i></a>
+              
+              <div class="art-card-controls">
+                <a class="item-edit" title="수정"><i class="fas fa-edit"></i></a>
+                <a class="item-delete" title="삭제"><i class="fas fa-trash"></i></a>
               </div>
             </div>
             
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; font-size:11px; margin-bottom:8px;">
-              <div style="background:#f4f4f4; padding:4px; border-radius:3px; text-align:center;"><span style="color:#666; font-weight:bold;">타이밍:</span> <span style="color:#333; font-weight:bold;">{{art.system.timing}}</span></div>
-              <div style="background:#f4f4f4; padding:4px; border-radius:3px; text-align:center;"><span style="color:#666; font-weight:bold;">대상:</span> <span style="color:#333; font-weight:bold;">{{art.system.target}}</span></div>
-              <div style="background:#f4f4f4; padding:4px; border-radius:3px; text-align:center;"><span style="color:#666; font-weight:bold;">지속시간:</span> <span style="color:#333; font-weight:bold;">{{art.system.duration}}</span></div>
+            <div class="art-stats-grid">
+              <div class="art-stat-box">
+                <span class="art-stat-label">타이밍:</span> <span class="art-stat-val">{{art.system.timing}}</span>
+              </div>
+              <div class="art-stat-box">
+                <span class="art-stat-label">대상:</span> <span class="art-stat-val">{{art.system.target}}</span>
+              </div>
+              <div class="art-stat-box">
+                <span class="art-stat-label">지속시간:</span> <span class="art-stat-val">{{art.system.duration}}</span>
+              </div>
             </div>
             
-            <div style="font-size:12px; color:#222; background:#fafafa; padding:8px; border:1px solid #eee; border-radius:3px; white-space:pre-wrap; line-height:1.4;">{{art.system.effect}}</div>
+            <div class="art-effect-box">{{art.system.effect}}</div>
+            
           </div>
           {{/each}}
           
           {{#unless classArts}}
-            <div style="text-align:center; color:#aaa; font-size:12px; margin-top:30px; border:2px dashed #ccc; padding:20px; border-radius:4px;">
-              등록된 클래스 아츠가 없습니다.<br>우측의 아이템 목록에서 클래스 아츠 아이템을 이 시트 위로 드래그 앤 드롭하여 추가하세요.
+            <div class="art-empty-box">
+              <i class="fas fa-folder-open"></i>
+              등록된 클래스 아츠가 없습니다.<br>
+              <strong style="color:#555;">우측의 아이템 탭</strong>이나 <strong style="color:#555;">아이템 목록창</strong>에서 클래스 아츠 아이템을<br>
+              이 시트 위로 드래그 앤 드롭하여 추가하세요.
             </div>
           {{/unless}}
         </div>

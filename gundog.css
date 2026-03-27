@@ -530,10 +530,10 @@ form.gundog-sheet {
 /* ★ 본문 전체를 감싸는 테두리 박스 설정 */
 /* ========================================== */
 .gundog-sheet .sheet-body {
-    border: 1px solid #363636; /* 탭과 동일한 테두리 색상 */
+    border: 1px solid #a3a3a3; /* 탭과 동일한 테두리 색상 */
     border-radius: 0 5px 5px 5px; /* 탭이 붙는 왼쪽 위를 제외하고 모서리를 둥글게 */
     background: rgba(255, 255, 255, 0.4); /* 본문 영역임을 알 수 있게 은은한 하얀 배경 추가 */
-    padding: 15px 0px 15px 15px; /* 본문 안쪽 여백 */
+    padding: 15px 15px 15px 15px; /* 본문 안쪽 여백 */
     flex: 1; 
     overflow-y: auto; 
 }
@@ -728,13 +728,12 @@ form.gundog-sheet {
 /* ★ 본문 상단/하단 구분선 */
 /* ========================================== */
 .gundog-sheet .section-divider {
-    border: none;
     border-top: 1px dashed #ccc;
     margin: 15px 0;
 }
 
 /* ========================================== */
-/* ★ 하단 7:3 레이아웃 (여가행동 vs 신념/특징) */
+/* ★ 하단 1:1 레이아웃 (여가행동 vs 신념/특징) */
 /* ========================================== */
 .gundog-sheet .profile-bottom-layout {
     display: grid;
@@ -758,7 +757,7 @@ form.gundog-sheet {
     gap: 10px;
 }
 .gundog-sheet .leisure-slot {
-    min-height: 60px;
+    min-height: 83px;
     border: 1px dashed #17a2b8;
     border-radius: 4px;
     display: flex;
@@ -780,8 +779,12 @@ form.gundog-sheet {
 }
 .gundog-sheet .leisure-stats > div:last-child { border-left: 1px solid #cce5ff; }
 .gundog-sheet .leisure-effect {
-    font-size: 11px; color: #555; line-height: 1.3;
-    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    font-size: 11px;
+    color: #555;
+    line-height: 1.3;
+    display: block;
+    overflow: hidden;
+    max-height: 2.6em; /* line-height(1.3em) * 2줄 = 2.6em */
 }
 .gundog-sheet .remove-leisure {
     position: absolute; top: 6px; right: 6px; font-size: 12px; color: #dc3545; z-index: 10;
@@ -809,13 +812,1653 @@ form.gundog-sheet {
 .gundog-sheet .bt-controls a { color: #888; cursor: pointer; }
 .gundog-sheet .bt-controls a:hover { color: #dc3545; }
 .gundog-sheet .bt-desc {
-    font-size: 11px; color: #333; line-height: 1.3; background: #f4f4f4; 
-    padding: 6px; border-radius: 2px; word-break: keep-all; white-space: pre-wrap; 
-    border-left: 2px solid #0056b3; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+    font-size: 11px;
+    color: #333;
+    line-height: 1.3;
+    background: #f4f4f4; 
+    padding: 6px;
+    border-radius: 2px;
+    word-break: keep-all;
+    white-space: pre-wrap; 
+    border-left: 2px solid #0056b3;
+    display: block;
+    overflow: hidden;
+    max-height: 5.2em; /* line-height(1.3em) * 4줄 = 5.2em */
 }
 .gundog-sheet .bt-desc.trait { border-left-color: #17a2b8; } /* 특징은 청록색 선 */
 .gundog-sheet .bt-empty { text-align: center; color: #aaa; font-size: 11px; margin-top: 10px; }
 .gundog-sheet .trait-stats { display: flex; gap: 10px; font-size: 11px; color: #555; }
+
+/* ========================================== */
+/* ★ 본문 하단 텍스트 영역 (백스토리, 특이사항) */
+/* ========================================== */
+.gundog-sheet .profile-text-group {
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* 특이사항 쪽 위쪽 여백 조절용 */
+.gundog-sheet .profile-text-group.notes-group {
+    margin-top: 5px;
+}
+
+/* 텍스트 영역 라벨(제목) */
+.gundog-sheet .profile-text-label {
+    font-size: 12px;
+    color: #222;
+    font-weight: bold;
+    display: block;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+    margin-bottom: 8px;
+}
+
+/* 텍스트 입력창 공통 디자인 */
+.gundog-sheet .profile-textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fafafa;
+    resize: none; /* 우측 하단 크기 조절 못하게 고정 */
+    font-family: inherit;
+    font-size: 12px;
+    box-sizing: border-box; /* 패딩 때문에 박스가 삐져나가지 않도록 방지 */
+    transition: border-color 0.2s, background 0.2s;
+}
+
+/* 텍스트 창 클릭(포커스) 시 효과 */
+.gundog-sheet .profile-textarea:focus {
+    background: #fff;
+    border-color: #aaa;
+    outline: none;
+}
+
+/* 각 입력창의 세로 높이 개별 지정 */
+.gundog-sheet .profile-textarea.backstory-input { height: 120px; }
+.gundog-sheet .profile-textarea.notes-input { height: 80px; }
+
+/* ========================================== */
+/* ★ 스킬 그룹 전체를 2단(좌우)으로 배치 */
+/* ========================================== */
+.gundog-sheet .skills-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 그룹 자체를 좌우 2열로 나눕니다 */
+    gap: 15px; /* 그룹 사이의 간격 */
+    align-items: flex-start; /* 각 그룹의 높이가 달라도 위쪽으로 가지런히 정렬되게 합니다 */
+}
+.gundog-sheet .skill-group {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    overflow: hidden;
+}
+.gundog-sheet .skill-group-title {
+    background: #424242;
+    color: white;
+    padding: 5px 10px;
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 13px;
+    font-weight: bold;
+}
+.gundog-sheet .skill-list {
+    display: flex;
+    flex-direction: column; /* 그룹 너비가 좁아졌으므로 내부 스킬은 1열로 세웁니다 */
+    gap: 8px;
+    padding: 10px;
+    background: #fcfcfc;
+}
+.gundog-sheet .skill-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 3px;
+    padding: 4px 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    transition: border-color 0.2s;
+}
+.gundog-sheet .skill-row:hover {
+    border-color: #17a2b8; /* 마우스를 올리면 테두리가 청록색으로 강조됨 */
+}
+
+/* 스킬 이름 (클릭 버튼 디자인) */
+.gundog-sheet .skill-name {
+    flex: 1; 
+    font-weight: bold;
+    font-size: 12px;
+    color: #222;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.2s;
+}
+.gundog-sheet .skill-bullet {
+    color: #aaa; 
+    font-size: 14px; /* • 기호의 크기 */
+    transition: color 0.2s; 
+}
+.gundog-sheet .skill-name:hover,
+.gundog-sheet .skill-name:hover .skill-bullet {
+    color: #17a2b8; /* 마우스를 올리면 글씨와 • 기호가 청록색으로 강조됨 */
+    text-shadow: 0 0 2px rgba(23, 162, 184, 0.2);
+}
+
+/* 스킬 레벨 입력칸 (아이템 수정치가 들어갈 공간을 위해 우측 여백을 15px -> 10px로 살짝 줄임) */
+.gundog-sheet .skill-lv { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    margin-right: 10px; 
+}
+.gundog-sheet .skill-lv label { 
+    font-size: 12px; 
+    color: #666; 
+    font-weight: bold; 
+}
+.gundog-sheet .skill-lv input {
+    /* ★ 이곳의 width 값을 변경하여 가로 길이를 마음대로 조절하세요! (기존 30px) */
+    width: 40px; 
+    height: 22px; 
+    text-align: center; 
+    font-family: 'VITRO_CORE_OTF' ;
+    font-size: 13px;
+    color: #1c5aaa;
+    
+    /* 테두리 및 배경색 제거 */
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent; 
+    outline: none; /* 클릭 시 파란색 굵은 테두리가 생기는 것도 방지 */
+    
+    /* 입력칸임을 살짝 알 수 있게 밑에 아주 옅은 선만 남김 (원치 않으시면 삭제 가능) */
+    border-bottom: 1px solid #eee; 
+    transition: all 0.2s;
+}
+
+/* 입력칸을 클릭(포커스)했을 때의 시각적 피드백 */
+.gundog-sheet .skill-lv input:focus {
+    background: #f4fbfc; /* 아주 옅은 청록색 배경 */
+    border-bottom: 1px solid #17a2b8; /* 밑줄 강조 */
+}
+
+
+
+/* ========================================== */
+/* ★ 스킬 탭: 아이템 수정치 복구 디자인 */
+/* ========================================== */
+.gundog-sheet .skill-item-mod {
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    min-width: 30px; 
+    margin-right: 10px;
+}
+.gundog-sheet .skill-item-mod label { 
+    font-size: 9px; 
+    color: #17a2b8; /* 눈에 띄는 청록색 */
+    font-weight: bold; 
+    line-height: 1; 
+    margin-bottom: 2px; 
+}
+.gundog-sheet .skill-item-mod .mod-val { 
+    font-size: 13px; 
+    font-weight: bold; 
+    color: #17a2b8; 
+    line-height: 1; 
+}
+
+/* 성공률 표시 구역 */
+.gundog-sheet .skill-target-value {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 40px;
+}
+.gundog-sheet .skill-target-value label { font-size: 9px; color: #888; line-height: 1; margin-bottom: 2px; }
+.gundog-sheet .skill-target-value strong { color: #49525c; font-size: 14px; line-height: 1; }
+
+/* ========================================== */
+/* ★ 주사위 굴림 팝업(Dialog) 세부 디자인 */
+/* ========================================== */
+
+/* 팝업 전체 배경 및 테두리 (요청하신 그라데이션 적용) */
+.gundog-roll-dialog {
+    background: transparent; /* 안쪽 배경은 투명하게 */
+    padding: 20px 15px 10px 15px; /* 상단 여백을 살짝 늘리고 하단은 줄여 밸런스 조정 */
+    border: none; /* 내부 박스의 선 제거 */
+    text-align: center;
+}
+
+/* 팝업 상단(스킬 이름, 목표치) */
+.gundog-roll-dialog .dialog-header {
+    margin-bottom: 15px;
+    border-bottom: 1px dashed #dce4ec;
+    padding-bottom: 10px;
+}
+.gundog-roll-dialog .dialog-skill-name {
+    margin: 0 0 5px 0;
+    font-size: 18px;
+    font-weight: bold;
+    color: #222;
+    border: none;
+}
+.gundog-roll-dialog .dialog-target {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px; /* 텍스트 사이 간격 */
+    margin: 5px 0 0 0;
+    font-size: 13px;
+    color: #555;
+}
+.gundog-roll-dialog .dialog-target strong {
+    color: #0056b3;
+    font-size: 20px;
+    font-weight: 600;
+}
+.gundog-roll-dialog .dialog-target .base-val { color: #666; }
+.gundog-roll-dialog .dialog-target .item-val { color: #6cb0bb; }
+.gundog-roll-dialog .dialog-target .equals { color: #aaa; }
+
+/* 보너스와 페널티 가로(좌우) 배치 설정 */
+.gundog-roll-dialog .dialog-modifiers {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+}
+
+/* 개별 수정치 박스 공통 디자인 */
+.gundog-roll-dialog .mod-group {
+    flex: 1; /* 가로 공간을 50:50으로 정확히 나눔 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.gundog-roll-dialog .mod-group label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+/* 보너스 박스 세부 색상 (초록색 포인트) */
+.gundog-roll-dialog .bonus-group { border-top: 3px solid #28a745; }
+.gundog-roll-dialog .bonus-group label { color: #28a745; }
+
+/* 페널티 박스 세부 색상 (빨간색 포인트) */
+.gundog-roll-dialog .penalty-group { border-top: 3px solid #dc3545; }
+.gundog-roll-dialog .penalty-group label { color: #dc3545; }
+
+/* 팝업 안의 숫자 입력칸 */
+.gundog-roll-dialog .mod-group input {
+    width: 80%;
+    height: 30px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: #fafafa;
+    transition: all 0.2s;
+}
+
+/* 입력칸 클릭 시 하이라이트 */
+.gundog-roll-dialog .mod-group input:focus {
+    border-color: #17a2b8;
+    background: #fff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(23,162,184,0.3);
+}
+/* ========================================== */
+/* ★ 팝업 하단 기본 버튼(파운드리 내장) 디자인 덮어쓰기 */
+/* ========================================== */
+
+/* 버튼들을 감싸는 영역 (여백 다듬기) */
+.gundog-roll-app .dialog-buttons {
+    padding: 0 15px 15px 15px; 
+    margin: 0;
+}
+
+/* 파운드리 팝업창의 가장 바깥 껍데기(window-content) 전체에 그라데이션 적용 */
+.gundog-roll-app .window-content {
+    background: linear-gradient(to bottom, #ffffff 0%, #F0F4FA 100%);
+    padding: 0; /* 파운드리의 기본 테두리 여백을 제거하여 화면을 꽉 채우게 만듭니다 */
+}
+
+/* 굴림, 취소 버튼 공통 디자인 */
+.gundog-roll-app .dialog-button {
+    background: #f4f4f4;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-weight: bold;
+    color: #333;
+    font-size: 13px;
+    font-family: inherit; /* 시트의 폰트(VITRO)를 그대로 따라감 */
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+/* '주사위 굴림!' 버튼 전용 강조 색상 */
+.gundog-roll-app .dialog-button.roll {
+    background: #2c7fd8; 
+    color: white;
+    border-color: #2c7fd8;
+}
+/* ========================================== */
+/* ★ 채팅창 주사위 굴림 결과 카드 디자인 */
+/* ========================================== */
+.gundog-chat-card {
+    background: linear-gradient(to bottom, #ffffff 0%, #F0F4FA 100%);
+    border: 1px solid #dce4ec;
+    border-radius: 5px;
+    padding: 12px;
+    margin: 5px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+/* 상단 스킬 이름과 목표값 */
+.gundog-chat-card .chat-header {
+    border-bottom: 1px dashed #dce4ec;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+.gundog-chat-card .chat-skill-name {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #222;
+    border: none;
+}
+.gundog-chat-card .chat-target {
+    font-size: 12px;
+    color: #555;
+}
+.gundog-chat-card .chat-target strong {
+    color: #0056b3;
+    font-size: 14px;
+}
+
+/* 중간 연산 공식 및 수정치 부분 */
+.gundog-chat-card .chat-details {
+    font-size: 11px;
+    color: #666;
+    margin-bottom: 10px;
+}
+.gundog-chat-card .chat-modifier {
+    color: #d9534f; /* 수정치가 있을 땐 눈에 띄게 붉은 톤 */
+    font-weight: bold;
+    margin-bottom: 3px;
+}
+.gundog-chat-card .chat-calc {
+    background: rgba(0,0,0,0.03);
+    padding: 4px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+/* 주사위 최종 결과 숫자 */
+.gundog-chat-card .chat-dice-total {
+    font-size: 32px; /* 팝업창 숫자만큼 큼직하게 */
+    font-weight: 900;
+    color: #222;
+    line-height: 1;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* 하단 성공/실패 박스 영역 */
+.gundog-chat-card .chat-outcome {
+    padding: 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+/* 자바스크립트에서 보낸 상태에 따라 색상 변경 */
+.gundog-chat-card .chat-outcome.success {
+    background: #28a745;
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.4);
+}
+.gundog-chat-card .chat-outcome.failure {
+    background: #dc3545;
+    box-shadow: 0 0 5px rgba(220, 53, 69, 0.4);
+}
+
+/* 달성치, 크리티컬, 펌블 글자 장식 */
+.gundog-chat-card .chat-achievement { color: #e9ecef; font-size: 12px; }
+.gundog-chat-card .chat-critical { color: #ffc107; text-shadow: 0 0 3px rgba(255, 193, 7, 0.5); }
+.gundog-chat-card .chat-fumble { color: #000; text-shadow: 0 0 3px rgba(0, 0, 0, 0.5); }
+
+/* ========================================== */
+/* ★ 장비(Equipment) 탭 레이아웃 및 디자인 */
+/* ========================================== */
+
+/* 좌우 2단 배치 (무기 / 방어구) */
+.gundog-sheet .equip-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-top: 10px;
+}
+.gundog-sheet .equip-col {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 개별 장비 슬롯(박스) 공통 디자인 */
+.gundog-sheet .equip-slot {
+    border-radius: 4px;
+    padding: 10px;
+    min-height: 80px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+.gundog-sheet .equip-header {
+    padding: 5px 10px;
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    font-weight: bold;
+    color: white;
+    border-radius: 3px;
+}
+
+/* 슬롯별 테마 색상 지정 (메인, 서브, 머리, 몸통, 인벤토리) */
+.gundog-sheet .equip-main { border: 1px solid #ccc; background: #f4f8ff; }
+.gundog-sheet .equip-main .equip-header { background: #366fa5; }
+.gundog-sheet .equip-main .w-name, .gundog-sheet .equip-main .w-ammo, .gundog-sheet .equip-main .w-action a { color: #424242; }
+
+.gundog-sheet .equip-sub { border: 1px solid #ccc; background: #f9fcfd; }
+.gundog-sheet .equip-sub .equip-header { background: #385570; }
+.gundog-sheet .equip-sub .w-name, .gundog-sheet .equip-sub .w-ammo, .gundog-sheet .equip-sub .w-action a { color: #424242; }
+
+.gundog-sheet .equip-head { border: 1px solid #ccc; background: #f4f8ff; }
+.gundog-sheet .equip-head .equip-header { background: #3694a5; }
+.gundog-sheet .equip-head .w-name, .gundog-sheet .equip-head .w-action a { color: #424242; }
+
+.gundog-sheet .equip-body { border: 1px solid #ccc; background: #f9fcfd; }
+.gundog-sheet .equip-body .equip-header { background: #409e82; }
+.gundog-sheet .equip-body .w-name, .gundog-sheet .equip-body .w-action a { color: #424242; }
+
+.gundog-sheet .equip-inv { border: 1px solid #ccc; background: #fff; }
+.gundog-sheet .equip-inv .equip-header { background: #222; }
+.gundog-sheet .equip-inv .w-name { color: #333; }
+.gundog-sheet .equip-inv .w-ammo, .gundog-sheet .equip-inv .w-stat { color: #555; }
+.gundog-sheet .equip-inv .w-action a { color: #666; margin-right: 4px; }
+.gundog-sheet .equip-inv .w-action a.item-delete { color: #dc3545; }
+
+/* 리스트 항목(테이블) 디자인 */
+.gundog-sheet .equip-table-header {
+    display: flex; align-items: center; font-weight: bold; font-size: 11px; 
+    color: #666; border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 6px; margin-bottom: 6px;
+}
+.gundog-sheet .equip-item {
+    display: flex; align-items: center; font-size: 11px; padding: 6px 0; 
+    min-height: 28px; background: #fff; border: 1px solid #eee; border-radius: 4px; 
+    cursor: pointer; transition: all 0.2s; margin-bottom: 4px;
+}
+.gundog-sheet .equip-item:hover {
+    border-color: #bbb; box-shadow: 0 2px 4px rgba(0,0,0,0.08); transform: translateY(-1px);
+}
+
+/* 각 열(Column) 비율 설정 */
+.gundog-sheet .w-equip { flex: 0 0 30px; text-align: center; }
+.gundog-sheet .w-name { flex: 2; padding-left: 10px; font-weight: bold; line-height: 1.2; }
+.gundog-sheet .w-stat { flex: 1; text-align: center; font-size: 12px; font-weight: bold; }
+.gundog-sheet .w-ammo { flex: 1.5; text-align: center; font-size: 12px; font-weight: bold; }
+.gundog-sheet .w-ammo span { font-size: 10px; color: #888; }
+.gundog-sheet .w-action { flex: 0 0 40px; text-align: center; font-size: 12px; transition: color 0.2s; }
+.gundog-sheet .w-action a:hover { filter: brightness(0.7); }
+
+/* 방어구 전용 스탯 색상 및 장착 체크박스 */
+.gundog-sheet .stat-armor { color: rgb(36, 49, 83) !important; }
+.gundog-sheet .stat-defense { color: #1f4c7c !important; }
+.gundog-sheet .item-equip { color: #ccc; font-size: 14px; transition: color 0.2s; }
+.gundog-sheet .equip-head .item-equip.is-equipped { color: #28a745; }
+.gundog-sheet .equip-body .item-equip.is-equipped { color: #20c997; }
+
+/* 빈 슬롯(장착 안됨) 안내 문구 */
+.gundog-sheet .equip-empty { text-align: center; font-size: 11px; padding: 15px 0; opacity: 0.6; font-weight: bold; }
+.gundog-sheet .equip-main .equip-empty { color: #888; }
+.gundog-sheet .equip-sub .equip-empty { color: #888; }
+.gundog-sheet .equip-head .equip-empty { color: #888; }
+.gundog-sheet .equip-body .equip-empty { color: #888; }
+
+/* ========================================== */
+/* ★ 아이템(Items) 탭 레이아웃 및 디자인 */
+/* ========================================== */
+
+/* 아이템 탭 전체 상단 레이아웃 (좌: 그리드 / 우: 아이템 목록) */
+.gundog-sheet .item-top-layout {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+/* 좌측 그리드(CP 관리표, 가방) 구역 */
+.gundog-sheet .item-grid-section {
+    flex: 0 0 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 각 그리드 박스의 헤더 타이틀 */
+.gundog-sheet .item-grid-section h3 {
+    background: #2b2b2b;
+    color: white;
+    padding: 5px 10px;
+    margin: 0 0 10px 0;
+    font-size: 13px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+/* CP 관리표 상단 크기/무기 조절 구역 */
+.gundog-sheet .cp-controls { display: flex; align-items: center; margin: 0 0 5px 40px; }
+.gundog-sheet .cp-controls label { font-size: 12px; font-weight: bold; color: #0056b3; margin-right: 5px; }
+.gundog-sheet .cp-controls input {
+    width: 40px; height: 22px; text-align: center; font-weight: bold;
+    border: 1px solid #0056b3; border-radius: 3px; background: #e8f4ff; color: #0056b3;
+}
+
+/* 가로/세로 숫자 눈금표 (1~10) */
+.gundog-sheet .grid-ruler-x { display: flex; margin-left: 40px; height: 15px; margin-bottom: 2px; }
+.gundog-sheet .grid-ruler-x div { width: 40px; text-align: center; font-size: 11px; color: #555; font-weight: bold; }
+.gundog-sheet .grid-layout-main { display: flex; }
+.gundog-sheet .grid-ruler-y-container { width: 40px; display: flex; position: relative; }
+.gundog-sheet .grid-ruler-y-label {
+    position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center;
+}
+.gundog-sheet .grid-ruler-y-label span {
+    writing-mode: vertical-rl; font-size: 12px; font-weight: bold; color: #d9534f; letter-spacing: 2px;
+}
+.gundog-sheet .grid-ruler-y-label input {
+    width: 26px; height: 20px; text-align: center; font-size: 12px; font-weight: bold;
+    border: 0px ; border-radius: 3px; margin-top: 5px; margin-left: 5px; padding: 0; background: transparent !important; box-shadow: none !important; color: #d9534f;
+}
+.gundog-sheet .grid-ruler-y-numbers { margin-left: 20px; display: flex; flex-direction: column; width: 20px; }
+.gundog-sheet .grid-ruler-y-numbers div {
+    height: 40px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #555; font-weight: bold;
+}
+
+/* 공통 그리드 배경 껍데기 */
+.gundog-sheet .grid-wrapper {
+    position: relative; background: #e8e8e8; border: 2px solid #555; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); flex-shrink: 0;
+}
+.gundog-sheet .cp-grid-wrapper { width: 400px; height: 400px; }
+.gundog-sheet .bag-grid-wrapper { width: 160px; height: 160px; margin-left: 60px; }
+
+/* 그리드 칸 선 그리기 */
+.gundog-sheet .grid-bg {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;
+}
+.gundog-sheet .cp-grid-bg { display: grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(10, 40px); }
+.gundog-sheet .bag-grid-bg { display: grid; grid-template-columns: repeat(4, 40px); grid-template-rows: repeat(4, 40px); }
+.gundog-sheet .grid-cell { border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; box-sizing: border-box; }
+
+/* 배치된 아이템 블록 디자인 */
+.gundog-sheet .grid-item-block {
+    position: absolute; color: white; font-size: 10px; font-weight: bold;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; cursor: grab; overflow: hidden; box-shadow: 2px 2px 5px rgba(0,0,0,0.4); z-index: 10; user-select: none;
+}
+.gundog-sheet .grid-item-block.cp-item { background: rgba(0, 86, 179, 0.85); border: 1px solid #002752; }
+.gundog-sheet .grid-item-block.bag-item { background: rgba(40, 167, 69, 0.85); border: 1px solid #1e7e34; }
+.gundog-sheet .grid-item-attach { color: #a2f1ff; font-size: 9px; margin-bottom: 2px; }
+.gundog-sheet .grid-item-name { word-break: keep-all; font-size: 16px; }
+
+/* ========================================== */
+/* ★ 우측 미배치 아이템 리스트 */
+/* ========================================== */
+.gundog-sheet .unplaced-list-container {
+    flex: 1; height: 650px; border: 1px solid #999; padding: 15px;
+    background: #fcfcfc; border-radius: 5px; overflow-y: auto; box-sizing: border-box;
+}
+.gundog-sheet .unplaced-title {
+    margin: 0 0 15px 0; color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 5px; font-weight: bold;
+}
+.gundog-sheet .unplaced-item {
+    border: 1px solid #ddd; background: #fff; padding: 4px; margin-bottom: 3px;
+    border-radius: 4px; cursor: grab; display: flex; justify-content: space-between; align-items: center;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: border-color 0.2s, transform 0.2s;
+}
+.gundog-sheet .unplaced-item:hover { border-color: #0056b3; transform: translateX(2px); }
+.gundog-sheet .unplaced-item-left { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+.gundog-sheet .unplaced-size-badge {
+    font-weight: bold; font-size: 12px; color: #fff; background: #0056b3; width: 24px; height: 24px;
+    display: flex; align-items: center; justify-content: center; border-radius: 3px; flex-shrink: 0;
+}
+.gundog-sheet .unplaced-name { font-weight: bold; color: #333; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gundog-sheet .unplaced-controls { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.gundog-sheet .unplaced-status-badge { font-size: 11px; color: #fff; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
+.gundog-sheet .unplaced-item-delete { color: #dc3545; cursor: pointer; transition: transform 0.2s; }
+.gundog-sheet .unplaced-item-delete:hover { transform: scale(1.2); }
+
+/* ========================================== */
+/* ★ 하단 유지비 / 커넥션 박스 */
+/* ========================================== */
+.gundog-sheet .item-bottom-layout { display: flex; gap: 15px; margin-top: 20px; }
+.gundog-sheet .bottom-box {
+    flex: 1; border: 1px solid #ddd; background: #fff; border-radius: 5px; padding: 15px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.gundog-sheet .bottom-box.upkeep-box h4 { margin: 0 0 10px 0; color: #dc3545; border-bottom: 2px solid #dc3545; padding-bottom: 5px; }
+.gundog-sheet .bottom-box.conn-box h4 { margin: 0 0 10px 0; color: #17a2b8; border-bottom: 2px solid #17a2b8; padding-bottom: 5px; }
+
+/* 하단 박스 내부 테이블(리스트) 공통 디자인 */
+.gundog-sheet .b-table-header {
+    display: flex; font-weight: bold; font-size: 11px; color: #666; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 4px;
+}
+.gundog-sheet .b-table-row {
+    display: flex; font-size: 11px; align-items: center; border-bottom: 1px solid #eee; padding: 6px 0; transition: background 0.2s;
+}
+.gundog-sheet .b-table-row:hover { background: #f9f9f9; }
+.gundog-sheet .b-name { font-weight: bold; cursor: pointer; color: #0056b3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gundog-sheet .b-text { text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #555; }
+.gundog-sheet .b-cost { text-align: center; color: #dc3545; font-weight: bold; font-size: 12px; }
+.gundog-sheet .b-action { text-align: center; }
+.gundog-sheet .b-action a { margin: 0 3px; cursor: pointer; transition: color 0.2s; }
+.gundog-sheet .b-action a.item-edit { color: #888; }
+.gundog-sheet .b-action a.item-delete { color: #dc3545; }
+.gundog-sheet .b-action a:hover { filter: brightness(0.6); }
+.gundog-sheet .b-empty { text-align: center; color: #aaa; font-size: 11px; margin-top: 15px; }
+
+/* ========================================== */
+/* ★ 클래스 아츠(Class Arts) 탭 레이아웃 및 디자인 */
+/* ========================================== */
+
+/* 클래스 아츠 탭 전체 컨테이너 */
+.gundog-sheet .arts-container {
+    box-sizing: border-box; 
+    width: 100%;
+}
+
+/* 상단 타이틀 헤더 */
+.gundog-sheet .arts-header {
+    background: #2D4563;
+    color: white;
+    padding: 8px 12px;
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.gundog-sheet .arts-header-limit {
+    font-size: 11px;
+    font-weight: normal;
+    color: #ccc;
+}
+
+/* 아츠 리스트 레이아웃 */
+.gundog-sheet .arts-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 정확히 50:50 비율의 2열로 나눕니다 */
+    gap: 15px; /* 카드 사이의 여백 */
+    align-items: stretch; 
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* 개별 아츠 카드 디자인 */
+.gundog-sheet .art-card {
+    border: 1px solid #dce4ec;
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 10px;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    transition: border-color 0.2s;
+    box-sizing: border-box; 
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.gundog-sheet .art-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+    border-color: #0056b3;
+}
+
+/* 아츠 카드 상단 (체크박스, 이름, 태그, 관리버튼) */
+.gundog-sheet .art-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+.gundog-sheet .art-card-title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.gundog-sheet .art-use-toggle {
+    font-size: 18px;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.1s;
+}
+.gundog-sheet .art-use-toggle:hover { transform: scale(1.1); }
+.gundog-sheet .art-use-toggle.is-used { color: #dc3545; }
+.gundog-sheet .art-use-toggle.not-used { color: #ccc; }
+
+.gundog-sheet .art-name {
+    font-weight: 900;
+    font-size: 15px;
+    color: #0056b3;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.gundog-sheet .art-name:hover { color: #003d82; text-decoration: underline; }
+
+.gundog-sheet .art-group-tag {
+    font-size: 10px;
+    color: #fff;
+    background: #555;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.gundog-sheet .art-card-controls {
+    display: flex;
+    gap: 10px;
+}
+.gundog-sheet .art-card-controls a { cursor: pointer; transition: color 0.2s; }
+.gundog-sheet .art-card-controls .item-edit { color: #888; }
+.gundog-sheet .art-card-controls .item-edit:hover { color: #333; }
+.gundog-sheet .art-card-controls .item-delete { color: #dc3545; }
+.gundog-sheet .art-card-controls .item-delete:hover { filter: brightness(0.8); }
+
+/* 아츠 카드 중간 스탯 (타이밍, 대상, 지속시간) 3단 그리드 */
+.gundog-sheet .art-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+.gundog-sheet .art-stat-box {
+    background: #f8f9fa;
+    padding: 6px;
+    border-radius: 4px;
+    text-align: center;
+    border: 1px solid #eee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    white-space: nowrap; /* 창이 좁아져도 글자가 아래로 떨어지지 않게 막음 */
+}
+.gundog-sheet .art-stat-box .art-stat-label {
+    width: 50px ;
+    font-weight: bold;
+    margin-right: 4px;
+    font-size: 12px ;
+    color: #444 ;
+    text-shadow: none ;
+    line-height: 1; /* 높낮이 틀어짐 방지 */
+}
+.gundog-sheet .art-stat-box .art-stat-val {
+    width: 40px ;
+    font-weight: bold;
+    margin-right: 4px;
+    font-size: 12px ;
+    color: #222 ;
+    text-shadow: none ;
+    line-height: 1; /* 높낮이 틀어짐 방지 */
+ }
+
+/* 아츠 효과(Effect) 텍스트 박스 */
+.gundog-sheet .art-effect-box {
+    font-size: 12px !important;
+    color: #333;
+    background: #fdfdfd;
+    padding: 10px;
+    border-left: 3px solid #0056b3;
+    border-radius: 0 4px 4px 0;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    flex: 1; 
+    box-sizing: border-box;
+    
+    /* 아주 긴 단어가 들어와도 박스를 뚫고 나가지 못하게 강제로 줄을 바꿈 */
+    word-break: keep-all;
+    overflow-wrap: break-word;
+}
+
+/* 등록된 아츠가 없을 때 안내 문구 박스 */
+.gundog-sheet .art-empty-box {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-top: 30px;
+    border: 2px dashed #ccc;
+    padding: 30px 20px;
+    border-radius: 6px;
+    background: #fcfcfc;
+    line-height: 1.6;
+}
+.gundog-sheet .art-empty-box i {
+    font-size: 24px;
+    color: #ccc;
+    margin-bottom: 10px;
+    display: block;
+}
+
+
+/* ========================================== */
+/* ★ 차량(Vehicle) 시트 헤더 디자인 */
+/* ========================================== */
+.gundog-sheet .vehicle-header {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    height: 220px; /* 차량 사진이 시원하게 보이도록 높이 설정 */
+}
+
+/* 1. 좌측: 차량 이미지 박스 */
+.gundog-sheet .vehicle-portrait {
+    position: relative;
+    flex: 0 0 260px; /* 가로폭을 넓혀서 차량 사진(풍경 비율)에 적합하게 만듦 */
+    height: 100%;
+    border: 1px solid #bebebe;
+    border-radius: 5px;
+    overflow: hidden;
+    background: #222;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+.gundog-sheet .vehicle-portrait .profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: none;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+.gundog-sheet .vehicle-portrait .profile-img:hover {
+    filter: brightness(1.1); /* 마우스 올리면 이미지가 살짝 밝아짐 */
+}
+
+/* 이미지 위에 겹쳐지는 이름표 (오버레이) */
+.gundog-sheet .vehicle-name-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-family: 'VITRO_CORE_OTF';
+    font-size: 16px;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.75); /* 반투명 검정 배경 */
+    padding: 8px 10px;
+    box-sizing: border-box;
+    border-top: 2px solid #17a2b8; /* 청록색 포인트 선 */
+}
+.gundog-sheet .vehicle-name-overlay input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.9);
+}
+.gundog-sheet .vehicle-name-overlay input::placeholder {
+    color: #aaa;
+}
+.gundog-sheet .vehicle-name-overlay input:focus {
+    outline: none;
+    border-bottom: 1px solid #17a2b8;
+}
+
+/* ========================================== */
+/* 2. 우측: 차량 기본 정보 (카드형 레이아웃) */
+/* ========================================== */
+.gundog-sheet .vehicle-basic-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+}
+.gundog-sheet .v-info-panel {
+    background: #fdfdfd;
+    border: 1px solid #dce4ec;
+    border-radius: 6px;
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    height: 100%;
+    box-sizing: border-box;
+    
+    /* 다시 위아래(column)로 배치하되, 간격을 예쁘게 띄웁니다 */
+    display: flex;
+    flex-direction: column; 
+    gap: 6px; 
+}
+
+/* 최상단 공통 타이틀 */
+.gundog-sheet .v-info-title {
+    background: #2b2b2b;
+    color: white;
+    padding: 4px 8px;
+    margin: 0; 
+    font-size: 12px;
+    border-radius: 3px;
+    font-weight: bold;
+    align-self: flex-start;
+}
+
+/* ★ 새롭게 추가된 '카드' 디자인 */
+.gundog-sheet .v-info-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    padding: 10px 15px;
+    display: flex; /* 카드 안의 내용물은 좌우(가로)로 배치 */
+    gap: 15px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    flex: 1; /* 위아래 카드가 남은 200px 높이 공간을 공평하게 나눠 가집니다 */
+    align-items: center;
+}
+
+/* 개별 입력 박스 */
+.gundog-sheet .v-stat-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    justify-content: center;
+}
+.gundog-sheet .v-stat-box label {
+    font-size: 13px;
+    font-weight: bold;
+    color: #636363;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 4px;
+    white-space: nowrap;
+}
+
+/* 입력칸 디자인 */
+.gundog-sheet .v-stat-box input {
+    height: 26px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fafafa;
+    text-align: center;
+    transition: all 0.2s;
+    width: 160px;
+    box-sizing: border-box;
+}
+.gundog-sheet .v-stat-box input:focus {
+    border-color: #0056b3; background: #fff; outline: none;
+}
+
+/* 두 번째 카드 (자산 정보) 전용 붉은색 테마 */
+.gundog-sheet .v-stat-box .cost-label {
+    color: #dc3545;
+    border-bottom-color: #f5c6cb;
+}
+.gundog-sheet .v-cost-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.gundog-sheet .v-cost-total {
+    white-space: nowrap;
+    font-weight: bold;
+    color: #dc3545;
+    font-size: 14px;
+}
+/* ========================================== */
+/* ★ 차량 성능: 클릭 시 수정되는 동적 스탯 입력칸 */
+/* ========================================== */
+.gundog-sheet .v-dynamic-stat {
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+    border: none !important ;
+    box-shadow: none !important;
+    background: transparent;
+    border-radius: 3px;
+    transition: all 0.2s;
+    cursor: pointer;
+    padding: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+.gundog-sheet .v-dynamic-stat:focus {
+    border: none !important ;
+    box-shadow: none !important;
+    background: #fff;
+    outline: none;
+    cursor: text;
+}
+/* ========================================== */
+/* ★ 차량 시트: 네비게이션 탭 및 바디 레이아웃 */
+/* ========================================== */
+.gundog-sheet .v-tabs {
+    display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #222; padding-bottom: 5px;
+}
+.gundog-sheet .v-tabs .v-tab-item {
+    font-weight: bold; font-size: 14px; padding: 5px 10px; cursor: pointer; color: #444; transition: color 0.2s;
+}
+.gundog-sheet .v-tabs .v-tab-item:hover { color: #000; }
+.gundog-sheet .v-body {
+    flex: 1; overflow-y: auto; padding-right: 5px;
+}
+
+/* ========================================== */
+/* ★ 차량 성능: 5단 그리드 및 스탯 디자인 */
+/* ========================================== */
+.gundog-sheet .v-section-title {
+    background: #222; color: white; padding: 5px 10px; margin: 0 0 10px 0; font-size: 14px; border-radius: 2px;
+}
+.gundog-sheet .v-perf-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.5fr 0.5fr 1fr 0.5fr; /* 5칸을 완벽하게 동일한 비율(20%)로 나눕니다 */
+    gap: 10px;
+    margin-bottom: 15px;
+    background: #fff;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: none;
+}
+.gundog-sheet .v-perf-col {
+    text-align: center;
+    min-width: 0; /* ★ 핵심: 내부 글자가 길어져도 그리드 칸이 뚱뚱해지는 것을 막아줍니다 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative; /* ★ 구분선을 띄우기 위한 기준점 역할 추가 */
+}
+.gundog-sheet .v-perf-col:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -5px; /* 칸 사이 여백(gap: 10px)의 정확히 한가운데에 위치시킵니다 */
+    top: 15%; /* 선이 위아래 끝까지 닿지 않도록 살짝 띄워줍니다 (고급스러운 느낌) */
+    height: 70%;
+    width: 1px; /* 얇은 선 */
+    background: #e2e8f0; /* 눈에 거슬리지 않는 아주 옅은 회색 */
+}
+.gundog-sheet .v-perf-label {
+    font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px; white-space: nowrap;
+}
+.gundog-sheet .v-perf-val-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 26px;
+    box-shadow: none !important;
+}
+
+/* 공통 색상 및 부속품 클래스 */
+.gundog-sheet .v-color-red { color: #d9534f !important; }
+.gundog-sheet .v-color-blue { color: #0056b3 !important; }
+.gundog-sheet .v-color-green { color: #28a745 !important; }
+.gundog-sheet .v-color-cyan { color: #17a2b8 !important; }
+.gundog-sheet .v-separator { font-weight: bold; color: #555; }
+.gundog-sheet .w-45 { width: 45px !important; } /* HP 칸 너비 고정용 */
+
+/* 현재 HP 입력칸 디자인 */
+.gundog-sheet .v-hp-input {
+    width: 45px; height: 26px; text-align: center; font-weight: bold; font-size: 17px; 
+    border: none !important ;
+    box-shadow: none !important;
+    border-radius: 3px;
+    color: #222;
+    background-color: #fff;
+}
+/* ========================================== */
+/* ★ 차량 부착물 (Attachment) 그리드 및 카드 디자인 */
+/* ========================================== */
+.gundog-sheet .v-attach-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 좌우 2단 배치 복구 */
+    gap: 15px;
+    margin-bottom: 20px;
+}
+.gundog-sheet .v-attach-slot {
+    border: 1px dashed #999;
+    padding: 10px;
+    background: #f4f4f4;
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+}
+.gundog-sheet .v-attach-slot.span-2 {
+    grid-column: span 2; /* 가로 두 칸을 모두 차지하게 만드는 속성 (유리창 용) */
+}
+
+/* 각 부위별 타이틀 */
+.gundog-sheet .v-attach-title {
+    font-size: 13px;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 8px;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 4px;
+}
+.gundog-sheet .v-attach-title.red-title { color: #d9534f; } /* 무장 전용 색상 */
+
+/* 개별 부착물 아이템 박스 */
+.gundog-sheet .v-attach-item-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    border-radius: 3px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+.gundog-sheet .v-attach-item-box:hover {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-color: #bbb;
+}
+
+/* 아이템 이름 및 버튼 컨트롤 */
+.gundog-sheet .v-attach-name {
+    font-weight: bold;
+    color: #0056b3;
+    font-size: 12px;
+    cursor: pointer;
+}
+.gundog-sheet .v-attach-name.red-name { color: #d9534f; }
+.gundog-sheet .v-attach-controls {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+.gundog-sheet .v-attach-controls a { cursor: pointer; transition: transform 0.1s; }
+.gundog-sheet .v-attach-controls a:hover { transform: scale(1.1); }
+.gundog-sheet .v-attach-controls .unequip { color: #28a745; }
+.gundog-sheet .v-attach-controls .edit { color: #666; }
+.gundog-sheet .v-attach-controls .delete { color: #dc3545; }
+
+/* 비어있을 때 안내 문구 */
+.gundog-sheet .v-attach-empty {
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* 유리(Glass) 전용 하위 2단 그리드 */
+.gundog-sheet .v-glass-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+/* ========================================== */
+/* ★ 차량 적재량 (Cargo / Inventory) 디자인 */
+/* ========================================== */
+
+/* 상단 헤더 및 VCP 컨트롤 */
+.gundog-sheet .v-cargo-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 5px;
+}
+.gundog-sheet .v-cargo-title {
+    background: #222; color: white; padding: 5px 10px; margin: 0;
+    font-size: 14px; border-radius: 2px; display: flex; align-items: center; gap: 10px;
+}
+.gundog-sheet .v-cargo-vcp-box {
+    display: flex; align-items: center; background: #fff; color: #222;
+    padding: 2px 8px; border-radius: 3px; font-size: 12px; box-shadow: inset 0 0 3px rgba(0,0,0,0.1);
+}
+.gundog-sheet .v-cargo-vcp-input {
+    width: 40px; height: 20px; text-align: center; border: 1px solid #ccc;
+    border-radius: 2px; font-weight: bold; outline: none;
+}
+.gundog-sheet .v-cargo-vcp-label { margin-left: 4px; font-weight: bold; color: #d9534f; }
+.gundog-sheet .v-cargo-vcp-total {
+    margin-left: 8px; padding-left: 8px; border-left: 1px solid #ccc;
+    display: flex; align-items: center; font-size: 11px; color: #555;
+}
+.gundog-sheet .v-cargo-vcp-total strong { color: #0056b3; font-size: 14px; margin: 0 4px; }
+
+/* 간이 중량 규칙 토글 버튼 */
+.gundog-sheet .v-cargo-toggle {
+    display: flex; align-items: center; gap: 5px; padding: 6px 12px;
+    color: white; border-radius: 4px; font-size: 12px; font-weight: bold;
+    cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.2); transition: filter 0.2s;
+}
+.gundog-sheet .v-cargo-toggle:hover { filter: brightness(1.1); }
+.gundog-sheet .v-cargo-toggle.is-on { background: #28a745; }
+.gundog-sheet .v-cargo-toggle.is-off { background: #666; }
+
+/* 레이아웃 분할 (좌측 그리드 / 우측 리스트) */
+.gundog-sheet .v-cargo-layout { display: flex; gap: 15px; align-items: flex-start; }
+.gundog-sheet .v-cargo-grid-section { flex: 0 0 440px; display: flex; flex-direction: column; }
+.gundog-sheet .v-cargo-list-section { flex: 1; height: 1200px; } /* 세로 30칸짜리 그리드와 높이 맞춤 */
+
+/* 좌측: 그리드 컨트롤 및 눈금자 */
+.gundog-sheet .v-cargo-ruler-ctrl { display: flex; margin-left: 40px; margin-bottom: 5px; align-items: center; }
+.gundog-sheet .v-cargo-ruler-ctrl label { font-size: 12px; font-weight: bold; color: #0056b3; margin-right: 5px; }
+.gundog-sheet .v-cargo-ruler-ctrl input {
+    width: 40px; height: 20px; text-align: center; font-weight: bold;
+    border: none !important; box-shadow: none !important; border-radius: 3px; background: transparent !important; color: #0056b3;
+}
+.gundog-sheet .v-cargo-ruler-x { display: flex; margin-left: 40px; height: 15px; margin-bottom: 2px; }
+.gundog-sheet .v-cargo-ruler-x div { width: 40px; text-align: center; font-size: 11px; color: #555; font-weight: bold; }
+
+.gundog-sheet .v-cargo-grid-row { display: flex; }
+.gundog-sheet .v-cargo-ruler-y-wrap { width: 40px; display: flex; position: relative; }
+.gundog-sheet .v-cargo-ruler-y-title { position: absolute; left: 0; top: 0; display: flex; flex-direction: column; align-items: center; }
+.gundog-sheet .v-cargo-ruler-y-title span { writing-mode: vertical-rl; font-size: 12px; font-weight: bold; color: #d9534f; letter-spacing: 2px;  }
+.gundog-sheet .v-cargo-ruler-y-title input {
+    width: 26px; height: 20px; text-align: center; font-size: 11px; font-weight: bold;
+    border: none !important; box-shadow: none !important; border-radius: 3px; margin-top: 5px; margin-left: -5px; padding: 0; background: transparent !important; color: #d9534f;
+}
+.gundog-sheet .v-cargo-ruler-y-cells { margin-left: 20px; display: flex; flex-direction: column; width: 20px; }
+.gundog-sheet .v-cargo-ruler-y-cells div { height: 40px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+.gundog-sheet .v-cargo-ruler-y-cells .is-fifth { color: #d9534f; box-sizing: border-box; }
+.gundog-sheet .v-cargo-ruler-y-cells .not-fifth { color: #555; }
+
+/* 좌측: 그리드 본체 및 배경 셀 */
+.gundog-sheet .v-cargo-grid-box {
+    position: relative; width: 400px; height: 1200px; background: #e8e8e8;
+    border: 2px solid #555; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); flex-shrink: 0;
+}
+.gundog-sheet .v-cargo-grid-bg {
+    display: grid; grid-template-columns: repeat(10, 40px); grid-template-rows: repeat(30, 40px);
+    width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none;
+}
+.gundog-sheet .v-cargo-cell { border-right: 1px solid #ccc; border-bottom: 1px solid #ccc; box-sizing: border-box; background: transparent; }
+.gundog-sheet .v-cargo-cell.is-inactive { background: rgba(0, 0, 0, 0.6); }
+.gundog-sheet .v-cargo-cell.is-fifth-row { border-bottom: 2px solid #d9534f; }
+
+/* 배치된 아이템 블록 */
+.gundog-sheet .v-cargo-grid-item {
+    position: absolute; background: rgba(0, 86, 179, 0.85); border: 1px solid #002752;
+    color: white; font-size: 10px; font-weight: bold; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; cursor: grab;
+    overflow: hidden; box-shadow: 2px 2px 5px rgba(0,0,0,0.4); z-index: 10; user-select: none;
+}
+.gundog-sheet .v-cargo-grid-item span { word-break: keep-all; font-size: 16px; }
+
+/* 좌측: 간이 중량 규칙 경고 박스 */
+.gundog-sheet .v-cargo-warning {
+    margin-top: 15px; padding: 10px; border: 1px solid #28a745; background: #eaffea;
+    border-radius: 4px; font-size: 12px; color: #1e7e34; line-height: 1.4;
+}
+
+/* 우측: 미배치 아이템 리스트 */
+.gundog-sheet .v-cargo-list-wrap {
+    height: 100%; border: 1px solid #999; padding: 15px; background: #fafafa;
+    border-radius: 4px; overflow-y: auto; position: relative; box-sizing: border-box;
+}
+.gundog-sheet .v-cargo-list-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    border-bottom: 2px solid #0056b3; padding-bottom: 5px; margin-bottom: 15px;
+}
+.gundog-sheet .v-cargo-list-header h4 { margin: 0; color: #0056b3; font-size: 14px; font-weight: bold; }
+.gundog-sheet .v-cargo-list-stat {
+    font-size: 11px; color: #555; background: #e8f4ff; padding: 3px 8px;
+    border-radius: 12px; border: 1px solid #b8daff; font-weight: bold;
+}
+.gundog-sheet .v-cargo-list-stat strong { color: #d9534f; font-size: 14px; margin: 0 4px; }
+
+/* 개별 리스트 아이템 디자인 */
+.gundog-sheet .v-cargo-item {
+    border: 1px solid #ccc; background: #fff; padding: 8px; margin-bottom: 8px;
+    border-radius: 4px; cursor: grab; display: flex; justify-content: space-between;
+    align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.2s, border-color 0.2s;
+}
+.gundog-sheet .v-cargo-item:hover { transform: translateX(2px); border-color: #0056b3; }
+.gundog-sheet .v-cargo-item-left { display: flex; align-items: center; gap: 8px; overflow: hidden; }
+.gundog-sheet .v-cargo-item-badge {
+    font-weight: bold; font-size: 12px; color: #fff; background: #0056b3;
+    width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+    border-radius: 3px; flex-shrink: 0;
+}
+.gundog-sheet .v-cargo-item-name {
+    font-weight: bold; color: #333; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.gundog-sheet .v-cargo-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.gundog-sheet .v-cargo-item-status {
+    font-size: 11px; color: #fff; padding: 3px 8px; border-radius: 12px; font-weight: bold;
+}
+.gundog-sheet .v-cargo-item-status.is-placed { background: #0056b3; }
+.gundog-sheet .v-cargo-item-status.not-placed { background: #555; }
+.gundog-sheet .v-cargo-item-delete { color: #dc3545; cursor: pointer; transition: transform 0.2s; font-size: 14px; }
+.gundog-sheet .v-cargo-item-delete:hover { transform: scale(1.2); }
+
+
+/* ========================================== */
+/* ★ 무기 사격 & 데미지 판정 팝업창 디자인 */
+/* ========================================== */
+
+/* 팝업 전체 껍데기 */
+.gundog-weapon-dialog {
+    background: linear-gradient(to bottom, #ffffff 0%, #F0F4FA 100%);
+    padding: 15px;
+    border-radius: 5px;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 상단 헤더 (캐릭터명, 무기명, 탄약) */
+.gundog-weapon-dialog .w-header {
+    border-bottom: 2px solid #222;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+.gundog-weapon-dialog .w-actor-name {
+    font-size: 12px; color: #666; margin-bottom: 4px;
+}
+.gundog-weapon-dialog .w-actor-name i { color: #0056b3; }
+.gundog-weapon-dialog .w-item-title-row {
+    display: flex; justify-content: space-between; align-items: center;
+}
+.gundog-weapon-dialog .w-item-name {
+    font-size: 16px; font-weight: bold; color: #222;
+}
+.gundog-weapon-dialog .w-range { color: #d9534f; font-size: 14px; margin-left: 4px; }
+.gundog-weapon-dialog .w-ammo-box {
+    font-size: 12px; display: flex; align-items: center; gap: 5px;
+    background: #fff; padding: 4px 8px; border-radius: 4px; border: 1px solid #ddd;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+}
+.gundog-weapon-dialog .w-ammo-box input {
+    width: 35px; text-align: center; height: 22px; font-weight: bold;
+    border: 1px solid #aaa; border-radius: 3px; background: #fafafa;
+}
+
+/* 중간 정보 스탯 줄 */
+.gundog-weapon-dialog .w-stat-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px; font-size: 13px; color: #555;
+}
+.gundog-weapon-dialog .w-stat-row strong { color: #222; }
+.gundog-weapon-dialog .w-stat-highlight {
+    font-size: 14px; font-weight: bold; color: #0056b3;
+    padding: 8px 10px; background: #f4f8ff; border: 1px solid #cce5ff; border-radius: 4px;
+    margin-bottom: 15px; display: flex; justify-content: space-between;
+}
+
+/* 최종 목표값 박스 */
+.gundog-weapon-dialog .w-final-target {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 15px; padding: 12px; background: #fff3cd; 
+    border: 1px solid #ffeeba; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+.gundog-weapon-dialog .w-final-target .label { font-size: 16px; font-weight: bold; color: #856404; }
+.gundog-weapon-dialog .w-final-target .value { font-size: 24px; font-weight: 900; color: #d9534f; }
+
+/* 공통 버튼 디자인 */
+.gundog-weapon-dialog .w-btn {
+    width: 100%; border: none; border-radius: 4px; height: 38px; cursor: pointer;
+    font-weight: bold; font-size: 14px; transition: all 0.2s;
+    display: flex; justify-content: center; align-items: center; gap: 6px;
+}
+.gundog-weapon-dialog .w-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.gundog-weapon-dialog .w-btn-roll { background: #0056b3; color: white; margin-top: 10px; }
+.gundog-weapon-dialog .w-btn-dmg { background: #d9534f; color: white; margin-bottom: 15px; }
+.gundog-weapon-dialog .w-btn-pen { background: #6f42c1; color: white; flex: 2; }
+.gundog-weapon-dialog .w-btn-close { background: #e2e8f0; color: #444; flex: 1; border: 1px solid #cbd5e1; }
+
+/* 섹션 타이틀 및 구분선 */
+.gundog-weapon-dialog .w-divider { margin: 15px 0; border-top: 1px dashed #cbd5e1; }
+.gundog-weapon-dialog .w-section-title {
+    padding-bottom: 6px; margin-bottom: 12px; font-size: 15px; font-weight: bold; border-bottom: 2px solid;
+}
+.gundog-weapon-dialog .w-section-title.red { color: #d9534f; border-color: #d9534f; }
+.gundog-weapon-dialog .w-section-title.purple { color: #6f42c1; border-color: #6f42c1; }
+
+/* 하단 데미지 및 페널티 옵션 구역 */
+.gundog-weapon-dialog .w-options-box {
+    display: flex; justify-content: space-around; align-items: center;
+    margin-bottom: 15px; padding: 10px; background: #fff;
+    border: 1px solid #ddd; border-radius: 4px; box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+}
+.gundog-weapon-dialog .w-options-box label {
+    font-weight: bold; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.gundog-weapon-dialog .w-dmg-bonus { color: #0056b3; }
+
+/* 추가 다이스 및 드롭다운 입력 */
+.gundog-weapon-dialog .w-extra-hits {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 0 5px;
+}
+.gundog-weapon-dialog .w-extra-hits label { font-weight: bold; font-size: 13px; color: #333; }
+.gundog-weapon-dialog .w-extra-hits input,
+.gundog-weapon-dialog .w-options-box select,
+.gundog-weapon-dialog .w-options-box input[type="number"] {
+    text-align: center; font-weight: bold; border: 1px solid #ccc; border-radius: 3px; height: 26px;
+}
+.gundog-weapon-dialog .w-extra-hits input { width: 50px; border: 2px solid #333; font-size: 14px; }
+.gundog-weapon-dialog .w-btn-group { display: flex; gap: 10px; }
+
+/* ========================================== */
+/* ★ 무기 판정 팝업창: 보너스/페널티 입력 박스 디자인 */
+/* ========================================== */
+.gundog-weapon-dialog .w-dialog-modifiers {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+.gundog-weapon-dialog .w-mod-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.gundog-weapon-dialog .w-mod-group label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.gundog-weapon-dialog .w-bonus-group { border-top: 3px solid #28a745; }
+.gundog-weapon-dialog .w-bonus-group label { color: #28a745; }
+
+.gundog-weapon-dialog .w-penalty-group { border-top: 3px solid #dc3545; }
+.gundog-weapon-dialog .w-penalty-group label { color: #dc3545; }
+
+.gundog-weapon-dialog .w-mod-group input {
+    width: 80%;
+    height: 30px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background: #fafafa;
+    transition: all 0.2s;
+}
+.gundog-weapon-dialog .w-mod-group input:focus {
+    border-color: #17a2b8;
+    background: #fff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(23,162,184,0.3);
+}
+
+/* ========================================== */
+/* ★ 주사위 굴림 채팅 메시지 (명중/스킬 공통) */
+/* ========================================== */
+
+.dice-roll.gundog-roll {
+    background: linear-gradient(to bottom, #ffffff 0%, #F0F4FA 100%);
+    border: 1px solid #ccc;
+    border-radius: 8px; /* 요청하신 5px 둥근 모서리 */
+    padding: 0; /* 파운드리의 기본 여백을 없애서 내용물이 꽉 차게 만듭니다 */
+    overflow: hidden; /* 안쪽 내용물이 둥근 모서리를 삐져나가지 않게 자릅니다 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    margin-bottom: 8px;
+}
+.gundog-roll .dice-result {
+    border: 1px solid #ccc;
+    background-color: transparent;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 상단 무기/스킬 이름 헤더 */
+.gundog-roll .gundog-chat-header {
+    background-color: transparent;
+    color: #222;
+    padding: 6px 10px;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+}
+.gundog-roll .gundog-chat-header .range-tag {
+    font-size: 12px;
+    color: #ff9800; /* 눈에 띄는 오렌지색 포인트 */
+    font-weight: normal;
+}
+
+/* 성공률 및 판정 종류 서브헤더 */
+.gundog-roll .gundog-chat-subheader {
+    background: transparent;
+    color: #333;
+    padding: 4px 10px;
+    font-size: 11px;
+    text-align: center;
+    font-weight: bold;
+    border-bottom: 1px dashed #dce4ec;
+}
+
+/* 주사위 연산 과정 */
+.gundog-roll .gundog-chat-formula {
+    background: transparent;
+    border: none !important;
+    font-size: 11px;
+    color: #555;
+}
+
+/* 주사위 최종 결과 값 */
+.gundog-roll .gundog-chat-total {
+    margin: 0;
+    padding: 10px;
+    border: none !important;
+    font-family: 'NEXON Lv1 Gothic OTF' !important;
+    font-size: 32px !important;
+    background: transparent;
+    color: #222;
+}
+
+/* 하단 성공/실패 결과 표시줄 */
+.gundog-roll .gundog-chat-result {
+    color: white;
+    padding: 8px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap; /* 내용이 길면 자연스럽게 줄바꿈 */
+}
+
+/* 결과창 내부 특수 텍스트 강조 */
+.gundog-roll .result-piercing { font-size: 12px; opacity: 0.9; font-weight: normal; }
+.gundog-roll .result-crit { color: #d9534f; text-shadow: 0 0 5px rgba(255,215,0,0.8); }
+.gundog-roll .result-fumble { color: #222; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+
+/* ========================================== */
+/* ★ 데미지 판정 채팅 메시지 (빨간색 테마) */
+/* ========================================== */
+
+/* 헤더: 붉은색 배경 */
+.gundog-roll .gundog-chat-header.dmg-header {
+    background: #d9534f;
+    border-bottom: 1px solid #b52b27;
+}
+
+/* 서브헤더 (관통/비관통): 옅은 붉은색 배경과 붉은 글씨 */
+.gundog-roll .gundog-chat-subheader.dmg-subheader {
+    color: #c9302c;
+    background: #fdf2f2;
+    border-bottom: 1px solid #f5c6cb;
+}
+
+/* 주사위 상세 결과: 길어질 경우 자동 줄바꿈 처리 */
+.gundog-roll .gundog-chat-formula.dmg-formula {
+    word-break: break-all;
+    color: #444;
+}
+
+/* 최종 데미지 숫자: 크고 붉은 글씨 */
+.gundog-roll .gundog-chat-total.dmg-total {
+    color: #d9534f;
+}
+
+/* ========================================== */
+/* ★ 대미지 페널티 굴림 채팅 메시지 (보라색 테마) */
+/* ========================================== */
+
+/* 하단 페널티 상세 정보 박스 */
+.gundog-chat-card .chat-penalty-box {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #6f42c1;
+    background: #fff;
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: left;
+}
+
+/* 페널티 효과 이름 (붉은 점선 밑줄) */
+.gundog-chat-card .chat-penalty-effect {
+    font-weight: bold;
+    color: #d9534f;
+    margin-bottom: 6px;
+    border-bottom: 1px dotted #d9534f;
+    padding-bottom: 4px;
+    text-align: center;
+    font-size: 14px;
+}
+
+/* 추가 대미지 및 출혈 등 수치 정보 */
+.gundog-chat-card .chat-penalty-details {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #444;
+}
+.gundog-chat-card .chat-penalty-details strong {
+    color: #6f42c1; /* 라벨에 보라색 포인트 */
+}
+
+
+
 
 /* ========================================== */
 /* 아이템 시트 (Item Sheet) 글로벌 스타일        */

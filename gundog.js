@@ -66,16 +66,34 @@ Hooks.on("renderChatMessage", (message, html, data) => {
 
     // 새로운 채팅 메시지 카드 생성
     const chatContent = `
-    <div class="dice-roll gundog-roll">
-      <div class="dice-result">
-        <div class="dice-formula" style="background:#d9534f; color:white; border-radius:4px 4px 0 0;"><i class="fas fa-tint"></i> ${title}</div>
-        <div class="dice-formula" style="font-size:12px; border-top:none; font-weight:bold; color:#d9534f;">대미지 굴림</div>
-        <div class="dice-tooltip" style="padding:5px; background:#fff; border:1px solid #ccc; font-size:12px; margin-bottom:5px; word-break:break-all;">
-          결과: ( ${detailString} )
-        </div>
-        <h4 class="dice-total" style="color:#d9534f;">총 ${roll.total} 데미지</h4>
-      </div>
-    </div>`;
+    <div class="dice-roll">
+            <div class="gundog-chat-card" style="border-top: 4px solid #d9534f;">
+              
+              <div class="chat-header">
+                <h3 class="chat-skill-name">
+                  <i class="fas fa-tint" style="color:#d9534f;"></i> ${title}
+                </h3>
+                <div class="chat-target">
+                  <strong style="color:#d9534f;">대미지 굴림</strong>
+                </div>
+              </div>
+              
+              <div class="chat-details">
+                <div class="chat-calc" style="word-break:break-all; padding:6px;">
+                  결과: ( ${detailString} )
+                </div>
+              </div>
+              
+              <div class="chat-dice-total" style="color:#d9534f;">
+                ${roll.total}
+              </div>
+              
+              <div class="chat-outcome failure">
+                <i class="fas fa-burst"></i> 총 대미지 발생
+              </div>
+              
+            </div>
+          </div>`;
 
     await ChatMessage.create({
       speaker: speaker,
@@ -391,6 +409,8 @@ class GundogActorSheet extends ActorSheet {
 
     return context;
   }
+
+  //캐릭터 시트 부분
 
   activateListeners(html) {
     super.activateListeners(html);
@@ -1037,7 +1057,19 @@ class GundogActorSheet extends ActorSheet {
         // 장착 해제 시 자동으로 소지 방어구 목록으로 돌아갑니다.
         await item.update({ "system.equipped": false });
       }
-    });    
+    });
+    
+    // 🌟 [추가] 캐릭터 시트에서 스마트폰 모듈 실행
+        html.find('.btn-open-smartphone').click(ev => {
+            ev.preventDefault(); // 기본 클릭 동작(링크 이동 등) 방지
+            
+            // 토큰을 찾을 필요 없이, 현재 열려있는 시트의 주인(this.actor)을 바로 넘겨줍니다!
+            if (window.GundogSmartphoneApp) {
+                new window.GundogSmartphoneApp(this.actor).render(true);
+            } else {
+                ui.notifications.error("📱 스마트폰 시스템이 로드되지 않았거나 오류가 있습니다.");
+            }
+        });
   }
 
   // ★ 초기화 기능 함수들 추가 ★
@@ -1268,48 +1300,131 @@ class GundogActorSheet extends ActorSheet {
       return;
     }
 
-    const targetValue = skill.targetValue;
-
-    // ★ 수정: 1d100으로 굴리고 3D 주사위용 데이터 생성
-    const roll = await new Roll("1d100").evaluate();
-    const total = roll.total;
+    const skillName = $(button).find('.s-name').text().trim() || skillKey.toUpperCase();
     
+    // =======================================================
+    // ★ 변수 선언부 (이곳에서 baseTarget이 정의됩니다!)
+    // =======================================================
+    const targetValue = Number(skill.targetValue) || 0;
     const skillLv = Number(skill.lv) || 0;
-    // 1d100 결과에서 10의 자리와 1의 자리 및 달성치 연산
-    const tensValue = total === 100 ? 0 : Math.floor(total / 10) * 10;
-    const onesValue = total === 100 ? 0 : total % 10;
-    const achievement = Math.floor(tensValue / 10) + onesValue + skillLv;
+    const itemMod = Number(skill.itemMod) || 0;
+    const baseTarget = targetValue - itemMod; 
 
-    const isSuccess = total <= targetValue;
-    const resultText = isSuccess ? "성공 (SUCCESS)" : "실패 (FAILURE)";
-    const resultColor = isSuccess ? "#28a745" : "#dc3545";
-
-    let resultType = "NORMAL";
-    if (total === 100) resultType = "FUMBLE";
-    else if (isSuccess && onesValue === 0) resultType = "CRITICAL";
-
-    const content = `
-    <div class="dice-roll gundog-roll">
-      <div class="dice-result">
-        <div class="dice-formula">${skillKey.toUpperCase()} 판정 (목표: 1d100 <= ${targetValue})</div>
-        <div class="dice-formula">10의 자리 (${tensValue}) + 1의 자리 (${onesValue}) + 스킬 Lv(${skillLv})</div>
-        <h4 class="dice-total">${total}</h4>
-        <div style="background:${resultColor}; color:white; padding:5px; text-align:center;">
-          ${resultText}
-          ${isSuccess ? ` | 달성치(${achievement})` : ""}
-          ${resultType === "CRITICAL" ? " 🔥CRITICAL" : ""}
-          ${resultType === "FUMBLE" ? " 💀FUMBLE" : ""}
+    // =======================================================
+    // 1. 팝업 창(Dialog) HTML 템플릿
+    // =======================================================
+    let dialogTemplate = `
+      <div class="gundog-roll-dialog">
+        
+        <div class="dialog-header">
+          <h3 class="dialog-skill-name">${skillName} 판정</h3>
+          <div class="dialog-target">
+            <span class="base-val">기본 ${baseTarget}</span>
+            <span class="item-val">${itemMod >= 0 ? '+' : ''}${itemMod} (장비)</span>
+            <span class="equals">=</span>
+            <strong>${targetValue}</strong>
+          </div>
         </div>
-      </div>
-    </div>`;
 
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-      content,
-      type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-      sound: CONFIG.sounds.dice,
-      rolls: [roll] // ★ 핵심: 3D 주사위(Dice So Nice!)에 데이터를 전달합니다
-    });
+        <div class="dialog-modifiers">
+          <div class="mod-group bonus-group">
+            <label>보너스 (+)</label>
+            <input type="number" id="roll-bonus" value="0" autofocus />
+          </div>
+          <div class="mod-group penalty-group">
+            <label>페널티 (-)</label>
+            <input type="number" id="roll-penalty" value="0" />
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    // =======================================================
+    // 2. 팝업 창 실행 및 버튼 동작
+    // =======================================================
+    new Dialog({
+      title: `${skillName} 판정`,
+      content: dialogTemplate,
+      buttons: {
+        roll: {
+          label: "",
+          icon: '<i class="fas fa-dice-d20"></i>',
+          callback: async (html) => {
+            const bonus = parseInt(html.find('#roll-bonus').val()) || 0;
+            const penalty = parseInt(html.find('#roll-penalty').val()) || 0;
+            const finalModifier = bonus - penalty;
+            const finalTarget = targetValue + finalModifier;
+
+            const roll = await new Roll("1d100").evaluate({async: true});
+            const total = roll.total;
+            
+            const tensValue = total === 100 ? 0 : Math.floor(total / 10) * 10;
+            const onesValue = total === 100 ? 0 : total % 10;
+            const achievement = Math.floor(tensValue / 10) + onesValue + skillLv;
+
+            const isSuccess = total <= finalTarget; 
+            const resultText = isSuccess ? "성공" : "실패";
+            const resultColor = isSuccess ? "#28a745" : "#dc3545";
+
+            let resultType = "NORMAL";
+            if (total === 100) resultType = "FUMBLE";
+            else if (isSuccess && onesValue === 0) resultType = "CRITICAL";
+
+            let modifierInfo = "";
+            if (finalModifier !== 0) {
+              modifierInfo = `<div class="chat-modifier">수정치 적용: <strong>${finalModifier > 0 ? '+'+finalModifier : finalModifier}</strong></div>`;
+            }
+
+            // 성공/실패에 따라 클래스 이름 부여 (CSS에서 색상 제어)
+            const resultStatusClass = isSuccess ? "success" : "failure";
+
+            // 새로운 채팅창 카드 HTML 구조
+            const content = `
+            <div class="gundog-chat-card">
+              
+              <div class="chat-header">
+                <h3 class="chat-skill-name">${skillName}</h3>
+                <span class="chat-target">성공률: <strong>${finalTarget}</strong> </span>
+              </div>
+              
+              <div class="chat-details">
+                ${modifierInfo}
+                <div class="chat-calc">10의 자리(${tensValue / 10}) + 1의 자리(${onesValue}) + 스킬 Lv(${skillLv})</div>
+              </div>
+              
+              <div class="chat-roll-result">
+                <div class="chat-dice-total">${total}</div>
+                <div class="chat-outcome ${resultStatusClass}">
+                  ${resultText}
+                  ${isSuccess ? `<span class="chat-achievement">| 달성치(${achievement})</span>` : ""}
+                  ${resultType === "CRITICAL" ? `<span class="chat-critical">🔥CRITICAL</span>` : ""}
+                  ${resultType === "FUMBLE" ? `<span class="chat-fumble">💀FUMBLE</span>` : ""}
+                </div>
+              </div>
+              
+            </div>`;
+
+            await ChatMessage.create({
+              speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+              content,
+              type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+              sound: CONFIG.sounds.dice,
+              rolls: [roll]
+            });
+          }
+        },
+        cancel: {
+          label: "",
+          icon: '<i class="fas fa-times"></i>'
+        }
+      },
+      default: "roll"
+    }, 
+    {
+      classes: ["dialog", "gundog-roll-app"], 
+      width: 320 
+    }).render(true);
   }
 }
 
@@ -1444,6 +1559,8 @@ class GundogItemSheet extends ItemSheet {
     }
     return context;
   }
+
+  //아이템 시트 부분
 
   activateListeners(html) {
     super.activateListeners(html);
@@ -1699,118 +1816,114 @@ class GundogItemSheet extends ItemSheet {
     const maxAmmo = (Number(this.item.system.ammo?.max) || 0) + ammoMaxBonus;
 
     const content = `
-      <form style="padding:10px;">
+     <form class="gundog-weapon-dialog">
         
-        <h3 style="border-bottom:2px solid #222; padding-bottom:8px; margin-bottom:15px; display:flex; flex-direction:column; gap:4px; line-height:1.2;">
-          <div style="font-size:12px; color:#666; font-weight:normal;">
-            <i class="fas fa-user" style="color:#0056b3;"></i> ${this.item.actor.name}
+        <div class="w-header">
+          <div class="w-actor-name">
+            <i class="fas fa-user"></i> ${this.item.actor.name}
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-size:16px;">
-              <i class="fas fa-crosshairs"></i> ${this.item.name} <span style="color:#d9534f; font-size:14px;">(${rangeLabel})</span>
+          <div class="w-item-title-row">
+            <div class="w-item-name">
+              <i class="fas fa-crosshairs"></i> ${this.item.name} <span class="w-range">(${rangeLabel})</span>
             </div>
-            
-            <div style="font-size:12px; font-weight:normal; display:flex; align-items:center; gap:5px; background:#f4f4f4; padding:3px 6px; border-radius:4px; border:1px solid #ccc;">
+            <div class="w-ammo-box">
               <i class="fas fa-cubes" style="color:#666;"></i> 탄약:
-              <input type="number" id="dialog-ammo-value" value="${currentAmmo}" style="width:35px; text-align:center; height:20px; font-weight:bold; border:1px solid #aaa; border-radius:3px; background:#fff; color:#333;" />
+              <input type="number" id="dialog-ammo-value" value="${currentAmmo}" />
               <span style="font-weight:bold; color:#666;">/ ${maxAmmo}</span>
             </div>
           </div>
-        </h3>
+        </div>
         
-        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:13px; color:#555;">
+        <div class="w-stat-row">
           <span>스킬 목표값 (${GUNDOG.skillNames[skillKey]}):</span> <strong>${baseTarget}</strong>
         </div>
         ${sniperText}
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:13px; color:#555;">
+        <div class="w-stat-row">
           <span>사거리 보정 (기본+부착물):</span> <strong>+${wBuff} / -${wPenalty}</strong>
         </div>
         
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:14px; font-weight:bold; color:#0056b3; padding:5px; background:#f4f8ff; border:1px solid #cce5ff;">
+        <div class="w-stat-highlight">
           <span>1차 연산 목표값:</span> <span>${initialTarget}</span>
         </div>
         
-        <div style="display:flex; gap:10px;">
-          <div class="form-group" style="flex:1;">
-            <label style="font-weight:bold; color:#28a745;">추가 보너스 (+)</label>
-            <input type="number" id="roll-bonus" value="0" style="width:100%; text-align:center; height:30px; font-size:14px; border:2px solid #28a745;"/>
+        <div class="w-dialog-modifiers">
+          <div class="w-mod-group w-bonus-group">
+            <label>추가 보너스 (+)</label>
+            <input type="number" id="roll-bonus" value="0" />
           </div>
-          <div class="form-group" style="flex:1;">
-            <label style="font-weight:bold; color:#dc3545;">추가 페널티 (-)</label>
-            <input type="number" id="roll-penalty" value="0" style="width:100%; text-align:center; height:30px; font-size:14px; border:2px solid #dc3545;"/>
+          <div class="w-mod-group w-penalty-group">
+            <label>추가 페널티 (-)</label>
+            <input type="number" id="roll-penalty" value="0" />
           </div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px; padding:10px; background:#fff3cd; border:1px solid #ffeeba; border-radius:4px;">
-          <span style="font-size:16px; font-weight:bold; color:#856404;">최종 목표값:</span>
-          <span id="final-target" style="font-size:24px; font-weight:bold; color:#d9534f;">${initialTarget}</span>
+        <div class="w-final-target">
+          <span class="label">최종 목표값:</span>
+          <span id="final-target" class="value">${initialTarget}</span>
         </div>
 
-        <button type="button" id="custom-roll-btn" style="width:100%; margin-top:10px; background:#0056b3; color:white; border:none; border-radius:3px; height:36px; cursor:pointer; font-weight:bold; font-size:13px;">
+        <button type="button" id="custom-roll-btn" class="w-btn w-btn-roll">
           <i class="fas fa-dice-d10"></i> 명중 판정 굴림
         </button>
 
-        <hr style="margin:20px 0; border-top:1px dashed #ccc;">
+        <hr class="w-divider">
 
-        <h3 style="border-bottom:2px solid #d9534f; padding-bottom:5px; margin-bottom:15px; color:#d9534f;">
+        <h3 class="w-section-title red">
           <i class="fas fa-burst"></i> 데미지 굴림
         </h3>
         
-        <div style="display:flex; justify-content:space-around; margin-bottom:15px; padding:8px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px;">
-          <label style="font-weight:bold; font-size:13px; cursor:pointer;">
+        <div class="w-options-box">
+          <label>
             <input type="radio" name="damage-type" value="non-pen" checked> 
-            비관통 (${dmgNonPen} <span style="color:blue;">${dmgNonPenBonus ? '+ ' + dmgNonPenBonus : ''}</span>)
+            비관통 (${dmgNonPen} <span class="w-dmg-bonus">${dmgNonPenBonus ? '+ ' + dmgNonPenBonus : ''}</span>)
           </label>
-          <label style="font-weight:bold; font-size:13px; cursor:pointer;">
+          <label>
             <input type="radio" name="damage-type" value="pen"> 
-            관통 (${dmgPen} <span style="color:blue;">${dmgPenBonus ? '+ ' + dmgPenBonus : ''}</span>)
+            관통 (${dmgPen} <span class="w-dmg-bonus">${dmgPenBonus ? '+ ' + dmgPenBonus : ''}</span>)
           </label>
         </div>
 
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:15px; padding:0 5px;">
-          <label style="font-weight:bold; font-size:13px; color:#333;">명중 횟수에 따른 추가 다이스 (+Xd6)</label>
+        <div class="w-extra-hits">
+          <label>명중 횟수에 따른 추가 다이스 (+Xd6)</label>
           <div style="display:flex; align-items:center; gap:5px;">
-            <input type="number" id="extra-hits" value="0" min="0" style="width:50px; text-align:center; height:28px; font-size:14px; font-weight:bold; border:2px solid #333;"/>
+            <input type="number" id="extra-hits" value="0" min="0" />
             <span style="font-weight:bold; font-size:14px;">d6</span>
           </div>
         </div>
 
-        <div style="display:flex; gap:10px; margin-bottom:15px;">
-          <button type="button" id="custom-damage-btn" style="width:100%; background:#d9534f; color:white; border:none; border-radius:3px; height:36px; cursor:pointer; font-weight:bold; font-size:13px;">
-            <i class="fas fa-dice"></i> 데미지 굴림
-          </button>
-        </div>
+        <button type="button" id="custom-damage-btn" class="w-btn w-btn-dmg">
+          <i class="fas fa-dice"></i> 데미지 굴림
+        </button>
 
-        <hr style="margin:20px 0; border-top:1px dashed #ccc;">
+        <hr class="w-divider">
 
-        <h3 style="border-bottom:2px solid #6f42c1; padding-bottom:5px; margin-bottom:15px; color:#6f42c1;">
+        <h3 class="w-section-title purple">
           <i class="fas fa-skull-crossbones"></i> 대미지 페널티 굴림 (2d9)
         </h3>
         
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px; padding:8px; background:#f9f9f9; border:1px solid #ddd; border-radius:4px;">
-          <label style="font-weight:bold; font-size:13px; display:flex; align-items:center; gap:5px;">
-            종류:
-            <select id="penalty-type" style="height:24px; font-size:12px;">
+        <div class="w-options-box">
+          <label>종류:
+            <select id="penalty-type">
               <option value="shooting">사격</option>
               <option value="melee">격투</option>
               <option value="vehicle">차량</option>
               <option value="general">범용</option>
             </select>
           </label>
-          <label style="font-weight:bold; font-size:13px; display:flex; align-items:center; gap:5px;">
-            보정치:
-            <input type="number" id="penalty-mod" value="0" style="width:50px; text-align:center; height:24px; font-weight:bold; border:1px solid #ccc;"/>
+          <label>보정치:
+            <input type="number" id="penalty-mod" value="0" />
           </label>
         </div>
 
-        <div style="display:flex; gap:10px;">
-          <button type="button" id="custom-penalty-btn" style="flex:2; background:#6f42c1; color:white; border:none; border-radius:3px; height:36px; cursor:pointer; font-weight:bold; font-size:13px;">
+        <div class="w-btn-group">
+          <button type="button" id="custom-penalty-btn" class="w-btn w-btn-pen">
             <i class="fas fa-skull"></i> 페널티 굴림
           </button>
-          <button type="button" id="custom-close-btn" style="flex:1; border:1px solid #999; border-radius:3px; height:36px; cursor:pointer; background:#f0f0f0; font-weight:bold;">
+          <button type="button" id="custom-close-btn" class="w-btn w-btn-close">
             닫기
           </button>
         </div>
+        
       </form>
     `;
 
@@ -1899,19 +2012,30 @@ class GundogItemSheet extends ItemSheet {
           else if (isSuccess && onesValue === 0) resultType = "CRITICAL";
 
           const chatContent = `
-          <div class="dice-roll gundog-roll">
+          <div class="dice-roll gundog-roll" style="border-radius:5px;">
             <div class="dice-result">
-              <div class="dice-formula" style="background:#222; color:white; border-radius:4px 4px 0 0;">
-                <i class="fas fa-crosshairs"></i> ${this.item.name} (${rangeLabel})
+              
+              <div class="gundog-chat-header">
+                <i class="fas fa-crosshairs"></i> ${this.item.name} <span class="range-tag">(${rangeLabel})</span>
               </div>
-              <div class="dice-formula" style="font-size:12px; border-top:none;">
-                ${GUNDOG.skillNames[skillKey]} 판정 (성공률: ${finalTargetValue})
+              
+              <div class="gundog-chat-subheader">
+                ${GUNDOG.skillNames[skillKey]} (성공률: ${finalTargetValue})
               </div>
-              <div class="dice-formula">주사위 값: ${tensValue} + ${onesValue}</div>
-              <h4 class="dice-total">${total}</h4>
-              <div style="background:${resultColor}; color:white; padding:6px; text-align:center; font-weight:bold; font-size:14px; border-radius:0 0 4px 4px;">
-                ${resultText} ${isSuccess ? ` | 관통력(${finalPiercing})` : ""} ${resultType === "CRITICAL" ? " 🔥CRITICAL" : ""} ${resultType === "FUMBLE" ? " 💀FUMBLE" : ""}
+              
+              <div class="dice-formula gundog-chat-formula">
+                10의 자리(${tensValue / 10}) + 1의 자리(${onesValue})
               </div>
+              
+              <h4 class="dice-total gundog-chat-total" style="color:#000000">${total}</h4>
+              
+              <div class="gundog-chat-result" style="background:${resultColor};">
+                <span>${resultText}</span>
+                ${isSuccess ? `<span class="result-piercing">| 관통력(${finalPiercing})</span>` : ""}
+                ${resultType === "CRITICAL" ? `<span class="result-crit"><i class="fas fa-fire"></i> CRITICAL</span>` : ""}
+                ${resultType === "FUMBLE" ? `<span class="result-fumble"><i class="fas fa-skull"></i> FUMBLE</span>` : ""}
+              </div>
+              
             </div>
           </div>`;
 
@@ -1951,16 +2075,26 @@ class GundogItemSheet extends ItemSheet {
           let detailString = detailParts.join(" ");
 
           const chatContent = `
-          <div class="dice-roll gundog-roll">
-            <div class="dice-result">
-              <div class="dice-formula" style="background:#d9534f; color:white; border-radius:4px 4px 0 0;"><i class="fas fa-burst"></i> ${this.item.name}</div>
-              <div class="dice-formula" style="font-size:12px; border-top:none; font-weight:bold; color:#d9534f;">${damageLabel}</div>
-              <div class="dice-tooltip" style="padding:5px; background:#fff; border:1px solid #ccc; font-size:12px; margin-bottom:5px; word-break:break-all;">
-                결과: ( ${detailString} )
+          <div class="dice-roll">
+            <div class="gundog-chat-card">
+              
+              <div class="chat-header">
+                <h3 class="chat-skill-name"><i class="fas fa-burst" style="color:#d9534f;"></i> ${this.item.name}</h3>
+                <div class="chat-target">
+                  <strong style="color:#444;font-size:12px">${damageLabel}</strong>
+                </div>
               </div>
-              <h4 class="dice-total" style="color:#d9534f;">총 ${roll.total} 데미지</h4>
-            </div>
-          </div>`;
+              
+              <div class="chat-details">
+                <div class="chat-calc" style="word-break:break-all; padding:6px;">
+                  값: ( ${detailString} )
+                </div>
+              </div>
+              
+              <div class="chat-dice-total" style="color:#292929; margin-bottom:0px">
+                ${roll.total}
+              </div>
+              `;
 
           await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({ actor: this.item.actor }), content: chatContent, type: CONST.CHAT_MESSAGE_TYPES.ROLL, sound: CONFIG.sounds.dice, rolls: [roll]
@@ -2113,22 +2247,35 @@ class GundogItemSheet extends ItemSheet {
 
           // 채팅창에 띄울 내용 조합
           const chatContent = `
-          <div class="dice-roll gundog-roll">
-            <div class="dice-result">
-              <div class="dice-formula" style="background:#6f42c1; color:white; border-radius:4px 4px 0 0;"><i class="fas fa-skull"></i> ${typeLabels[pType]} 대미지 페널티</div>
-              <div class="dice-tooltip" style="padding:5px; background:#fff; border:1px solid #ccc; font-size:12px; margin-bottom:5px; word-break:break-all;">
-                페널티 굴림: ( ${detailString} )
+          <div class="dice-roll">
+            <div class="gundog-chat-card" style="border-top: 4px solid #6f42c1;">
+              
+              <div class="chat-header">
+                <h3 class="chat-skill-name">
+                  <i class="fas fa-skull" style="color:#6f42c1;"></i> ${typeLabels[pType]} 페널티
+                </h3>
               </div>
-              <h4 class="dice-total" style="color:#6f42c1; font-size:20px;">판정값 ${total}</h4>
-              <div style="margin-top:5px; padding:10px; border:1px solid #6f42c1; background:#f8f0ff; border-radius:4px; font-size:13px; text-align:left;">
-                <div style="font-weight:bold; color:#d9534f; margin-bottom:6px; border-bottom:1px dotted #d9534f; padding-bottom:4px;">
+              
+              <div class="chat-details">
+                <div class="chat-calc" style="word-break:break-all; padding:6px;">
+                  굴림: ( ${detailString} )
+                </div>
+              </div>
+              
+              <div class="chat-dice-total" style="color:#6f42c1;">
+                ${total}
+              </div>
+              
+              <div class="chat-penalty-box">
+                <div class="chat-penalty-effect">
                   ${resultData.effect}
                 </div>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="chat-penalty-details">
                   <span><strong>추가 대미지:</strong> ${addDmgDetail}</span>
                   <span><strong>${bleedLabel}:</strong> ${bleedDetail}</span>
                 </div>
               </div>
+              
             </div>
           </div>`;
 

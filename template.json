@@ -29,23 +29,10 @@
             "throwing": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
             "toughness": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 }
           },
-          "negotiation": {
-            "negotiation": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
-            "psychology": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
-            "procurement": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 }
-          },
           "exercise": {
             "athletics": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
             "urbanAction": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
             "fieldcraft": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 }
-          },
-          "generalEducation": {
-            "tactics": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
-            "dataProcessing": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0, "isSpecialty": true },
-            "survival": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
-            "knowledge": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
-            "language": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
-            "art": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 }
           },
           "perception": {
             "situationalAwareness": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
@@ -59,6 +46,19 @@
             "medical": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0, "isSpecialty": true },
             "communications": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0, "isSpecialty": true },
             "piloting": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 }
+          },
+          "generalEducation": {
+            "tactics": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
+            "dataProcessing": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0, "isSpecialty": true },
+            "survival": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
+            "knowledge": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
+            "language": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
+            "art": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 }
+          },
+          "negotiation": {
+            "negotiation": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
+            "psychology": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 },
+            "procurement": { "lv": 0, "value": 0, "bonus": 0, "penalty": 0 }
           }
         }
       },
